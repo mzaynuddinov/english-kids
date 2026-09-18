@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0e7490"/><stop offset=".45" stop-color="#083344"/><stop offset="1" stop-color="#020617"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#22d3ee"/><stop offset=".55" stop-color="#06b6d4"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect x="5" y="5" width="190" height="190" rx="30" fill="url(#bg)" stroke="#22d3ee" stroke-width="2"/>
+<path d="M12 74C38 29 81 13 139 22C92 20 49 38 18 89Z" fill="#164e63"/>
+<path d="M18 42C52 15 92 10 137 18C86 14 50 31 25 58Z" fill="#0e7490"/>
+<g filter="url(#glow)" fill="url(#cyan)" stroke="#67e8f9" stroke-width="1.2">
+<path d="M35 119C39 86 61 62 95 54C72 61 54 78 49 105L81 118L62 132Z"/>
+<path d="M100 91C117 70 140 64 160 68L166 111L128 119L100 104Z"/>
+<path d="M98 105L76 118L98 135L122 118Z"/>
+</g>
+<text x="84" y="82" fill="#22d3ee" font-family="Arial,sans-serif" font-weight="800" font-size="43" transform="rotate(-8 84 82)">A</text>
+<text x="116" y="70" fill="#ecfeff" font-family="Arial,sans-serif" font-weight="800" font-size="28" transform="rotate(-8 116 70)">B</text>
+<text x="143" y="68" fill="#22d3ee" font-family="Arial,sans-serif" font-weight="800" font-size="21" transform="rotate(-8 143 68)">C</text>
+<path d="M165 24l2 7 7 2-7 2-2 7-2-7-7-2 7-2z" fill="#ecfeff"/>
+<text x="100" y="158" text-anchor="middle" fill="#a5f3fc" font-family="Arial,sans-serif" font-weight="800" font-size="19">Англисиро Омӯз</text>
+<path d="M38 172h48M114 172h48" stroke="#06b6d4"/>
+<text x="100" y="178" text-anchor="middle" fill="#22d3ee" font-family="Arial,sans-serif" font-size="14">▣</text>
+</svg>
