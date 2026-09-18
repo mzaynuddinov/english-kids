@@ -1,7 +1,7 @@
 name: english_kids
 description: English learning app for Tajik-speaking children aged 8-10.
 publish_to: "none"
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -22,3 +22,4 @@ flutter:
   uses-material-design: true
   assets:
     - data/vocabulary.json
+    - assets/logo.svg
