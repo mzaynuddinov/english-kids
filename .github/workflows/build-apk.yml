@@ -25,6 +25,9 @@ jobs:
       - name: Generate Android platform
         run: flutter create --platforms=android .
 
+      - name: Enable Android core library desugaring
+        run: python3 -c "from pathlib import Path; p=Path('android/app/build.gradle.kts'); s=p.read_text(encoding='utf-8'); s=s.replace('compileOptions {', 'compileOptions {\\n        isCoreLibraryDesugaringEnabled = true', 1); s += '\\ndependencies {\\n    coreLibraryDesugaring(\"com.android.tools:desugar_jdk_libs:2.1.4\")\\n}\\n'; p.write_text(s,encoding='utf-8')"
+
       - name: Configure Android manifest
         run: python3 -c "from pathlib import Path; p=Path('android/app/src/main/AndroidManifest.xml'); s=p.read_text(encoding='utf-8'); perms='    <uses-permission android:name=\\\"android.permission.POST_NOTIFICATIONS\\\" />\\n    <uses-permission android:name=\\\"android.permission.SCHEDULE_EXACT_ALARM\\\" />\\n    <uses-permission android:name=\\\"android.permission.WAKE_LOCK\\\" />\\n    <uses-permission android:name=\\\"android.permission.RECEIVE_BOOT_COMPLETED\\\" />\\n'; s=s.replace('<application ', perms+'<application ', 1) if 'android.permission.POST_NOTIFICATIONS' not in s else s; s=s.replace('android:label=\\\"english_kids\\\"','android:label=\\\"Англисиро Омӯз\\\"'); p.write_text(s,encoding='utf-8')"
 
