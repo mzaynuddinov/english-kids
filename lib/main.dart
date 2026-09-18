@@ -241,7 +241,7 @@ class _HomeShellState extends State<HomeShell> {
       week: week, title: weekNames[week]!,
       words: words.where((w) => w.week == week).toList(),
       learned: learned, saved: saved, speak: _speak,
-      onSave: _toggleSave, onLearn: _learn,
+      onSave: _toggleSave, onLearn: _learn, onTimer: _scheduleWord,
     )));
     _loadData();
   }
@@ -253,7 +253,7 @@ class _HomeShellState extends State<HomeShell> {
   @override Widget build(BuildContext context) {
     final pages = [
       _home(),
-      SavedPage(words: words, saved: saved, learned: learned, speak: _speak, onSave: _toggleSave, onLearn: _learn),
+      SavedPage(words: words, saved: saved, learned: learned, speak: _speak, onSave: _toggleSave, onLearn: _learn, onTimer: _scheduleWord),
       ProgressPage(words: words, learned: learned),
     ];
     return Scaffold(
