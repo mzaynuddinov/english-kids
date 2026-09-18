@@ -25,8 +25,37 @@ jobs:
       - name: Generate Android platform
         run: flutter create --platforms=android .
 
+      - name: Configure Android app identity and alarms
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          text = p.read_text(encoding='utf-8')
+          if 'android.permission.POST_NOTIFICATIONS' not in text:
+              permissions = '''
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />'''
+              text = re.sub(r'(<manifest[^>]*>)', r'\1' + permissions, text, count=1)
+          text = text.replace('android:label="english_kids"', 'android:label="Англисиро Омӯз"')
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Render launcher image
+        run: convert assets/logo.svg -background '#020617' -resize 1024x1024 assets/launcher.png
+
       - name: Get packages
         run: flutter pub get
+
+      - name: Generate launcher icon
+        run: dart run flutter_launcher_icons
+
+      - name: Analyze Dart code
+        run: flutter analyze
+
 
       - name: Build APK
         run: flutter build apk --release
