@@ -13,6 +13,8 @@ const emerald600 = Color(0xFF059669);
 const teal500 = Color(0xFF14B8A6);
 const cyan500 = Color(0xFF06B6D4);
 const sky500 = Color(0xFF0EA5E9);
+const blue500 = Color(0xFF3B82F6);
+const indigo600 = Color(0xFF4F46E5);
 const slate700 = Color(0xFF334155);
 const slate800 = Color(0xFF1E293B);
 const slate900 = Color(0xFF0F172A);
@@ -740,7 +742,7 @@ class _QuizPageState extends State<QuizPage> {
       body: SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         LinearProgressIndicator(value: (index + 1) / 5, minHeight: 8, borderRadius: BorderRadius.circular(99), color: cyan500),
         const SizedBox(height: 22),
-        Text('Саволи \${index + 1} аз 5', style: const TextStyle(fontWeight: FontWeight.w800, color: cyan500)),
+        Text('Саволи ${index + 1} аз 5', style: const TextStyle(fontWeight: FontWeight.w800, color: cyan500)),
         const SizedBox(height: 10),
         Card(child: Padding(padding: const EdgeInsets.all(22), child: Column(children: [
           const Icon(Icons.translate_rounded, size: 42, color: teal500),
@@ -766,7 +768,7 @@ class _QuizPageState extends State<QuizPage> {
             if (index == 4) {
               showDialog(context: context, builder: (_) => AlertDialog(
                 title: const Text('Офарин! 🎉'),
-                content: Text('Натиҷа: \$score / 5'),
+                content: Text('Натиҷа: $score / 5'),
                 actions: [TextButton(onPressed: () => Navigator.popUntil(context, (r) => r.isFirst), child: const Text('Тамом'))],
               ));
             } else {
