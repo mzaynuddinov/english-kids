@@ -463,8 +463,8 @@ class WeekPage extends StatelessWidget {
   final int week; final String title; final List<Word> words;
   final Set<String> learned, saved;
   final Future<void> Function(String) speak;
-  final Future<void> Function(Word) onSave, onLearn;
-  const WeekPage({super.key, required this.week, required this.title, required this.words, required this.learned, required this.saved, required this.speak, required this.onSave, required this.onLearn});
+  final Future<void> Function(Word) onSave, onLearn, onTimer;
+  const WeekPage({super.key, required this.week, required this.title, required this.words, required this.learned, required this.saved, required this.speak, required this.onSave, required this.onLearn, required this.onTimer});
 
   @override Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text('Ҳафтаи ' + week.toString())),
@@ -486,55 +486,58 @@ class WeekPage extends StatelessWidget {
           ]),
         ),
         const SizedBox(height: 16),
-        ...words.map((w) => WordCard(word: w, learned: learned.contains(w.english), saved: saved.contains(w.english), speak: speak, onSave: onSave, onLearn: onLearn)),
+        ...words.map((w) => WordCard(word: w, learned: learned.contains(w.english), saved: saved.contains(w.english), speak: speak, onSave: onSave, onLearn: onLearn, onTimer: onTimer)),
       ],
     )),
   );
 }
 
-class WordCard extends StatelessWidget {
+class WordCard extends StatefulWidget {
   final Word word; final bool learned, saved;
   final Future<void> Function(String) speak;
-  final Future<void> Function(Word) onSave, onLearn;
-  const WordCard({super.key, required this.word, required this.learned, required this.saved, required this.speak, required this.onSave, required this.onLearn});
-
+  final Future<void> Function(Word) onSave, onLearn, onTimer;
+  const WordCard({super.key, required this.word, required this.learned, required this.saved, required this.speak, required this.onSave, required this.onLearn, required this.onTimer});
+  @override State<WordCard> createState() => _WordCardState();
+}
+class _WordCardState extends State<WordCard> {
+  bool pressed = false;
   @override Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
-    child: Card(child: InkWell(
-      borderRadius: BorderRadius.circular(22), onTap: () => speak(word.english),
-      child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
-        Row(children: [
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(color: cyan500.withValues(alpha: .12), borderRadius: BorderRadius.circular(10)),
-            child: Text(word.topic, style: const TextStyle(color: cyan500, fontSize: 11, fontWeight: FontWeight.w800))),
-          const Spacer(),
-          IconButton(onPressed: () => onSave(word), tooltip: 'Барои баъд', icon: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, color: saved ? emerald500 : null)),
-          IconButton(onPressed: () => speak(word.english), tooltip: 'Гӯш кардан', icon: const Icon(Icons.volume_up_rounded, color: cyan500)),
-        ]),
-        Align(alignment: Alignment.centerLeft, child: Text(word.english, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900))),
-        Align(alignment: Alignment.centerLeft, child: Text(word.pronunciation, style: const TextStyle(fontWeight: FontWeight.w700))),
-        const SizedBox(height: 5),
-        Align(alignment: Alignment.centerLeft, child: Text(word.tajik, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600))),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: FilledButton.tonalIcon(
-            onPressed: learned ? null : () => onLearn(word),
-            icon: Icon(learned ? Icons.check_circle_rounded : Icons.school_rounded),
-            label: Text(learned ? 'Омӯхта шуд' : 'Омӯхтам'),
-          )),
-          const SizedBox(width: 8),
-          OutlinedButton(onPressed: () => onSave(word), child: Icon(saved ? Icons.event_available_rounded : Icons.event_note_rounded)),
-        ]),
-      ])),
-    )),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: pressed ? [BoxShadow(color: cyan500.withValues(alpha: .12), blurRadius: 18)] : null),
+      child: Card(clipBehavior: Clip.antiAlias, child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: () => widget.speak(widget.word.english),
+        onHighlightChanged: (v) => setState(() => pressed = v),
+        child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
+          Row(children: [
+            Flexible(child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: cyan500.withValues(alpha: .12), borderRadius: BorderRadius.circular(11)), child: Text(widget.word.topic, overflow: TextOverflow.ellipsis, style: const TextStyle(color: cyan500, fontSize: 11, fontWeight: FontWeight.w900)))),
+            const Spacer(),
+            IconButton(onPressed: () => widget.onSave(widget.word), tooltip: widget.saved ? 'Аз захираҳо хориҷ кардан' : 'Барои баъд захира кардан', icon: AnimatedSwitcher(duration: const Duration(milliseconds: 160), child: Icon(widget.saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, key: ValueKey(widget.saved), color: widget.saved ? emerald500 : null))),
+            IconButton(onPressed: () => widget.speak(widget.word.english), tooltip: 'Гӯш кардан', icon: const Icon(Icons.volume_up_rounded, color: cyan500)),
+          ]),
+          Align(alignment: Alignment.centerLeft, child: Text(widget.word.english, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900))),
+          Align(alignment: Alignment.centerLeft, child: Text(widget.word.pronunciation, style: const TextStyle(fontWeight: FontWeight.w700))),
+          const SizedBox(height: 5),
+          Align(alignment: Alignment.centerLeft, child: Text(widget.word.tajik, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
+          const SizedBox(height: 13),
+          Row(children: [
+            Expanded(child: FilledButton.tonalIcon(onPressed: widget.learned ? null : () => widget.onLearn(widget.word), icon: Icon(widget.learned ? Icons.check_circle_rounded : Icons.school_rounded), label: Text(widget.learned ? 'Омӯхта шуд' : 'Омӯхтам'))),
+            const SizedBox(width: 8),
+            Tooltip(message: 'Ёдрас барои «${widget.word.english}»', child: OutlinedButton(onPressed: () => widget.onTimer(widget.word), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13)), child: const Icon(Icons.alarm_add_rounded))),
+          ]),
+        ])),
+      )),
+    ),
   );
 }
 
 class SavedPage extends StatelessWidget {
   final List<Word> words; final Set<String> saved, learned;
   final Future<void> Function(String) speak;
-  final Future<void> Function(Word) onSave, onLearn;
-  const SavedPage({super.key, required this.words, required this.saved, required this.learned, required this.speak, required this.onSave, required this.onLearn});
+  final Future<void> Function(Word) onSave, onLearn, onTimer;
+  const SavedPage({super.key, required this.words, required this.saved, required this.learned, required this.speak, required this.onSave, required this.onLearn, required this.onTimer});
 
   @override Widget build(BuildContext context) {
     final list = words.where((w) => saved.contains(w.english)).toList();
@@ -545,7 +548,7 @@ class SavedPage extends StatelessWidget {
       ])]),
       const SizedBox(height: 16),
       if (list.isEmpty) const EmptyState(icon: Icons.bookmark_border_rounded, title: 'Ҳоло чизе нест', text: 'Калимаҳое, ки имрӯз азёд кардан мехоҳед, бо bookmark барои рӯзи дигар нигоҳ доред.'),
-      ...list.map((w) => WordCard(word: w, learned: learned.contains(w.english), saved: true, speak: speak, onSave: onSave, onLearn: onLearn)),
+      ...list.map((w) => WordCard(word: w, learned: learned.contains(w.english), saved: true, speak: speak, onSave: onSave, onLearn: onLearn, onTimer: onTimer)),
     ]);
   }
 }
