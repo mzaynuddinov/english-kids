@@ -1,25 +1,109 @@
-# English Kids 🇹🇯🇬🇧
+# Англисиро Омӯз 🇹🇯🇬🇧
 
-English learning app for Tajik-speaking children aged 8–10.
+**Англисиро Омӯз** — барномаи муосири омӯзиши забони англисӣ барои кӯдакони тоҷик. Барнома омӯзиши кӯтоҳ, бозигуна ва такрори мунтазами калимаҳоро дастгирӣ мекунад.
 
-## Current version
-- Flutter Android application foundation
-- 5-week learning plan
-- Exactly 150 normalized vocabulary entries
-- English word + Tajik pronunciation + Tajik meaning
-- Text-to-speech pronunciation
-- Local learning progress
-- Offline vocabulary JSON
-- Automatic Android APK build with GitHub Actions
+## Имкониятҳои асосӣ
 
-## Curriculum
-- Week 1 — Greetings & Feelings: 25
-- Week 2 — Numbers & Colors: 25
-- Week 3 — Family & Body: 30
-- Week 4 — Animals & First Grammar: 30
-- Week 5 — Food, Drinks & Actions: 40
+- 📚 5 ҳафтаи омӯзиш бо 150 калима.
+- 🔊 Талаффузи англисӣ бо TTS ва интихоби овози занона ё мардона.
+- 🔖 «Барои баъд» — калимаҳоро нигоҳ доред ва баъдтар зуд пайдо кунед.
+- ⏰ Ёдраси калима — аз дохили ҳар корти калима 30 сония, 1/5/15/30 дақиқа ё 1 соат.
+- 🔔 Дар вақти ёдрас Notification нишон дода мешавад; Android Alarm Manager барои иҷрои alarm ҳатто ҳангоми баста будани барнома истифода мешавад.
+- 🎯 «Мушкилоти имрӯз» — 5 саволи кӯтоҳ барои санҷиши хотира.
+- 📈 Пешрафти умумӣ ва пешрафти ҳар ҳафта.
+- 🌙 Light / Dark / Auto.
+- 🔠 Андозаи матн аз 85% то 125%.
+- 📱 Кортҳо ва тугмаҳо ба андозаи экран мутобиқ мешаванд.
+- 🧭 Менюи паҳлӯӣ: Асосӣ, Захираҳо, Пешрафт, Танзимот, Таҳиягар, Дар бораи барнома.
+- 🖼️ Логотипи асосӣ дар дохили интерфейс истифода мешавад ва ҳамчун launcher icon омода карда мешавад.
+- 👤 Саҳифаи алоҳидаи Таҳиягар бо акси пешниҳодшуда ва маълумоти тамос.
+- 📴 Offline-first: луғат дар data/vocabulary.json нигоҳ дошта мешавад.
 
-The supplied source document is titled as 150 words but its numbering reaches 152. The final standalone morning and night entries were removed from the app dataset because those concepts already occur in good morning and good night. This normalization produces exactly 150 entries.
+## Тарҳи визуалӣ
 
-## APK
-GitHub Actions prepares the Android platform, installs dependencies, analyzes the project, builds a release APK, and uploads the APK as an artifact.
+Тарҳ бо Material 3, кортҳои adaptive, border-ҳои turquoise/cyan/emerald, gradient-ҳои маҳдуд ва feedback-и равшан сохта шудааст.
+
+- SafeArea барои мундариҷа ва navigation bar.
+- Ҳолатҳои selected, pressed, disabled ва completed равшан нишон дода мешаванд.
+- Ҳангоми «Омӯхтам» ё захира кардани калима паёми равшан нишон дода мешавад ва ҳолати тугма фаъол мемонад.
+- Дар дохили корт нишонаи ⏰ ҳамчун **ёдраси калима** истифода мешавад, на ҳамчун calendar.
+
+Палитраи primary UI танҳо аз диапазони 500–950 истифода мебарад; shade-ҳои 50–400 барои primary UI истифода намешаванд.
+
+## Сохтори омӯзиш
+
+- **Ҳафтаи 1** — Салом ва ҳиссиёт: 25 калима
+- **Ҳафтаи 2** — Рақамҳо ва рангҳо: 25 калима
+- **Ҳафтаи 3** — Оила ва бадани инсон: 30 калима
+- **Ҳафтаи 4** — Ҳайвонот ва грамматика: 30 калима
+- **Ҳафтаи 5** — Хӯрок, нӯшокиҳо ва феълҳо: 40 калима
+
+## Ёдраси калима
+
+1. Корти калимаро кушоед.
+2. Тугмаи ⏰-ро пахш кунед.
+3. 30 сония, 1/5/15/30 дақиқа ё 1 соат интихоб кунед.
+4. Android alarm сабт мешавад.
+5. Дар вақти муайян Notification нишон дода мешавад ва callback-и Android калимаро барои такрор хондан кӯшиш мекунад.
+
+Барои Android 13+ иҷозаи Notification ва барои alarm-и дақиқ иҷозаи **Exact Alarm** метавонад талаб шавад.
+
+## Номи барнома
+
+Номи намоёни Android:
+
+**Англисиро Омӯз**
+
+Номи **English Kids** ҳамчун номи барнома истифода намешавад.
+
+## Маълумоти таҳиягар
+
+**Majnun Zaynuddinov**  
+📞 +992 98 537 36 35  
+✉️ mzaynuddinov@gmail.com  
+Telegram: @mzaynuddinov  
+Instagram: @mzaynuddinov  
+Facebook: majnun.zaynuddinov  
+YouTube: @mzaynuddinov
+
+## Технологияҳо
+
+- Flutter / Dart
+- Material 3
+- flutter_tts
+- shared_preferences
+- flutter_local_notifications
+- android_alarm_manager_plus
+- flutter_svg
+- flutter_launcher_icons
+- GitHub Actions
+
+## Сохтани APK
+
+Workflow-и GitHub Actions:
+
+1. Android platform-ро омода мекунад.
+2. Permission-ҳои notification ва alarm-ро илова мекунад.
+3. Номи Android-ро ба **Англисиро Омӯз** мегузорад.
+4. Аз assets/logo.svg launcher image месозад.
+5. Launcher icon-ро тавлид мекунад.
+6. flutter pub get ва flutter analyze иҷро мекунад.
+7. Release APK месозад.
+8. APK-ро ҳамчун artifact нигоҳ медорад.
+
+Workflow concurrency дорад, то build-ҳои ҳамзамон якдигарро халалдор накунанд.
+
+## Файлҳои асосӣ
+
+- lib/main.dart — интерфейс ва функсияҳои асосӣ
+- assets/logo.svg — логотип
+- data/vocabulary.json — луғат
+- pubspec.yaml — dependency ва launcher icon
+- .github/workflows/build-apk.yml — автоматии сохтани APK
+- README.md — ҳуҷҷатгузории тоҷикӣ
+
+## Версия
+
+**1.0.0+10**
+
+© Majnun Zaynuddinov
