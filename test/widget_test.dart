@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:english_kids/app.dart';
 import 'package:english_kids/services/preferences_service.dart';
+import 'package:english_kids/services/progress_service.dart';
 import 'package:english_kids/services/vocabulary_service.dart';
 import 'package:english_kids/theme.dart';
 import 'package:english_kids/widgets/error_fallback.dart';
@@ -33,6 +34,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     PreferencesService.instance.debugReset();
+    ProgressService.instance.debugReset();
     VocabularyService.debugLoader = () async {
       final raw = File('data/vocabulary.json').readAsStringSync();
       return VocabularyService.parseRaw(raw);
@@ -55,7 +57,9 @@ void main() {
 
     expect(find.text(appName), findsWidgets);
     expect(find.textContaining('Нақшаи омӯзиш'), findsOneWidget);
-    expect(find.text('Мушкилоти имрӯз'), findsOneWidget);
+    expect(find.textContaining('Мушкилоти имрӯз'), findsOneWidget);
+    expect(find.text('Алифбо'), findsOneWidget);
+    expect(find.textContaining('Калимаи имрӯз'), findsOneWidget);
   });
 
   testWidgets('drawer contains required destinations', (tester) async {
@@ -66,6 +70,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text('Асосӣ'), findsWidgets);
+    expect(find.text('Алифбо'), findsWidgets);
+    expect(find.text('Калимаҳо'), findsWidgets);
+    expect(find.text('Санҷиш'), findsOneWidget);
+    expect(find.text('Ёдраскуниҳо'), findsOneWidget);
     expect(find.text('Барои баъд'), findsWidgets);
     expect(find.text('Пешрафт'), findsWidgets);
     expect(find.text('Танзимот'), findsWidgets);

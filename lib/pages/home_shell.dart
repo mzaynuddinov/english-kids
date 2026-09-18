@@ -1,22 +1,35 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../models/alphabet.dart';
+import '../models/reminder.dart';
 import '../models/settings.dart';
+import '../models/test_models.dart';
 import '../models/word.dart';
 import '../services/preferences_service.dart';
+import '../services/progress_service.dart';
 import '../services/reminder_service.dart';
+import '../services/test_engine.dart';
 import '../services/tts_service.dart';
 import '../services/vocabulary_service.dart';
 import '../theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
 import 'about_page.dart';
+import 'alphabet_page.dart';
 import 'developer_page.dart';
+import 'practice_page.dart';
 import 'progress_page.dart';
-import 'quiz_page.dart';
+import 'reminders_page.dart';
 import 'saved_page.dart';
 import 'settings_page.dart';
+import 'test_hub_page.dart';
+import 'test_result_page.dart';
+import 'test_runner_page.dart';
 import 'timer_sheet.dart';
 import 'week_page.dart';
+import 'words_page.dart';
 
 class HomeShell extends StatefulWidget {
   final AppSettings settings;
@@ -43,9 +56,16 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
+    ReminderService.instance.onForegroundFire = _showInAppReminder;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadData();
+      if (mounted) unawaited(_loadData());
     });
+  }
+
+  @override
+  void dispose() {
+    ReminderService.instance.onForegroundFire = null;
+    super.dispose();
   }
 
   Future<void> _loadData({bool silent = false}) async {
@@ -88,6 +108,27 @@ class _HomeShellState extends State<HomeShell> {
     } catch (error, stack) {
       debugPrint('Progress load failed: $error\n$stack');
     }
+
+    try {
+      await ProgressService.instance.load();
+      ReminderService.instance.rearmActive(widget.settings.voiceGender, widget.settings.speechRate);
+      if (mounted) setState(() {});
+    } catch (error, stack) {
+      debugPrint('Learning state load failed: $error\n$stack');
+    }
+  }
+
+  Future<void> _touchActivity() async {
+    try {
+      final snap = ProgressService.instance.withActivity(ProgressService.instance.snapshot);
+      final next = snap.copyWith(
+        achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
+      );
+      await ProgressService.instance.save(next);
+      if (mounted) setState(() {});
+    } catch (error) {
+      debugPrint('Activity save skipped: $error');
+    }
   }
 
   Future<void> _speak(String text) async {
@@ -96,6 +137,17 @@ class _HomeShellState extends State<HomeShell> {
       gender: widget.settings.voiceGender,
       rate: widget.settings.speechRate,
     );
+    try {
+      final snap = ProgressService.instance.snapshot;
+      final next = snap.copyWith(
+        listens: snap.listens + 1,
+        achievements: ProgressService.instance.computeAchievements(
+          snap.copyWith(listens: snap.listens + 1),
+          learned: learned.length,
+        ),
+      );
+      await ProgressService.instance.save(next);
+    } catch (_) {}
     final selection = TtsService.instance.lastSelection;
     if (!mounted || selection == null || selection.genderMatched) return;
     if (widget.settings.voiceGender == 'male' && !selection.genderMatched) {
@@ -136,7 +188,7 @@ class _HomeShellState extends State<HomeShell> {
     await PreferencesService.instance.saveSet('saved', next);
     if (!mounted) return;
     setState(() => saved = next);
-    _feedback(added ? '«${word.displayEnglish}» барои баъд захира шуд ✓' : '«${word.displayEnglish}» аз захираҳо хориҷ шуд');
+    _feedback(added ? '🔖 «${word.displayEnglish}» барои баъд захира шуд' : '«${word.displayEnglish}» аз захираҳо хориҷ шуд');
   }
 
   Future<void> _learn(Word word) async {
@@ -144,24 +196,78 @@ class _HomeShellState extends State<HomeShell> {
     await PreferencesService.instance.saveSet('learned', next);
     if (!mounted) return;
     setState(() => learned = next);
-    _feedback('Офарин! «${word.displayEnglish}» омӯхта шуд 🎉');
+    await _touchActivity();
+    _feedback('🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.');
+  }
+
+  Future<void> _learnLetter(AlphabetLetter letter) async {
+    final snap = ProgressService.instance.snapshot;
+    final letters = {...snap.letters, letter.letter};
+    final next = snap.copyWith(
+      letters: letters,
+      achievements: ProgressService.instance.computeAchievements(
+        snap.copyWith(letters: letters),
+        learned: learned.length,
+      ),
+    );
+    await ProgressService.instance.save(ProgressService.instance.withActivity(next));
+    if (mounted) setState(() {});
+    _feedback('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
   }
 
   Future<void> _scheduleWord(Word word) async {
-    final delay = await showModalBottomSheet<Duration>(
+    final plan = await showModalBottomSheet<ReminderPlan>(
       context: context,
       showDragHandle: true,
       builder: (_) => TimerSheet(word: word),
     );
-    if (delay == null || !mounted) return;
+    if (plan == null || !mounted) return;
     final message = await ReminderService.instance.scheduleWord(
       word: word,
-      delay: delay,
+      delay: plan.interval,
+      repeats: plan.repeats,
       gender: widget.settings.voiceGender,
       rate: widget.settings.speechRate,
     );
     if (!mounted) return;
+    setState(() {});
     _feedback(message);
+  }
+
+  void _showInAppReminder(WordReminder reminder) {
+    if (!mounted) return;
+    setState(() {});
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('🔊 Вақти такрор!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                reminder.english[0].toUpperCase() + reminder.english.substring(1),
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+              ),
+              Text(reminder.pronunciation, style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(reminder.tajik, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              Text('Такрор ${reminder.completed} аз ${reminder.repeatTotal}'),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Пӯшидан')),
+            FilledButton(
+              onPressed: () {
+                unawaited(_speak(reminder.english));
+                Navigator.pop(ctx);
+              },
+              child: const Text('Гӯш кардам'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _feedback(String message) {
@@ -214,8 +320,150 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  Future<void> _startTest(TestKind kind) async {
+    final snap = ProgressService.instance.snapshot;
+    final active = snap.active;
+    TestSession? session;
+    if (active != null && !active.completed && active.kind == kind) {
+      final choice = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Санҷишро идома медиҳед?'),
+          content: Text('${active.kindLabel}: саволи ${active.index + 1} / ${active.total}'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, 'cancel'), child: const Text('Бекор')),
+            TextButton(onPressed: () => Navigator.pop(ctx, 'restart'), child: const Text('Аз нав')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, 'continue'), child: const Text('Идома')),
+          ],
+        ),
+      );
+      if (!mounted) return;
+      if (choice == 'continue') {
+        session = active;
+      } else if (choice == 'restart') {
+        session = _buildSession(kind);
+      } else {
+        return;
+      }
+    } else {
+      session = _buildSession(kind);
+    }
+    await ProgressService.instance.save(snap.copyWith(active: session));
+    if (!mounted) return;
+    await _openRunner(session);
+  }
+
+  Future<void> _startFresh(TestKind kind) async {
+    final session = _buildSession(kind);
+    await ProgressService.instance.save(ProgressService.instance.snapshot.copyWith(active: session));
+    if (!mounted) return;
+    await _openRunner(session);
+  }
+
+  Future<void> _openRunner(TestSession session) async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TestRunnerPage(
+          session: session,
+          onSpeak: _speak,
+          onChanged: (next) => ProgressService.instance.save(
+            ProgressService.instance.snapshot.copyWith(active: next),
+          ),
+          onFinished: (done) async {
+            await _completeTest(done);
+            if (!mounted) return;
+            Navigator.pop(context);
+            await Navigator.push<void>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TestResultPage(
+                  session: done,
+                  onRetry: () {
+                    Navigator.pop(context);
+                    unawaited(_startFresh(done.kind));
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
+  TestSession _buildSession(TestKind kind) {
+    final plan = TestBlueprint(
+      learned: learned,
+      saved: saved,
+      misses: ProgressService.instance.snapshot.misses,
+      seed: DateTime.now().millisecondsSinceEpoch,
+    );
+    switch (kind) {
+      case TestKind.alphabet:
+        return buildAlphabetSession(seed: plan.seed);
+      case TestKind.vocabulary:
+        return buildVocabularySession(words: words, plan: plan);
+      case TestKind.daily:
+        return buildDailySession(words: words, plan: plan);
+    }
+  }
+
+  Future<void> _completeTest(TestSession session) async {
+    final result = resultFrom(session);
+    var snap = ProgressService.instance.snapshot;
+    final misses = {...snap.misses};
+    final hits = {...snap.hits};
+    final letters = {...snap.letters};
+    for (final answer in session.answers) {
+      TestQuestion? q;
+      for (final item in session.questions) {
+        if (item.id == answer.questionId) {
+          q = item;
+          break;
+        }
+      }
+      if (q == null) continue;
+      if (q.wordId != null) {
+        if (answer.correct) {
+          hits[q.wordId!] = (hits[q.wordId!] ?? 0) + 1;
+        } else {
+          misses[q.wordId!] = (misses[q.wordId!] ?? 0) + 1;
+        }
+      }
+      if (q.letter != null && answer.correct) {
+        letters.add(q.letter!);
+      }
+    }
+    snap = snap.copyWith(
+      misses: misses,
+      hits: hits,
+      letters: letters,
+      history: [result, ...snap.history].take(40).toList(),
+      clearActive: true,
+      dailyDone: session.kind == TestKind.daily ? true : snap.dailyDone,
+    );
+    snap = ProgressService.instance.withActivity(snap);
+    snap = snap.copyWith(
+      achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
+    );
+    await ProgressService.instance.save(snap);
+    if (mounted) setState(() {});
+  }
+
+  Word get _wordOfDay {
+    if (words.isEmpty) {
+      return const Word(english: 'hello', pronunciation: '/həˈləʊ/', tajik: 'Салом', week: 1, topic: 'Greetings');
+    }
+    final now = DateTime.now();
+    final day = now.difference(DateTime(now.year)).inDays;
+    return words[day % words.length];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final snap = ProgressService.instance.snapshot;
     final pages = [
       _home(),
       SavedPage(
@@ -227,7 +475,13 @@ class _HomeShellState extends State<HomeShell> {
         onLearn: _learn,
         onRemind: _scheduleWord,
       ),
-      ProgressPage(words: words, learned: learned),
+      ProgressPage(
+        words: words,
+        learned: learned,
+        saved: saved,
+        snapshot: snap,
+        onPractice: _openPractice,
+      ),
     ];
 
     return Scaffold(
@@ -286,6 +540,25 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  void _openPractice() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PracticePage(
+          words: words,
+          learned: learned,
+          saved: saved,
+          misses: ProgressService.instance.snapshot.misses,
+          hits: ProgressService.instance.snapshot.hits,
+          onSpeak: _speak,
+          onSave: _toggleSave,
+          onLearn: _learn,
+          onRemind: _scheduleWord,
+        ),
+      ),
+    );
+  }
+
   Widget _home() {
     if (loading && words.isEmpty) {
       return const Center(
@@ -321,6 +594,9 @@ class _HomeShellState extends State<HomeShell> {
       (w) => !w.isMarked(learned),
       orElse: () => words.first,
     );
+    final snap = ProgressService.instance.snapshot;
+    final wotd = _wordOfDay;
+    final active = snap.active;
 
     return CustomScrollView(
       key: const ValueKey('home'),
@@ -330,9 +606,17 @@ class _HomeShellState extends State<HomeShell> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
             child: Column(
               children: [
-                _hero(progress, next),
-                const SizedBox(height: 14),
-                _dailyChallenge(),
+                _hero(progress, next, snap.streak),
+                if (active != null && !active.completed) ...[
+                  const SizedBox(height: 12),
+                  _continueCard(active),
+                ],
+                const SizedBox(height: 12),
+                _wordOfDayCard(wotd),
+                const SizedBox(height: 12),
+                _dailyChallenge(snap),
+                const SizedBox(height: 12),
+                _alphabetCard(snap.letters.length),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -340,7 +624,7 @@ class _HomeShellState extends State<HomeShell> {
                     const SizedBox(width: 9),
                     Expanded(child: _stat(Icons.check_circle_rounded, '${learned.length}', 'Омӯхта')),
                     const SizedBox(width: 9),
-                    Expanded(child: _stat(Icons.bookmark_rounded, '${saved.length}', 'Барои баъд')),
+                    Expanded(child: _stat(Icons.local_fire_department_rounded, '${snap.streak}', 'Рӯз')),
                   ],
                 ),
                 const SizedBox(height: 22),
@@ -381,7 +665,7 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Widget _hero(double progress, Word next) {
+  Widget _hero(double progress, Word next, int streak) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -432,7 +716,7 @@ class _HomeShellState extends State<HomeShell> {
                 style: const TextStyle(color: Color(0xFFCBD5E1)),
               ),
               Text(
-                '${(progress * 100).round()}%',
+                streak > 0 ? '🔥 $streak рӯз пай дар пай' : '${(progress * 100).round()}%',
                 style: const TextStyle(color: Color(0xFF6EE7B7), fontWeight: FontWeight.w900),
               ),
             ],
@@ -451,7 +735,56 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Widget _dailyChallenge() {
+  Widget _continueCard(TestSession active) {
+    return Card(
+      child: ListTile(
+        leading: const Icon(Icons.play_circle_rounded, color: teal600),
+        title: const Text('Идомаи санҷиш', style: TextStyle(fontWeight: FontWeight.w900)),
+        subtitle: Text('${active.kindLabel} • ${active.index + 1} / ${active.total}'),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        onTap: () => _startTest(active.kind),
+      ),
+    );
+  }
+
+  Widget _wordOfDayCard(Word word) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('🌟 Калимаи имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+            const SizedBox(height: 6),
+            Text(word.displayEnglish, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, height: 1.1)),
+            Text(word.tajik, style: const TextStyle(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () => _speak(word.english),
+                    icon: const Icon(Icons.volume_up_rounded),
+                    label: const Text('Гӯш кардан'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: word.isMarked(learned) ? null : () => _learn(word),
+                    icon: const Icon(Icons.check_rounded),
+                    label: Text(word.isMarked(learned) ? 'Омӯхта шуд' : 'Омӯзидан'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dailyChallenge(ProgressSnapshot snap) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -460,10 +793,7 @@ class _HomeShellState extends State<HomeShell> {
             _feedback('Аввал луғатро бор кунед.');
             return;
           }
-          Navigator.push<void>(
-            context,
-            MaterialPageRoute(builder: (_) => QuizPage(words: words)),
-          );
+          unawaited(_startTest(TestKind.daily));
         },
         child: Container(
           padding: const EdgeInsets.all(15),
@@ -475,21 +805,65 @@ class _HomeShellState extends State<HomeShell> {
               ],
             ),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              _QuizBadge(),
-              SizedBox(width: 12),
+              const _QuizBadge(),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Мушкилоти имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-                    SizedBox(height: 3),
-                    Text('5 саволи кӯтоҳ — ҷавоб деҳ ва хол гир!', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('🎯 Мушкилоти имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    const SizedBox(height: 3),
+                    Text(
+                      snap.dailyDone ? 'Имрӯз анҷом ёфт!' : 'Тақрибан 30 савол — якто-якто',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: cyan600),
+              const Icon(Icons.chevron_right_rounded, color: cyan600),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _alphabetCard(int done) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: _openAlphabet,
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [teal600, cyan600]),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(Icons.abc_rounded, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Алифбо', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(value: done / 26, minHeight: 7, color: emerald500),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text('$done / 26', style: const TextStyle(fontWeight: FontWeight.w900)),
             ],
           ),
         ),
@@ -576,6 +950,20 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  Future<void> _openAlphabet() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AlphabetPage(
+          learnedLetters: ProgressService.instance.snapshot.letters,
+          onSpeak: _speak,
+          onLearnLetter: _learnLetter,
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   Widget _drawer() {
     return Drawer(
       width: 320,
@@ -607,6 +995,61 @@ class _HomeShellState extends State<HomeShell> {
             _item(Icons.home_rounded, 'Асосӣ', () {
               Navigator.pop(context);
               setState(() => tab = 0);
+            }),
+            _item(Icons.abc_rounded, 'Алифбо', () {
+              Navigator.pop(context);
+              unawaited(_openAlphabet());
+            }),
+            _item(Icons.menu_book_rounded, 'Калимаҳо', () {
+              Navigator.pop(context);
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => WordsPage(
+                    words: words,
+                    learned: learned,
+                    saved: saved,
+                    onSpeak: _speak,
+                    onSave: _toggleSave,
+                    onLearn: _learn,
+                    onRemind: _scheduleWord,
+                  ),
+                ),
+              );
+            }),
+            _item(Icons.extension_rounded, 'Санҷиш', () {
+              Navigator.pop(context);
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => TestHubPage(onStart: _startTest)),
+              );
+            }),
+            _item(Icons.alarm_rounded, 'Ёдраскуниҳо', () {
+              Navigator.pop(context);
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RemindersPage(
+                    onPause: (r) async {
+                      await ReminderService.instance.pause(r.id);
+                      if (mounted) setState(() {});
+                    },
+                    onResume: (r) async {
+                      await ReminderService.instance.resume(
+                        r.id,
+                        widget.settings.voiceGender,
+                        widget.settings.speechRate,
+                      );
+                      if (mounted) setState(() {});
+                    },
+                    onDelete: (r) async {
+                      await ReminderService.instance.delete(r.id);
+                      if (mounted) setState(() {});
+                    },
+                    onSpeak: _speak,
+                  ),
+                ),
+              );
             }),
             _item(Icons.bookmark_rounded, 'Барои баъд', () {
               Navigator.pop(context);

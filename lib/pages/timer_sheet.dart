@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../models/reminder.dart';
 import '../models/word.dart';
 import '../theme.dart';
 
-class TimerSheet extends StatelessWidget {
+class TimerSheet extends StatefulWidget {
   final Word word;
-
   const TimerSheet({super.key, required this.word});
+
+  @override
+  State<TimerSheet> createState() => _TimerSheetState();
+}
+
+class _TimerSheetState extends State<TimerSheet> {
+  Duration? interval;
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +39,12 @@ class TimerSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Ёдраси калима',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                      Text(
+                        interval == null ? 'Кай такрор кунем?' : 'Чанд маротиба?',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
                       ),
                       Text(
-                        word.displayEnglish,
+                        widget.word.displayEnglish,
                         style: const TextStyle(color: cyan600, fontWeight: FontWeight.w800),
                       ),
                     ],
@@ -45,29 +52,47 @@ class TimerSheet extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _choice(context, const Duration(seconds: 30), '30 сония')),
-                const SizedBox(width: 8),
-                Expanded(child: _choice(context, const Duration(minutes: 1), '1 дақиқа')),
-                const SizedBox(width: 8),
-                Expanded(child: _choice(context, const Duration(minutes: 5), '5 дақ.')),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(child: _choice(context, const Duration(minutes: 15), '15 дақ.')),
-                const SizedBox(width: 8),
-                Expanded(child: _choice(context, const Duration(minutes: 30), '30 дақ.')),
-                const SizedBox(width: 8),
-                Expanded(child: _choice(context, const Duration(hours: 1), '1 соат')),
-              ],
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
+            if (interval == null) ...[
+              Row(
+                children: [
+                  Expanded(child: _time(const Duration(seconds: 30), '30 сония')),
+                  const SizedBox(width: 8),
+                  Expanded(child: _time(const Duration(minutes: 1), '1 дақиқа')),
+                  const SizedBox(width: 8),
+                  Expanded(child: _time(const Duration(minutes: 5), '5 дақ.')),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(child: _time(const Duration(minutes: 15), '15 дақ.')),
+                  const SizedBox(width: 8),
+                  Expanded(child: _time(const Duration(minutes: 30), '30 дақ.')),
+                  const SizedBox(width: 8),
+                  Expanded(child: _time(const Duration(hours: 1), '1 соат')),
+                ],
+              ),
+            ] else ...[
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [1, 2, 3, 5, 10]
+                    .map(
+                      (n) => OutlinedButton(
+                        onPressed: () => Navigator.pop(
+                          context,
+                          ReminderPlan(interval: interval!, repeats: n),
+                        ),
+                        child: Text('$n'),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+            const SizedBox(height: 10),
             Text(
-              'Огоҳӣ нишон дода мешавад. Хониши овоз дар пасзамина ба дастгоҳ вобаста аст.',
+              'Огоҳӣ ҳамеша нишон дода мешавад. Хониши овоз дар пасзамина ба дастгоҳ вобаста аст.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
@@ -77,9 +102,9 @@ class TimerSheet extends StatelessWidget {
     );
   }
 
-  Widget _choice(BuildContext context, Duration delay, String label) {
+  Widget _time(Duration delay, String label) {
     return OutlinedButton(
-      onPressed: () => Navigator.pop(context, delay),
+      onPressed: () => setState(() => interval = delay),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       ),

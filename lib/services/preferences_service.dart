@@ -75,6 +75,26 @@ class PreferencesService {
     }
   }
 
+  Future<String?> loadRaw(String key) async {
+    await init();
+    try {
+      return _prefs?.getString(key) ?? _memory[key] as String?;
+    } catch (error, stack) {
+      debugPrint('Corrupt raw $key: $error\n$stack');
+      return null;
+    }
+  }
+
+  Future<void> saveRaw(String key, String value) async {
+    await init();
+    _memory[key] = value;
+    try {
+      await _prefs?.setString(key, value);
+    } catch (error) {
+      debugPrint('writeRaw $key failed: $error');
+    }
+  }
+
   int? _readInt(String key) {
     try {
       return _prefs?.getInt(key);
