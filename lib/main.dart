@@ -298,7 +298,9 @@ class _HomeShellState extends State<HomeShell> {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
           child: Column(children: [
             _hero(progress, next),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
+            _dailyChallenge(),
+            const SizedBox(height: 14),
             Row(children: [
               Expanded(child: _stat(Icons.menu_book_rounded, words.length.toString(), 'Калима')),
               const SizedBox(width: 9),
@@ -368,7 +370,28 @@ class _HomeShellState extends State<HomeShell> {
     ]),
   );
 
-  Widget _stat(IconData icon, String value, String label) => Container(
+  Widget _dailyChallenge() => Card(
+    clipBehavior: Clip.antiAlias,
+    child: InkWell(
+      onTap: () { if (words.isNotEmpty) Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPage(words: words.take(20).toList()))); },
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(gradient: LinearGradient(colors: [indigo600.withValues(alpha: .10), cyan500.withValues(alpha: .10)])),
+        child: Row(children: [
+          Container(width: 48, height: 48, decoration: BoxDecoration(gradient: const LinearGradient(colors: [indigo600, blue500]), borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.extension_rounded, color: Colors.white)),
+          const SizedBox(width: 12),
+          const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Мушкилоти имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+            SizedBox(height: 3),
+            Text('5 саволи кӯтоҳ — ҷавоб деҳ ва хол гир!', style: TextStyle(fontWeight: FontWeight.w600)),
+          ])),
+          const Icon(Icons.chevron_right_rounded, color: cyan500),
+        ]),
+      ),
+    ),
+  );
+
+$stat
     padding: const EdgeInsets.symmetric(vertical: 13),
     decoration: BoxDecoration(
       color: Theme.of(context).cardColor,
@@ -430,8 +453,7 @@ class _HomeShellState extends State<HomeShell> {
         child: Row(children: [
           const AppLogo(size: 68), const SizedBox(width: 12),
           const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Англисиро Омӯз', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-            SizedBox(height: 4), Text('English for Kids', style: TextStyle(color: Color(0xFF67E8F9))),
+            Text('Омӯз, бозӣ кун ва пеш рав!', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
           ])),
         ]),
       ),
@@ -440,12 +462,8 @@ class _HomeShellState extends State<HomeShell> {
       _drawerItem(Icons.insights_rounded, 'Пешрафти ман', () { Navigator.pop(context); setState(() => tab = 2); }),
       const Divider(indent: 20, endIndent: 20),
       _drawerItem(Icons.settings_rounded, 'Танзимот', () { Navigator.pop(context); _settings(); }),
-      _drawerItem(Icons.info_outline_rounded, 'Дар бораи барнома', () {
-        Navigator.pop(context);
-        showAboutDialog(context: context, applicationName: 'Англисиро Омӯз', applicationVersion: '1.0.0',
-          applicationIcon: const AppLogo(size: 48),
-          children: const [Text('Барномаи омӯзиши англисӣ барои кӯдакон.'), SizedBox(height: 10), Text('Таҳиягар: Majnun Zaynuddinov')]);
-      }),
+      _drawerItem(Icons.person_outline_rounded, 'Таҳиягар', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const DeveloperPage())); }),
+      _drawerItem(Icons.info_outline_rounded, 'Дар бораи барнома', () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())); }),
       const Spacer(),
       const Padding(padding: EdgeInsets.all(18), child: Text('© Majnun Zaynuddinov', style: TextStyle(color: slate700, fontWeight: FontWeight.w700))),
     ])),
