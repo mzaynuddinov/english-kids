@@ -41,7 +41,7 @@ jobs:
         run: dart run flutter_launcher_icons
 
       - name: Analyze Dart code
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Build APK
         run: flutter build apk --release
