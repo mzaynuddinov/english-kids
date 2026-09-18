@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/settings.dart';
@@ -9,13 +9,20 @@ class PreferencesService {
 
   SharedPreferences? _prefs;
   bool _ready = false;
+  Future<void>? _initFuture;
 
   final Map<String, Object> _memory = {};
 
-  Future<void> init() async {
+  Future<void> init() {
+    return _initFuture ??= _doInit();
+  }
+
+  Future<void> _doInit() async {
     if (_ready) return;
     try {
-      _prefs = await SharedPreferences.getInstance();
+      _prefs = await SharedPreferences.getInstance().timeout(
+        const Duration(seconds: 4),
+      );
     } catch (error, stack) {
       debugPrint('SharedPreferences unavailable: $error\n$stack');
       _prefs = null;
@@ -117,5 +124,13 @@ class PreferencesService {
     } catch (error) {
       debugPrint('writeString $key failed: $error');
     }
+  }
+
+  @visibleForTesting
+  void debugReset() {
+    _prefs = null;
+    _ready = false;
+    _initFuture = null;
+    _memory.clear();
   }
 }

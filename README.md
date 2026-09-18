@@ -2,7 +2,8 @@
 
 **Англисиро Омӯз** — барномаи офлайнӣ барои кӯдакони тоҷик, ки калимаҳои англисиро бо талаффуз, маъно, такрор ва бозии кӯтоҳ меомӯзонад.
 
-Версия: **1.1.0+11**
+Версия: **1.1.0+12**
+
 
 ## Мақсад
 
@@ -127,6 +128,12 @@ GitHub Actions ҳангоми push ба `main`:
 - Instagram: [@mzaynuddinov](https://instagram.com/mzaynuddinov)
 - Facebook: [majnun.zaynuddinov](https://facebook.com/majnun.zaynuddinov)
 - YouTube: [@mzaynuddinov](https://youtube.com/@mzaynuddinov)
+
+## Тағйироти 1.1.0+12
+
+- Луғат аз UI ҷудо бор мешавад: агар SharedPreferences дер кунад, нақшаи омӯзиш ҳамоно кушода мемонад
+- Санҷишҳои виджет дигар ба `rootBundle` дар fake-async такя намекунанд
+- `SharedPreferences` ва луғат timeout доранд, то spinner абадӣ намонад
 
 ## Тағйироти 1.1.0
 

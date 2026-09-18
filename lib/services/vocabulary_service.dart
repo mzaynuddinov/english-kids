@@ -15,9 +15,33 @@ class VocabularyLoadResult {
 }
 
 class VocabularyService {
-  static Future<VocabularyLoadResult> load() async {
+  /// Test hook so widget tests do not depend on fake-async asset I/O.
+  @visibleForTesting
+  static Future<VocabularyLoadResult> Function()? debugLoader;
+
+  static Future<VocabularyLoadResult> load() {
+    final override = debugLoader;
+    if (override != null) return override();
+    return loadFromBundle();
+  }
+
+  static Future<VocabularyLoadResult> loadFromBundle() async {
     try {
-      final raw = await rootBundle.loadString('data/vocabulary.json');
+      final raw = await rootBundle
+          .loadString('data/vocabulary.json')
+          .timeout(const Duration(seconds: 8));
+      return parseRaw(raw);
+    } catch (error, stack) {
+      debugPrint('Vocabulary load failed: $error\n$stack');
+      return const VocabularyLoadResult(
+        words: [],
+        error: 'Калимаҳо бор нашуданд.',
+      );
+    }
+  }
+
+  static VocabularyLoadResult parseRaw(String raw) {
+    try {
       final decoded = jsonDecode(raw);
       if (decoded is! List) {
         return const VocabularyLoadResult(
@@ -42,11 +66,16 @@ class VocabularyService {
       }
       return VocabularyLoadResult(words: words);
     } catch (error, stack) {
-      debugPrint('Vocabulary load failed: $error\n$stack');
+      debugPrint('Vocabulary parse failed: $error\n$stack');
       return const VocabularyLoadResult(
         words: [],
         error: 'Калимаҳо бор нашуданд.',
       );
     }
+  }
+
+  @visibleForTesting
+  static void debugReset() {
+    debugLoader = null;
   }
 }

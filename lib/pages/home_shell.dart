@@ -43,27 +43,51 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadData();
+    });
   }
 
   Future<void> _loadData({bool silent = false}) async {
-    if (!silent || words.isEmpty) {
+    if (!silent && !loading) {
       setState(() {
         loading = true;
         loadError = null;
       });
     }
-    final vocab = await VocabularyService.load();
-    final learnedSet = await PreferencesService.instance.loadSet('learned');
-    final savedSet = await PreferencesService.instance.loadSet('saved');
-    if (!mounted) return;
-    setState(() {
-      words = vocab.words;
-      learned = learnedSet;
-      saved = savedSet;
-      loadError = vocab.ok ? null : (vocab.error ?? 'Калимаҳо бор нашуданд.');
-      loading = false;
-    });
+
+    try {
+      final vocab = await VocabularyService.load();
+      if (!mounted) return;
+      setState(() {
+        words = vocab.words;
+        loadError = vocab.ok ? null : (vocab.error ?? 'Калимаҳо бор нашуданд.');
+        loading = false;
+      });
+    } catch (error, stack) {
+      debugPrint('Vocabulary load failed: $error\n$stack');
+      if (!mounted) return;
+      setState(() {
+        loadError = 'Калимаҳо бор нашуданд.';
+        loading = false;
+      });
+    }
+
+    try {
+      final learnedSet = await PreferencesService.instance
+          .loadSet('learned')
+          .timeout(const Duration(seconds: 4), onTimeout: () => <String>{});
+      final savedSet = await PreferencesService.instance
+          .loadSet('saved')
+          .timeout(const Duration(seconds: 4), onTimeout: () => <String>{});
+      if (!mounted) return;
+      setState(() {
+        learned = learnedSet;
+        saved = savedSet;
+      });
+    } catch (error, stack) {
+      debugPrint('Progress load failed: $error\n$stack');
+    }
   }
 
   Future<void> _speak(String text) async {

@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:english_kids/app.dart';
+import 'package:english_kids/services/preferences_service.dart';
+import 'package:english_kids/services/vocabulary_service.dart';
 import 'package:english_kids/theme.dart';
 import 'package:english_kids/widgets/error_fallback.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +10,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> pumpApp(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(1080, 1920);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
   await tester.pumpWidget(const EnglishKidsApp());
-  await tester.pump();
-  for (var i = 0; i < 40; i++) {
-    await tester.pump(const Duration(milliseconds: 50));
+  await tester.pump(); // first frame + post-frame load
+  await tester.pump(); // apply vocabulary setState
+  for (var i = 0; i < 12; i++) {
+    await tester.pump(const Duration(milliseconds: 16));
     if (find.textContaining('Нақшаи омӯзиш').evaluate().isNotEmpty) return;
     if (find.text('Калимаҳо бор нашуданд.').evaluate().isNotEmpty) return;
   }
@@ -20,7 +32,14 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    PreferencesService.instance.debugReset();
+    VocabularyService.debugLoader = () async {
+      final raw = File('data/vocabulary.json').readAsStringSync();
+      return VocabularyService.parseRaw(raw);
+    };
   });
+
+  tearDown(VocabularyService.debugReset);
 
   testWidgets('first frame shows the Tajik app name, not a black screen', (tester) async {
     await tester.pumpWidget(const EnglishKidsApp());
@@ -28,6 +47,7 @@ void main() {
 
     expect(find.text(appName), findsWidgets);
     expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(Scaffold), findsOneWidget);
   });
 
   testWidgets('home shell renders after vocabulary load', (tester) async {
