@@ -683,6 +683,163 @@ class ContactLine extends StatelessWidget {
   @override Widget build(BuildContext context) => ListTile(dense: true, contentPadding: EdgeInsets.zero, leading: Icon(icon, color: cyan500), title: Text(text));
 }
 
+
+class TimerSheet extends StatelessWidget {
+  final Word word;
+  const TimerSheet({super.key, required this.word});
+  @override Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+    child: Column(mainAxisSize: MainAxisSize.min, children: [
+      Row(children: [
+        Container(width: 48, height: 48, decoration: BoxDecoration(gradient: const LinearGradient(colors: [teal500, cyan500]), borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.alarm_rounded, color: Colors.white)),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Ёдрас барои калима', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(word.english, style: const TextStyle(color: cyan500, fontWeight: FontWeight.w800)),
+        ])),
+      ]),
+      const SizedBox(height: 16),
+      Row(children: [
+        Expanded(child: _choice(context, 30, '30 сония', true)), const SizedBox(width: 8),
+        Expanded(child: _choice(context, 1, '1 дақиқа')), const SizedBox(width: 8),
+        Expanded(child: _choice(context, 5, '5 дақ.')),
+      ]),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(child: _choice(context, 15, '15 дақ.')), const SizedBox(width: 8),
+        Expanded(child: _choice(context, 30, '30 дақ.')), const SizedBox(width: 8),
+        Expanded(child: _choice(context, 60, '1 соат')),
+      ]),
+    ]),
+  );
+  Widget _choice(BuildContext context, int value, String label, [bool seconds = false]) => OutlinedButton.icon(
+    onPressed: () => Navigator.pop(context, seconds ? Duration(seconds: value) : Duration(minutes: value)),
+    icon: const Icon(Icons.schedule_rounded, size: 18),
+    label: Text(label, textAlign: TextAlign.center),
+  );
+}
+
+class QuizPage extends StatefulWidget {
+  final List<Word> words;
+  const QuizPage({super.key, required this.words});
+  @override State<QuizPage> createState() => _QuizPageState();
+}
+class _QuizPageState extends State<QuizPage> {
+  int index = 0, score = 0;
+  bool answered = false;
+  Word get current => widget.words[index % widget.words.length];
+  List<String> choices() {
+    final values = <String>{current.tajik};
+    for (final w in widget.words) {
+      if (values.length >= 4) break;
+      values.add(w.tajik);
+    }
+    return values.toList()..shuffle();
+  }
+  @override Widget build(BuildContext context) {
+    final options = choices();
+    return Scaffold(
+      appBar: AppBar(title: const Text('Мушкилоти имрӯз')),
+      body: SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        LinearProgressIndicator(value: (index + 1) / 5, minHeight: 8, borderRadius: BorderRadius.circular(99), color: cyan500),
+        const SizedBox(height: 22),
+        Text('Саволи \${index + 1} аз 5', style: const TextStyle(fontWeight: FontWeight.w800, color: cyan500)),
+        const SizedBox(height: 10),
+        Card(child: Padding(padding: const EdgeInsets.all(22), child: Column(children: [
+          const Icon(Icons.translate_rounded, size: 42, color: teal500),
+          const SizedBox(height: 10),
+          Text(current.english, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900)),
+          Text(current.pronunciation, style: const TextStyle(fontWeight: FontWeight.w700)),
+        ]))),
+        const SizedBox(height: 14),
+        ...options.map((choice) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: OutlinedButton(
+            onPressed: answered ? null : () => setState(() {
+              answered = true;
+              if (choice == current.tajik) score++;
+            }),
+            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+            child: Text(choice, style: const TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        )),
+        const Spacer(),
+        if (answered) FilledButton.icon(
+          onPressed: () {
+            if (index == 4) {
+              showDialog(context: context, builder: (_) => AlertDialog(
+                title: const Text('Офарин! 🎉'),
+                content: Text('Натиҷа: \$score / 5'),
+                actions: [TextButton(onPressed: () => Navigator.popUntil(context, (r) => r.isFirst), child: const Text('Тамом'))],
+              ));
+            } else {
+              setState(() { index++; answered = false; });
+            }
+          },
+          icon: const Icon(Icons.arrow_forward_rounded),
+          label: Text(index == 4 ? 'Натиҷа' : 'Саволи нав'),
+        ),
+      ])),
+    );
+  }
+}
+
+class DeveloperPage extends StatelessWidget {
+  const DeveloperPage({super.key});
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Таҳиягар')),
+    body: SafeArea(child: ListView(padding: const EdgeInsets.fromLTRB(20, 14, 20, 40), children: [
+      Center(child: Container(
+        width: 116, height: 116, padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(shape: BoxShape.circle, gradient: const LinearGradient(colors: [teal500, cyan500, sky500]), boxShadow: [BoxShadow(color: cyan500.withValues(alpha: .22), blurRadius: 24)]),
+        child: CircleAvatar(backgroundImage: MemoryImage(base64Decode(_developerPhotoBase64))),
+      )),
+      const SizedBox(height: 14),
+      const Center(child: Text('Majnun Zaynuddinov', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900))),
+      const SizedBox(height: 4),
+      const Center(child: Text('Таҳиягар ва созандаи барнома', style: TextStyle(color: cyan500, fontWeight: FontWeight.w800))),
+      const SizedBox(height: 22),
+      _contact(Icons.phone_rounded, '+992 98 537 36 35'),
+      _contact(Icons.email_rounded, 'mzaynuddinov@gmail.com'),
+      _contact(Icons.send_rounded, '@mzaynuddinov'),
+      _contact(Icons.camera_alt_outlined, '@mzaynuddinov'),
+      _contact(Icons.public_rounded, 'majnun.zaynuddinov'),
+      _contact(Icons.play_circle_outline, '@mzaynuddinov'),
+    ]),
+  );
+  Widget _contact(IconData icon, String text) => Card(margin: const EdgeInsets.only(bottom: 9), child: ListTile(leading: Icon(icon, color: cyan500), title: Text(text, style: const TextStyle(fontWeight: FontWeight.w800))));
+}
+
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+  @override Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Дар бораи барнома')),
+    body: SafeArea(child: ListView(padding: const EdgeInsets.fromLTRB(20, 18, 20, 40), children: [
+      const Center(child: AppLogo(size: 120)),
+      const SizedBox(height: 14),
+      const Center(child: Text(appName, style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900))),
+      const SizedBox(height: 5),
+      const Center(child: Text('Омӯзиши англисӣ барои кӯдакон', style: TextStyle(color: cyan500, fontWeight: FontWeight.w800))),
+      const SizedBox(height: 24),
+      Card(child: Padding(padding: const EdgeInsets.all(18), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Имкониятҳо', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 12),
+        _feature(Icons.menu_book_rounded, '5 ҳафта ва 150 калима'),
+        _feature(Icons.volume_up_rounded, 'Талаффузи англисӣ бо овози зан/мард'),
+        _feature(Icons.bookmark_rounded, 'Захира барои баъд'),
+        _feature(Icons.alarm_rounded, 'Ёдраскунии калима бо таймер'),
+        _feature(Icons.extension_rounded, 'Мушкилоти кӯтоҳи ҳаррӯза'),
+        _feature(Icons.dark_mode_rounded, 'Light / Dark / Auto'),
+      ]))),
+      const SizedBox(height: 14),
+      const Center(child: Text('Offline • Барои кӯдакон • Тоҷикистон 🇹🇯', style: TextStyle(fontWeight: FontWeight.w800))),
+      const SizedBox(height: 5),
+      const Center(child: Text('Версия 1.0.0', style: TextStyle(color: slate700))),
+    ]),
+  );
+  Widget _feature(IconData icon, String text) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [Icon(icon, color: cyan500), const SizedBox(width: 10), Expanded(child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)))]));
+}
+
 class EmptyState extends StatelessWidget {
   final IconData icon; final String title, text;
   const EmptyState({super.key, required this.icon, required this.title, required this.text});
