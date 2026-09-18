@@ -23,7 +23,7 @@ class Word {
   }
 
   /// Homonyms such as color/fruit "orange" must stay distinct.
-  String get id => '${english.toLowerCase()}|${week}|${tajik.toLowerCase()}';
+  String get id => '${english.toLowerCase()}|$week|${tajik.toLowerCase()}';
 
   bool isMarked(Set<String> keys) => keys.contains(id) || keys.contains(english);
 
