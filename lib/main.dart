@@ -391,7 +391,7 @@ class _HomeShellState extends State<HomeShell> {
     ),
   );
 
-$stat
+  Widget _stat(IconData icon, String value, String label) => Container(
     padding: const EdgeInsets.symmetric(vertical: 13),
     decoration: BoxDecoration(
       color: Theme.of(context).cardColor,
@@ -620,10 +620,7 @@ class SettingsPage extends StatelessWidget {
   @override Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Танзимот')),
     body: SafeArea(child: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 40), children: [
-      const Center(child: AppLogo(size: 96)),
       const SizedBox(height: 8),
-      const Center(child: Text('Англисиро Омӯз', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),
-      const SizedBox(height: 22),
       section(context, Icons.palette_rounded, 'Намуди барнома', [
         SegmentedButton<ThemeMode>(
           segments: const [
