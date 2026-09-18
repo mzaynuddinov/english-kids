@@ -26,7 +26,7 @@ jobs:
         run: flutter create --platforms=android .
 
       - name: Configure Android manifest
-        run: python3 -c "from pathlib import Path; p=Path('android/app/src/main/AndroidManifest.xml'); s=p.read_text(encoding='utf-8'); s=s.replace('<manifest ', '<manifest >\\n    <uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\" />\\n    <uses-permission android:name=\"android.permission.SCHEDULE_EXACT_ALARM\" />\\n    <uses-permission android:name=\"android.permission.WAKE_LOCK\" />\\n    <uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />\\n    <manifest ' , 1) if 'android.permission.POST_NOTIFICATIONS' not in s else s; s=s.replace('android:label=\"english_kids\"','android:label=\"Англисиро Омӯз\"'); p.write_text(s,encoding='utf-8')"
+        run: python3 -c "from pathlib import Path; p=Path('android/app/src/main/AndroidManifest.xml'); s=p.read_text(encoding='utf-8'); perms='    <uses-permission android:name=\\\"android.permission.POST_NOTIFICATIONS\\\" />\\n    <uses-permission android:name=\\\"android.permission.SCHEDULE_EXACT_ALARM\\\" />\\n    <uses-permission android:name=\\\"android.permission.WAKE_LOCK\\\" />\\n    <uses-permission android:name=\\\"android.permission.RECEIVE_BOOT_COMPLETED\\\" />\\n'; s=s.replace('<application ', perms+'<application ', 1) if 'android.permission.POST_NOTIFICATIONS' not in s else s; s=s.replace('android:label=\\\"english_kids\\\"','android:label=\\\"Англисиро Омӯз\\\"'); p.write_text(s,encoding='utf-8')"
 
       - name: Render launcher image
         run: convert assets/logo.svg -background '#020617' -resize 1024x1024 assets/launcher.png
