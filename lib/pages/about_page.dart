@@ -52,12 +52,12 @@ class _AboutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return const Card(
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('Чӣ кор мекунад', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
             SizedBox(height: 12),
             _Feature(Icons.menu_book_rounded, 'Луғати англисӣ бо маънои тоҷикӣ, офлайн.'),

@@ -15,7 +15,7 @@ COLORS = ANDROID / "app" / "src" / "main" / "res" / "values" / "colors.xml"
 STYLES = ANDROID / "app" / "src" / "main" / "res" / "values" / "styles.xml"
 LAUNCH = ANDROID / "app" / "src" / "main" / "res" / "drawable" / "launch_background.xml"
 
-APP_ID = "tj.mzaynuddinov.englishkids"
+APP_ID = "tj.mzaynuddinov.english_kids"
 APP_LABEL = "Англисиро Омӯз"
 
 PERMISSIONS = [
@@ -149,29 +149,55 @@ def patch_manifest() -> None:
 
 def write_resources() -> None:
     STRINGS.parent.mkdir(parents=True, exist_ok=True)
-    STRINGS.write_text(
-        f'''<?xml version="1.0" encoding="utf-8"?>
+    if STRINGS.exists():
+        strings = STRINGS.read_text(encoding="utf-8")
+        if "app_name" in strings:
+            strings = re.sub(
+                r'<string name="app_name">[^<]*</string>',
+                f'<string name="app_name">{APP_LABEL}</string>',
+                strings,
+            )
+        else:
+            strings = strings.replace(
+                "</resources>",
+                f'    <string name="app_name">{APP_LABEL}</string>\n</resources>',
+            )
+        STRINGS.write_text(strings, encoding="utf-8")
+    else:
+        STRINGS.write_text(
+            f'''<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">{APP_LABEL}</string>
 </resources>
 ''',
-        encoding="utf-8",
-    )
-    COLORS.write_text(
-        '''<?xml version="1.0" encoding="utf-8"?>
+            encoding="utf-8",
+        )
+
+    if COLORS.exists():
+        colors = COLORS.read_text(encoding="utf-8")
+        if "splash_color" not in colors:
+            colors = colors.replace(
+                "</resources>",
+                '    <color name="splash_color">#020617</color>\n</resources>',
+            )
+            COLORS.write_text(colors, encoding="utf-8")
+    else:
+        COLORS.write_text(
+            '''<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_color">#020617</color>
 </resources>
 ''',
-        encoding="utf-8",
-    )
+            encoding="utf-8",
+        )
 
     if STYLES.exists():
         styles = STYLES.read_text(encoding="utf-8")
-        if "splash_color" not in styles:
+        if "splash_color" not in styles and "LaunchTheme" in styles:
             styles = styles.replace(
                 'parent="@android:style/Theme.Light.NoTitleBar">',
                 'parent="@android:style/Theme.Light.NoTitleBar">\n        <item name="android:windowBackground">@color/splash_color</item>',
+                1,
             )
             STYLES.write_text(styles, encoding="utf-8")
 
