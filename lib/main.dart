@@ -199,22 +199,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _speak(String text) async {
-    await tts.stop();
-    await tts.setLanguage('en-US');
-    await tts.setSpeechRate(widget.settings.speechRate);
-    final voices = await tts.getVoices;
-    if (voices is List) {
-      final wanted = widget.settings.voiceGender == 'male' ? 'male' : 'female';
-      for (final v in voices) {
-        final s = v.toString().toLowerCase();
-        if (s.contains(wanted) && s.contains('en')) {
-          if (v is Map && v['name'] != null && v['locale'] != null) {
-            await tts.setVoice({'name': v['name'], 'locale': v['locale']});
-          }
-          break;
-        }
-      }
-    }
+    await _configureTts(tts, widget.settings.voiceGender, widget.settings.speechRate);
     await tts.speak(text);
   }
 
@@ -224,6 +209,11 @@ class _HomeShellState extends State<HomeShell> {
     if (!next.add(w.english)) next.remove(w.english);
     await p.setStringList('saved', next.toList());
     setState(() => saved = next);
+    _feedback(added ? '«${w.english}» барои баъд захира шуд ✓' : '«${w.english}» аз захираҳо хориҷ шуд');
+  }
+
+  void _feedback(String message) {
+    ScaffoldMessenger.of(context)..hideCurrentSnackBar()..showSnackBar(SnackBar(content: Row(children: [const Icon(Icons.check_circle_rounded, color: emerald500), const SizedBox(width: 8), Expanded(child: Text(message))])));
   }
 
   Future<void> _learn(Word w) async {
@@ -231,6 +221,19 @@ class _HomeShellState extends State<HomeShell> {
     final next = {...learned, w.english};
     await p.setStringList('learned', next.toList());
     setState(() => learned = next);
+    _feedback('Офарин! «${w.english}» омӯхта шуд 🎉');
+  }
+
+  Future<void> _scheduleWord(Word w) async {
+    final delay = await showModalBottomSheet<Duration>(context: context, showDragHandle: true, builder: (_) => TimerSheet(word: w));
+    if (delay == null) return;
+    final id = DateTime.now().millisecondsSinceEpoch.remainder(2147483000);
+    try {
+      final ok = await AndroidAlarmManager.oneShotAt(DateTime.now().add(delay), id, scheduledWordAlarm, exact: true, allowWhileIdle: true, wakeup: true, rescheduleOnReboot: true, params: {'word': w.english, 'tajik': w.tajik, 'gender': widget.settings.voiceGender, 'rate': widget.settings.speechRate});
+      _feedback(ok ? 'Ёдрас гузошта шуд ⏰' : 'Ёдрас гузошта нашуд. Иҷозаи Alarm/Notification-ро фаъол кунед.');
+    } catch (_) {
+      _feedback('Барои ёдрас иҷозаи Alarm/Notification лозим аст.');
+    }
   }
 
   Future<void> _week(int week) async {
