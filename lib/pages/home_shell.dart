@@ -550,7 +550,8 @@ class _HomeShellState extends State<HomeShell> {
     return Drawer(
       width: 320,
       child: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             Container(
               margin: const EdgeInsets.all(14),
@@ -604,7 +605,6 @@ class _HomeShellState extends State<HomeShell> {
                 MaterialPageRoute(builder: (_) => const AboutPage()),
               );
             }),
-            const Spacer(),
             const Padding(
               padding: EdgeInsets.all(18),
               child: Text(

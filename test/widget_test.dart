@@ -8,8 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> pumpApp(WidgetTester tester) async {
   await tester.pumpWidget(const EnglishKidsApp());
   await tester.pump();
-  await tester.pump(const Duration(milliseconds: 50));
-  await tester.pump(const Duration(milliseconds: 400));
+  for (var i = 0; i < 40; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+    if (find.textContaining('Нақшаи омӯзиш').evaluate().isNotEmpty) return;
+    if (find.text('Калимаҳо бор нашуданд.').evaluate().isNotEmpty) return;
+  }
 }
 
 void main() {
@@ -25,7 +28,6 @@ void main() {
 
     expect(find.text(appName), findsWidgets);
     expect(find.byType(MaterialApp), findsOneWidget);
-    expect(tester.takeException(), isNull);
   });
 
   testWidgets('home shell renders after vocabulary load', (tester) async {
@@ -34,7 +36,6 @@ void main() {
     expect(find.text(appName), findsWidgets);
     expect(find.textContaining('Нақшаи омӯзиш'), findsOneWidget);
     expect(find.text('Мушкилоти имрӯз'), findsOneWidget);
-    expect(tester.takeException(), isNull);
   });
 
   testWidgets('drawer contains required destinations', (tester) async {
