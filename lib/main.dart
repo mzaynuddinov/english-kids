@@ -208,7 +208,8 @@ class _HomeShellState extends State<HomeShell> {
   Future<void> _toggleSave(Word w) async {
     final p = await SharedPreferences.getInstance();
     final next = {...saved};
-    if (!next.add(w.english)) next.remove(w.english);
+    final added = next.add(w.english);
+    if (!added) next.remove(w.english);
     await p.setStringList('saved', next.toList());
     setState(() => saved = next);
     _feedback(added ? '«${w.english}» барои баъд захира шуд ✓' : '«${w.english}» аз захираҳо хориҷ шуд');
@@ -778,7 +779,7 @@ class _QuizPageState extends State<QuizPage> {
           icon: const Icon(Icons.arrow_forward_rounded),
           label: Text(index == 4 ? 'Натиҷа' : 'Саволи нав'),
         ),
-      ])),
+      ]))),
     );
   }
 }
@@ -834,7 +835,7 @@ class AboutPage extends StatelessWidget {
       const Center(child: Text('Offline • Барои кӯдакон • Тоҷикистон 🇹🇯', style: TextStyle(fontWeight: FontWeight.w800))),
       const SizedBox(height: 5),
       const Center(child: Text('Версия 1.0.0', style: TextStyle(color: slate700))),
-    ]),
+    ])),
   );
   Widget _feature(IconData icon, String text) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [Icon(icon, color: cyan500), const SizedBox(width: 10), Expanded(child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)))]));
 }
