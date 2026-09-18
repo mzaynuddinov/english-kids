@@ -107,3 +107,6 @@ Workflow concurrency дорад, то build-ҳои ҳамзамон якдига
 **1.0.0+10**
 
 © Majnun Zaynuddinov
+
+
+> Build validation: Android workflow uses the current main workflow configuration.
