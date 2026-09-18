@@ -602,11 +602,18 @@ class ContactLine extends StatelessWidget {
 class EmptyState extends StatelessWidget {
   final IconData icon; final String title, text;
   const EmptyState({super.key, required this.icon, required this.title, required this.text});
-  @override Widget build(BuildContext context) => Card(child: Padding(padding: const EdgeInsets.all(24), child: Column(children: [
-    Icon(icon, size: 52, color: cyan500), const SizedBox(height: 10),
-    Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
-    const SizedBox(height: 5), Text(text, textAlign: TextAlign.center),
-  ]));
+  @override Widget build(BuildContext context) => Card(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(children: [
+        Icon(icon, size: 52, color: cyan500),
+        const SizedBox(height: 10),
+        Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 5),
+        Text(text, textAlign: TextAlign.center),
+      ]),
+    ),
+  );
 }
 
 class AppLogo extends StatelessWidget {
