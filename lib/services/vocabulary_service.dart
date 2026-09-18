@@ -54,7 +54,7 @@ class VocabularyService {
       for (final item in decoded) {
         final word = Word.tryParse(item);
         if (word == null) continue;
-        final key = word.english.toLowerCase();
+        final key = word.id;
         if (!seen.add(key)) continue;
         words.add(word);
       }

@@ -48,14 +48,19 @@ class _WeekPageState extends State<WeekPage> {
     await widget.onSave(word);
     if (!mounted) return;
     setState(() {
-      if (!saved.add(word.english)) saved.remove(word.english);
+      if (word.isMarked(saved)) {
+        saved.remove(word.id);
+        saved.remove(word.english);
+      } else {
+        saved.add(word.id);
+      }
     });
   }
 
   Future<void> _learn(Word word) async {
     await widget.onLearn(word);
     if (!mounted) return;
-    setState(() => learned.add(word.english));
+    setState(() => learned.add(word.id));
   }
 
   @override
@@ -101,10 +106,10 @@ class _WeekPageState extends State<WeekPage> {
               ),
             ...widget.words.map(
               (word) => WordCard(
-                key: ValueKey(word.english),
+                key: ValueKey(word.id),
                 word: word,
-                learned: learned.contains(word.english),
-                saved: saved.contains(word.english),
+                learned: word.isMarked(learned),
+                saved: word.isMarked(saved),
                 onSpeak: widget.onSpeak,
                 onSave: _save,
                 onLearn: _learn,

@@ -22,6 +22,11 @@ class Word {
     return value[0].toUpperCase() + value.substring(1);
   }
 
+  /// Homonyms such as color/fruit "orange" must stay distinct.
+  String get id => '${english.toLowerCase()}|${week}|${tajik.toLowerCase()}';
+
+  bool isMarked(Set<String> keys) => keys.contains(id) || keys.contains(english);
+
   static Word? tryParse(dynamic raw) {
     try {
       if (raw is List && raw.length >= 5) {

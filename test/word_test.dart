@@ -36,6 +36,8 @@ void main() {
     expect(decoded, isA<List>());
     final words = (decoded as List).map(Word.tryParse).whereType<Word>().toList();
     expect(words.length, 150);
+    expect(words.map((w) => w.id).toSet().length, 150);
+    expect(words.where((w) => w.english.toLowerCase() == 'orange').length, 2);
     expect(words.every((w) => w.isValid), isTrue);
     expect(words.where((w) => w.week == 1).length, 25);
     expect(words.where((w) => w.week == 2).length, 25);

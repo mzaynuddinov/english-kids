@@ -26,7 +26,7 @@ class SavedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final list = words.where((w) => saved.contains(w.english)).toList();
+    final list = words.where((w) => w.isMarked(saved)).toList();
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       children: [
@@ -45,9 +45,9 @@ class SavedPage extends StatelessWidget {
           ),
         ...list.map(
           (word) => WordCard(
-            key: ValueKey('saved-${word.english}'),
+            key: ValueKey('saved-${word.id}'),
             word: word,
-            learned: learned.contains(word.english),
+            learned: word.isMarked(learned),
             saved: true,
             onSpeak: onSpeak,
             onSave: onSave,

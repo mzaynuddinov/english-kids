@@ -13,6 +13,7 @@ void main() {
     final result = VocabularyService.parseRaw(raw);
     expect(result.ok, isTrue);
     expect(result.words.length, 150);
+    expect(result.words.where((w) => w.english.toLowerCase() == 'orange').length, 2);
     expect(result.error, isNull);
   });
 
@@ -28,5 +29,6 @@ void main() {
     expect(jsonDecode(raw), isA<List>());
     final result = VocabularyService.parseRaw(raw);
     expect(result.words.length, 150);
+    expect(result.words.map((w) => w.id).toSet().length, 150);
   });
 }

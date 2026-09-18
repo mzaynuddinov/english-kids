@@ -68,7 +68,7 @@ class ProgressPage extends StatelessWidget {
         ...List.generate(5, (i) {
           final week = i + 1;
           final list = words.where((w) => w.week == week).toList();
-          final done = list.where((w) => learned.contains(w.english)).length;
+          final done = list.where((w) => w.isMarked(learned)).length;
           return Card(
             margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(

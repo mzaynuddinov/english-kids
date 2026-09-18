@@ -20,7 +20,7 @@ List<QuizQuestion> buildQuiz(List<Word> words, {int count = 5, int seed = 0}) {
   if (words.isEmpty) return [];
   final unique = <String, Word>{};
   for (final word in words) {
-    unique.putIfAbsent(word.english.toLowerCase(), () => word);
+    unique.putIfAbsent(word.id, () => word);
   }
   final pool = unique.values.toList();
   pool.sort((a, b) => a.english.compareTo(b.english));

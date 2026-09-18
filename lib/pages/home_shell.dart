@@ -125,8 +125,14 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _toggleSave(Word word) async {
     final next = {...saved};
-    final added = next.add(word.english);
-    if (!added) next.remove(word.english);
+    final added = !word.isMarked(next);
+    if (added) {
+      next.add(word.id);
+      next.remove(word.english);
+    } else {
+      next.remove(word.id);
+      next.remove(word.english);
+    }
     await PreferencesService.instance.saveSet('saved', next);
     if (!mounted) return;
     setState(() => saved = next);
@@ -134,7 +140,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _learn(Word word) async {
-    final next = {...learned, word.english};
+    final next = {...learned, word.id}..remove(word.english);
     await PreferencesService.instance.saveSet('learned', next);
     if (!mounted) return;
     setState(() => learned = next);
@@ -312,7 +318,7 @@ class _HomeShellState extends State<HomeShell> {
 
     final progress = words.isEmpty ? 0.0 : learned.length / words.length;
     final next = words.firstWhere(
-      (w) => !learned.contains(w.english),
+      (w) => !w.isMarked(learned),
       orElse: () => words.first,
     );
 
@@ -363,7 +369,7 @@ class _HomeShellState extends State<HomeShell> {
             itemBuilder: (_, i) {
               final week = i + 1;
               final list = words.where((w) => w.week == week).toList();
-              final done = list.where((w) => learned.contains(w.english)).length;
+              final done = list.where((w) => w.isMarked(learned)).length;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 11),
                 child: _weekCard(week, weekTitles[week] ?? '', list.length, done),
