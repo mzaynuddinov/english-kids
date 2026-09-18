@@ -1,112 +1,140 @@
-# Англисиро Омӯз 🇹🇯🇬🇧
+# Англисиро Омӯз
 
-**Англисиро Омӯз** — барномаи муосири омӯзиши забони англисӣ барои кӯдакони тоҷик. Барнома омӯзиши кӯтоҳ, бозигуна ва такрори мунтазами калимаҳоро дастгирӣ мекунад.
+**Англисиро Омӯз** — барномаи офлайнӣ барои кӯдакони тоҷик, ки калимаҳои англисиро бо талаффуз, маъно, такрор ва бозии кӯтоҳ меомӯзонад.
 
-## Имкониятҳои асосӣ
+Версия: **1.1.0+11**
 
-- 📚 5 ҳафтаи омӯзиш бо 150 калима.
-- 🔊 Талаффузи англисӣ бо TTS ва интихоби овози занона ё мардона.
-- 🔖 «Барои баъд» — калимаҳоро нигоҳ доред ва баъдтар зуд пайдо кунед.
-- ⏰ Ёдраси калима — аз дохили ҳар корти калима 30 сония, 1/5/15/30 дақиқа ё 1 соат.
-- 🔔 Дар вақти ёдрас Notification нишон дода мешавад; Android Alarm Manager барои иҷрои alarm ҳатто ҳангоми баста будани барнома истифода мешавад.
-- 🎯 «Мушкилоти имрӯз» — 5 саволи кӯтоҳ барои санҷиши хотира.
-- 📈 Пешрафти умумӣ ва пешрафти ҳар ҳафта.
-- 🌙 Light / Dark / Auto.
-- 🔠 Андозаи матн аз 85% то 125%.
-- 📱 Кортҳо ва тугмаҳо ба андозаи экран мутобиқ мешаванд.
-- 🧭 Менюи паҳлӯӣ: Асосӣ, Захираҳо, Пешрафт, Танзимот, Таҳиягар, Дар бораи барнома.
-- 🖼️ Логотипи асосӣ дар дохили интерфейс истифода мешавад ва ҳамчун launcher icon омода карда мешавад.
-- 👤 Саҳифаи алоҳидаи Таҳиягар бо акси пешниҳодшуда ва маълумоти тамос.
-- 📴 Offline-first: луғат дар data/vocabulary.json нигоҳ дошта мешавад.
+## Мақсад
 
-## Тарҳи визуалӣ
+Кӯдак дар 5 ҳафта 150 калимаи англисиро меомӯзад: гӯш мекунад, захира мекунад, «омӯхтам» мезанад ва бо ёдрас такрор мекунад.
 
-Тарҳ бо Material 3, кортҳои adaptive, border-ҳои turquoise/cyan/emerald, gradient-ҳои маҳдуд ва feedback-и равшан сохта шудааст.
+## Имкониятҳо
 
-- SafeArea барои мундариҷа ва navigation bar.
-- Ҳолатҳои selected, pressed, disabled ва completed равшан нишон дода мешаванд.
-- Ҳангоми «Омӯхтам» ё захира кардани калима паёми равшан нишон дода мешавад ва ҳолати тугма фаъол мемонад.
-- Дар дохили корт нишонаи ⏰ ҳамчун **ёдраси калима** истифода мешавад, на ҳамчун calendar.
+- Луғати офлайнӣ (`data/vocabulary.json`) бо калимаи англисӣ, талаффуз ва маънои тоҷикӣ
+- Нақшаи 5-ҳафтаинаи омӯзиш
+- Гӯш кардани калима бо TTS
+- Интихоби овози зан / мард (агар дастгоҳ чунин овоз дошта бошад)
+- «Барои баъд» ва «Омӯхтам» бо нигоҳдории ҳолат
+- Ёдраси калима: 30 сония, 1 / 5 / 15 / 30 дақиқа, 1 соат
+- Огоҳии Android бо калима ва маъно
+- Пешрафти умумӣ ва ҳафтаина
+- «Мушкилоти имрӯз» — 5 саволи кӯтоҳ
+- Light / Dark / Auto ва андозаи матн 85%–125%
+- Саҳифаҳои алоҳида: Танзимот, Таҳиягар, Дар бораи барнома
+- Тарҳи мутобиқ ба экранҳои хурд ва калон
 
-Палитраи primary UI танҳо аз диапазони 500–950 истифода мебарад; shade-ҳои 50–400 барои primary UI истифода намешаванд.
+## Чаро экрани сиёҳ ислоҳ шуд
 
-## Сохтори омӯзиш
+APK-и қаблӣ сохта мешуд, вале дар телефон экрани сиёҳ мемонд. Сабабҳои асосӣ:
 
-- **Ҳафтаи 1** — Салом ва ҳиссиёт: 25 калима
-- **Ҳафтаи 2** — Рақамҳо ва рангҳо: 25 калима
-- **Ҳафтаи 3** — Оила ва бадани инсон: 30 калима
-- **Ҳафтаи 4** — Ҳайвонот ва грамматика: 30 калима
-- **Ҳафтаи 5** — Хӯрок, нӯшокиҳо ва феълҳо: 40 калима
+1. **Хатои MediaQuery дар `MaterialApp.builder`** — `MediaQuery.of(context)` аз виҷети болои `MaterialApp` гирифта мешуд. Дар он ҷо MediaQuery нест. Дар реҷаи release Flutter ErrorWidget-и холӣ нишон медиҳад → экрани сиёҳ.
+2. **Оғози барнома баста мешуд** — пеш аз `runApp()` TTS не, вале `flutter_local_notifications` ва `AndroidAlarmManager.initialize()` интизорӣ мешуданд. Агар плагин ё иҷозат хато кунад, UI ҳеҷ гоҳ намеояд.
+3. **ErrorWidget дар release холӣ аст** — ҳар хатои build экрани сиёҳ мемонд.
 
-## Ёдраси калима
+Ҳоло:
 
-1. Корти калимаро кушоед.
-2. Тугмаи ⏰-ро пахш кунед.
-3. 30 сония, 1/5/15/30 дақиқа ё 1 соат интихоб кунед.
-4. Android alarm сабт мешавад.
-5. Дар вақти муайян Notification нишон дода мешавад ва callback-и Android калимаро барои такрор хондан кӯшиш мекунад.
+- аввал UI кушода мешавад;
+- хидматҳои ихтиёрӣ баъд аз кадри аввал бо `try/catch` оғоз меёбанд;
+- агар TTS, огоҳӣ ё ёдрас кор накунад, саҳифаи асосӣ ҳамоно кушода мемонад;
+- логотип PNG-и аслии муштарӣ аст, на SVG-и ноустувор.
 
-Барои Android 13+ иҷозаи Notification ва барои alarm-и дақиқ иҷозаи **Exact Alarm** метавонад талаб шавад.
+## Меъморӣ
+
+- `lib/main.dart` — оғози бехатар ва error handling
+- `lib/app.dart` — `MaterialApp`, мавзӯъ, андозаи матн
+- `lib/pages/` — саҳифаҳо
+- `lib/services/tts_service.dart` — TTS-и танбал (lazy) бо интихоби овози англисӣ
+- `lib/services/reminder_service.dart` — ёдрасҳо тавассути `flutter_local_notifications`
+- `lib/services/vocabulary_service.dart` — боркунии муҳофизавии луғат
+- `lib/services/preferences_service.dart` — SharedPreferences бо fallback
+- `data/vocabulary.json` — 150 калима
+- `assets/logo.png` — логотипи аслӣ
+- `assets/developer.png` — акси таҳиягар
+- `tool/configure_android.py` — танзими такроршавандаи Android барои CI
+
+Плагини `android_alarm_manager_plus` хориҷ карда шуд: он оғозро ноустувор мекард. Ёдрасҳо ҳоло бо notification-и банақшагирифташуда кор мекунанд.
+
+## TTS
+
+Овоз **пеш аз кадри аввал** оғоз намеёбад.
+
+Тартиби интихоб:
+
+1. Овозҳои locale-и англисӣ
+2. Ҷинси дархостшуда, агар metadata ё ном онро нишон диҳад
+3. Агар набошад — дигар овози англисӣ
+4. Ҳеҷ гоҳ барнома намеафтад
+
+Овозҳои Samantha / Daniel / Alex ҳатмӣ нестанд. Агар овози мардона дар дастгоҳ набошад, паём нишон дода мешавад ва овози англисии дастрас истифода мешавад.
+
+## Ёдрасҳо ва огоҳӣ
+
+Аз корти калима тугмаи **⏰ Ёдраси калима** (на тақвим)-ро пахш кунед.
+
+Дар вақти муайян:
+
+- огоҳии Android бо калима ва маъно меояд;
+- агар кӯдак огоҳиро пахш кунад, барнома калимаро хонданӣ мешавад.
+
+Маҳдудиятҳои Android:
+
+- Android 13+ иҷозати Notification мехоҳад
+- ёдрасҳои дақиқ иҷозати Exact Alarm мехоҳанд
+- баъзе истеҳсолкунандагон TTS-ро дар пасзамина манъ мекунанд
+- батарея / battery optimization метавонад ёдрасро дер кунад
+
+Агар TTS дар пасзамина кор накунад, **огоҳӣ ҳамоно нишон дода мешавад**.
 
 ## Номи барнома
 
-Номи намоёни Android:
+Номи намоён ҳамеша:
 
 **Англисиро Омӯз**
 
-Номи **English Kids** ҳамчун номи барнома истифода намешавад.
-
-## Маълумоти таҳиягар
-
-**Majnun Zaynuddinov**  
-📞 +992 98 537 36 35  
-✉️ mzaynuddinov@gmail.com  
-Telegram: @mzaynuddinov  
-Instagram: @mzaynuddinov  
-Facebook: majnun.zaynuddinov  
-YouTube: @mzaynuddinov
-
-## Технологияҳо
-
-- Flutter / Dart
-- Material 3
-- flutter_tts
-- shared_preferences
-- flutter_local_notifications
-- android_alarm_manager_plus
-- flutter_svg
-- flutter_launcher_icons
-- GitHub Actions
+«English Kids» ҳамчун номи барнома истифода намешавад. Идентификатори техникии баста `english_kids` аст.
 
 ## Сохтани APK
 
-Workflow-и GitHub Actions:
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter build apk --release
+```
 
-1. Android platform-ро омода мекунад.
-2. Permission-ҳои notification ва alarm-ро илова мекунад.
-3. Номи Android-ро ба **Англисиро Омӯз** мегузорад.
-4. Аз assets/logo.svg launcher image месозад.
-5. Launcher icon-ро тавлид мекунад.
-6. flutter pub get ва flutter analyze иҷро мекунад.
-7. Release APK месозад.
-8. APK-ро ҳамчун artifact нигоҳ медорад.
+GitHub Actions ҳангоми push ба `main`:
 
-Workflow concurrency дорад, то build-ҳои ҳамзамон якдигарро халалдор накунанд.
+1. Checkout
+2. Java 17 ва Flutter
+3. `flutter create --platforms=android`
+4. `tool/configure_android.py` (иҷозатҳо, ном, desugaring, Impeller off)
+5. `flutter pub get`
+6. launcher icon ва splash
+7. `flutter analyze`
+8. `flutter test`
+9. `flutter build apk --release`
+10. боргузории artifact
 
-## Файлҳои асосӣ
+Танҳо як workflow. Concurrency дорад, build-ҳои ҳамзамон бекор карда мешаванд.
 
-- lib/main.dart — интерфейс ва функсияҳои асосӣ
-- assets/logo.svg — логотип
-- data/vocabulary.json — луғат
-- pubspec.yaml — dependency ва launcher icon
-- .github/workflows/build-apk.yml — автоматии сохтани APK
-- README.md — ҳуҷҷатгузории тоҷикӣ
+## Таҳиягар
 
-## Версия
+**Majnun Zaynuddinov**
 
-**1.0.0+10**
+- Телефон: +992 98 537 36 35
+- Почта: mzaynuddinov@gmail.com
+- Telegram: [@mzaynuddinov](https://t.me/mzaynuddinov)
+- Instagram: [@mzaynuddinov](https://instagram.com/mzaynuddinov)
+- Facebook: [majnun.zaynuddinov](https://facebook.com/majnun.zaynuddinov)
+- YouTube: [@mzaynuddinov](https://youtube.com/@mzaynuddinov)
+
+## Тағйироти 1.1.0
+
+- Ислоҳи экрани сиёҳ ҳангоми кушодани APK
+- Оғози бехатар: UI аввал, хидматҳо баъд
+- Ёдрасҳо бе `android_alarm_manager_plus`
+- Логотип ва акси таҳиягари аслӣ
+- TTS ва notification дигар оғозро намебанданд
+- Саҳифаи хатогии дӯстона барои кӯдакон
 
 © Majnun Zaynuddinov
-
-
-> Build validation: Android workflow uses the current main workflow configuration.

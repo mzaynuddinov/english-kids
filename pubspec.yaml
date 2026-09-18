@@ -1,7 +1,7 @@
 name: english_kids
 description: Англисиро Омӯз — барномаи муосири омӯзиши англисӣ барои кӯдакони тоҷик.
 publish_to: "none"
-version: 1.0.0+10
+version: 1.1.0+11
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -11,27 +11,40 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_tts: ^4.2.3
-  flutter_svg: ^2.2.0
   shared_preferences: ^2.5.3
   flutter_local_notifications: ^19.5.0
-  android_alarm_manager_plus: ^4.0.8
+  timezone: ^0.10.1
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
 
 flutter:
   uses-material-design: true
   assets:
     - data/vocabulary.json
-    - assets/logo.svg
+    - assets/logo.png
+    - assets/developer.png
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: false
-  image_path: "assets/launcher.png"
+  image_path: assets/logo.png
   min_sdk_android: 21
-  adaptive_icon_background: "#020617"
-  adaptive_icon_foreground: "assets/launcher.png"
+  adaptive_icon_background: "#083344"
+  adaptive_icon_foreground: assets/logo.png
+  adaptive_icon_foreground_inset: 8
+
+flutter_native_splash:
+  color: "#020617"
+  image: assets/logo.png
+  android_12:
+    color: "#020617"
+    image: assets/logo.png
+  android: true
+  ios: false
+  web: false
