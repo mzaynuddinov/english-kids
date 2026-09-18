@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const emerald500 = Color(0xFF10B981);
@@ -556,8 +557,8 @@ class SettingsPage extends StatelessWidget {
       section(context, Icons.record_voice_over_rounded, 'Овози талаффуз', [
         SegmentedButton<String>(
           segments: const [
-            ButtonSegment(value: 'female', icon: Icon(Icons.female_rounded), label: Text('Зан')),
-            ButtonSegment(value: 'male', icon: Icon(Icons.male_rounded), label: Text('Мард')),
+            ButtonSegment(value: 'female', icon: Icon(Icons.female), label: Text('Зан')),
+            ButtonSegment(value: 'male', icon: Icon(Icons.male), label: Text('Мард')),
           ],
           selected: {settings.voiceGender},
           onSelectionChanged: (v) => onChanged(copy(voiceGender: v.first)),
@@ -575,10 +576,10 @@ class SettingsPage extends StatelessWidget {
       ]),
       section(context, Icons.person_rounded, 'Таҳиягар', [
         const ListTile(contentPadding: EdgeInsets.zero, leading: AppLogo(size: 48), title: Text('Majnun Zaynuddinov', style: TextStyle(fontWeight: FontWeight.w900)), subtitle: Text('+992 98 537 36 35\nmzaynuddinov@gmail.com')),
-        const ContactLine(Icons.telegram, '@mzaynuddinov'),
-        const ContactLine(Icons.camera_alt_rounded, '@mzaynuddinov'),
-        const ContactLine(Icons.facebook_rounded, 'majnun.zaynuddinov'),
-        const ContactLine(Icons.play_circle_outline_rounded, '@mzaynuddinov'),
+        const ContactLine(Icons.send_rounded, '@mzaynuddinov'),
+        const ContactLine(Icons.camera_alt_outlined, '@mzaynuddinov'),
+        const ContactLine(Icons.public_rounded, 'majnun.zaynuddinov'),
+        const ContactLine(Icons.play_circle_outline, '@mzaynuddinov'),
       ]),
     ])),
   );
@@ -613,6 +614,6 @@ class AppLogo extends StatelessWidget {
   const AppLogo({super.key, required this.size});
   @override Widget build(BuildContext context) => ClipRRect(
     borderRadius: BorderRadius.circular(size * .22),
-    child: Image.asset('assets/logo.svg', width: size, height: size, fit: BoxFit.cover),
+    child: SvgPicture.asset('assets/logo.svg', width: size, height: size, fit: BoxFit.cover),
   );
 }
