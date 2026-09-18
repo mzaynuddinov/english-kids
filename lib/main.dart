@@ -805,7 +805,7 @@ class DeveloperPage extends StatelessWidget {
       _contact(Icons.camera_alt_outlined, '@mzaynuddinov'),
       _contact(Icons.public_rounded, 'majnun.zaynuddinov'),
       _contact(Icons.play_circle_outline, '@mzaynuddinov'),
-    ]),
+    ])),
   );
   Widget _contact(IconData icon, String text) => Card(margin: const EdgeInsets.only(bottom: 9), child: ListTile(leading: Icon(icon, color: cyan500), title: Text(text, style: const TextStyle(fontWeight: FontWeight.w800))));
 }
