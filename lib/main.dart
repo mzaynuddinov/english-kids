@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:ui';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,7 +18,71 @@ const slate800 = Color(0xFF1E293B);
 const slate900 = Color(0xFF0F172A);
 const slate950 = Color(0xFF020617);
 
-void main() => runApp(const EnglishKidsApp());
+const appName = 'Англисиро Омӯз';
+const _developerPhotoBase64 = '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';
+final FlutterLocalNotificationsPlugin notifications = FlutterLocalNotificationsPlugin();
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _initNotifications();
+  await AndroidAlarmManager.initialize();
+  runApp(const EnglishKidsApp());
+}
+
+Future<void> _initNotifications() async {
+  const settings = InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher'));
+  await notifications.initialize(settings, onDidReceiveNotificationResponse: (response) async {
+    final raw = response.payload;
+    if (raw == null) return;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final tts = FlutterTts();
+    await _configureTts(tts, '${data['gender'] ?? 'female'}', (data['rate'] as num?)?.toDouble() ?? .42);
+    await tts.speak('${data['word'] ?? 'Hello'}');
+  });
+  await notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+}
+
+Future<void> _configureTts(FlutterTts tts, String gender, double rate) async {
+  await tts.stop();
+  await tts.setLanguage('en-US');
+  await tts.setSpeechRate(rate);
+  final voices = await tts.getVoices;
+  if (voices is! List) return;
+  final candidates = <Map<String, String>>[];
+  for (final item in voices) {
+    if (item is! Map) continue;
+    final name = '${item['name'] ?? ''}';
+    final locale = '${item['locale'] ?? ''}';
+    if (name.isNotEmpty && locale.toLowerCase().startsWith('en')) candidates.add({'name': name, 'locale': locale});
+  }
+  Map<String, String>? selected;
+  for (final voice in candidates) {
+    final name = voice['name']!.toLowerCase();
+    final male = name.contains('male') || name.contains('man') || name.contains('daniel') || name.contains('alex') || name.contains('aaron');
+    final female = name.contains('female') || name.contains('woman') || name.contains('samantha') || name.contains('ava') || name.contains('zira');
+    if ((gender == 'male' && male) || (gender == 'female' && female)) { selected = voice; break; }
+  }
+  selected ??= candidates.isEmpty ? null : candidates.first;
+  if (selected != null) await tts.setVoice(selected);
+}
+
+@pragma('vm:entry-point')
+Future<void> scheduledWordAlarm(int id, Map<String, dynamic> params) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  final word = '${params['word'] ?? ''}';
+  final tajik = '${params['tajik'] ?? ''}';
+  final gender = '${params['gender'] ?? 'female'}';
+  final rate = (params['rate'] as num?)?.toDouble() ?? .42;
+  if (word.isEmpty) return;
+  final tts = FlutterTts();
+  await _configureTts(tts, gender, rate);
+  await tts.speak(word);
+  final local = FlutterLocalNotificationsPlugin();
+  await local.initialize(const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')));
+  const details = AndroidNotificationDetails('word_review', 'Такрори калимаҳо', channelDescription: 'Ёдраскуниҳои калимаҳои англисӣ', importance: Importance.high, priority: Priority.high);
+  await local.show(id, 'Вақти такрори калима 📚', '$word — $tajik', const NotificationDetails(android: details), payload: jsonEncode({'word': word, 'gender': gender, 'rate': rate}));
+}
 
 class Word {
   final String english, pronunciation, tajik, topic;
