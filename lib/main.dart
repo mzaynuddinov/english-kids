@@ -659,18 +659,11 @@ class SettingsPage extends StatelessWidget {
           const Icon(Icons.speed_rounded, color: cyan500), const SizedBox(width: 8), const Text('Суръати овоз'),
           Expanded(child: Slider(min: .25, max: .65, value: settings.speechRate, onChanged: (v) => onChanged(copy(speechRate: v)))),
         ]),
-        FilledButton.tonalIcon(onPressed: () => speak('Hello! My name is English Kids.'), icon: const Icon(Icons.play_circle_rounded), label: const Text('Санҷиши овоз')),
+        FilledButton.tonalIcon(onPressed: () => speak('Hello! Let us learn English together.'), icon: const Icon(Icons.volume_up_rounded), label: const Text('Санҷиши овоз')),
       ]),
       section(context, Icons.accessibility_new_rounded, 'Осонии истифода', [
         const ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.phone_android_rounded, color: sky500), title: Text('Responsive layout', style: TextStyle(fontWeight: FontWeight.w800)), subtitle: Text('Барои экранҳои гуногун мутобиқ мешавад.')),
         const ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.touch_app_rounded, color: teal500), title: Text('Ҳолатҳои тугмаҳо', style: TextStyle(fontWeight: FontWeight.w800)), subtitle: Text('Selected, pressed, disabled ва loading бо feedback-и равшан.')),
-      ]),
-      section(context, Icons.person_rounded, 'Таҳиягар', [
-        const ListTile(contentPadding: EdgeInsets.zero, leading: AppLogo(size: 48), title: Text('Majnun Zaynuddinov', style: TextStyle(fontWeight: FontWeight.w900)), subtitle: Text('+992 98 537 36 35\nmzaynuddinov@gmail.com')),
-        const ContactLine(Icons.send_rounded, '@mzaynuddinov'),
-        const ContactLine(Icons.camera_alt_outlined, '@mzaynuddinov'),
-        const ContactLine(Icons.public_rounded, 'majnun.zaynuddinov'),
-        const ContactLine(Icons.play_circle_outline, '@mzaynuddinov'),
       ]),
     ])),
   );
