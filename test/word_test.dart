@@ -10,6 +10,15 @@ void main() {
     expect(ok, isNotNull);
     expect(ok!.displayEnglish, 'Hello');
     expect(ok.isValid, isTrue);
+    expect(ok.partOfSpeech, 'interjection');
+    expect(ok.cefr, 'A1');
+    expect(ok.ipa, 'həˈləʊ');
+    expect(ok.phoneticLabel, "/həˈləʊ/");
+    expect(ok.ipaLabel, "[həˈləʊ]");
+    expect(ok.stress, 'Hel-lo');
+    expect(ok.posLabel, 'Phrase / Interjection');
+    expect(ok.synonyms, ['Hi', 'Hey']);
+    expect(ok.antonyms, ['Goodbye']);
 
     expect(Word.tryParse(['', 'x', 'y', 1, 't']), isNull);
     expect(Word.tryParse(['hi', 'x', 'y', 0, 't']), isNull);
@@ -33,6 +42,9 @@ void main() {
     expect(word?.week, 4);
     expect(word?.day, 2);
     expect(word?.example, 'I like my cat.');
+    expect(word?.partOfSpeech, 'noun');
+    expect(word?.cefr, 'A1');
+    expect(word?.ipa, 'kæt');
   });
 
   test('bundled vocabulary.json is 500 unique valid words', () {
@@ -52,5 +64,7 @@ void main() {
     expect(words.every((w) => w.exampleTajik.trim().isNotEmpty), isTrue);
     expect(words.any((w) => w.english.toLowerCase() == 'hello' && w.example.startsWith('Hello!')), isTrue);
     expect(words.any((w) => w.english.toLowerCase() == 'apple' && w.example.toLowerCase().contains('apple')), isTrue);
+    expect(words.every((w) => w.cefr == 'A1' || w.cefr == 'A2'), isTrue);
+    expect(words.every((w) => w.partOfSpeech.isNotEmpty), isTrue);
   });
 }
