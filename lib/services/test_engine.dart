@@ -1,4 +1,5 @@
 import '../models/alphabet.dart';
+import '../models/activity.dart';
 import '../models/test_models.dart';
 import '../models/word.dart';
 
@@ -90,8 +91,26 @@ List<Word> _unique(List<Word> words) {
   return [for (final w in words) if (seen.add(w.id)) w];
 }
 
+List<Word> pickLearnedWeighted({
+  required List<Word> learned,
+  required Map<String, int> misses,
+  required int count,
+  required int seed,
+}) {
+  if (learned.isEmpty || count <= 0) return const [];
+  final bag = <Word>[];
+  for (final word in learned) {
+    final weight = (1 + (misses[word.id] ?? 0) * 2).clamp(1, 8);
+    for (var i = 0; i < weight; i++) {
+      bag.add(word);
+    }
+  }
+  final shuffled = _shuffled(bag, seed);
+  return _unique(shuffled).take(count.clamp(1, learned.length)).toList();
+}
+
 TestSession buildAlphabetSession({int seed = 1}) {
-  final letters = alphabetLetters;
+  final letters = _shuffled(alphabetLetters, seed);
   final questions = [
     for (var i = 0; i < letters.length; i++)
       TestQuestion(
@@ -116,9 +135,9 @@ TestSession buildAlphabetSession({int seed = 1}) {
 TestSession buildVocabularySession({
   required List<Word> words,
   required TestBlueprint plan,
-  int count = 24,
+  int count = 25,
 }) {
-  final pool = _unique(words);
+  final pool = _unique(words.where((w) => w.isMarked(plan.learned)).toList());
   if (pool.isEmpty) {
     return TestSession(
       id: 'empty',
@@ -129,18 +148,12 @@ TestSession buildVocabularySession({
   }
   final meanings = pool.map((w) => w.tajik).toSet().toList()..sort();
   final english = pool.map((w) => w.displayEnglish).toSet().toList()..sort();
-  final hard = [...pool]..sort((a, b) => (plan.misses[b.id] ?? 0).compareTo(plan.misses[a.id] ?? 0));
-  final saved = pool.where((w) => w.isMarked(plan.saved)).toList();
-  final learned = pool.where((w) => w.isMarked(plan.learned)).toList();
-  final fresh = pool.where((w) => !w.isMarked(plan.learned)).toList();
-  final buckets = [
-    ..._shuffled(fresh, plan.seed),
-    ..._shuffled(hard.take(8).toList(), plan.seed + 1),
-    ..._shuffled(saved, plan.seed + 2),
-    ..._shuffled(learned, plan.seed + 3),
-    ..._shuffled(pool, plan.seed + 4),
-  ];
-  final picked = _unique(buckets).take(count.clamp(1, pool.length)).toList();
+  final picked = pickLearnedWeighted(
+    learned: pool,
+    misses: plan.misses,
+    count: count.clamp(1, pool.length),
+    seed: plan.seed,
+  );
   final questions = <TestQuestion>[];
   for (var i = 0; i < picked.length; i++) {
     final word = picked[i];
@@ -216,10 +229,20 @@ TestSession submitAnswer(TestSession session, String given) {
 
 TestResult resultFrom(TestSession session) {
   final review = <String>[];
-  for (final answer in session.answers.where((a) => !a.correct)) {
-    final q = session.questions.where((item) => item.id == answer.questionId);
-    if (q.isEmpty) continue;
-    review.add(q.first.expected);
+  final items = <ReviewLine>[];
+  for (final question in session.questions) {
+    final match = session.answers.where((a) => a.questionId == question.id);
+    final given = match.isEmpty ? '' : match.first.given;
+    final correct = match.isNotEmpty && match.first.correct;
+    if (!correct) review.add(question.expected);
+    items.add(
+      ReviewLine(
+        prompt: question.speakText.isEmpty ? question.prompt : question.speakText,
+        given: given.isEmpty ? '—' : given,
+        expected: question.expected,
+        correct: correct,
+      ),
+    );
   }
   return TestResult(
     id: session.id,
@@ -228,5 +251,6 @@ TestResult resultFrom(TestSession session) {
     total: session.questions.length,
     correct: session.correctCount,
     review: review.toSet().toList(),
+    items: items,
   );
 }

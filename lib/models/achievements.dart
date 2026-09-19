@@ -57,6 +57,12 @@ const achievementCatalog = <AchievementInfo>[
     text: 'Як мушкилоти имрӯзро анҷом додед',
     icon: Icons.extension_rounded,
   ),
+  AchievementInfo(
+    id: 'grammar',
+    title: 'Грамматика',
+    text: '10 дарси грамматикӣ анҷом ёфт',
+    icon: Icons.spellcheck_rounded,
+  ),
 ];
 
 String masteryLabel(int hits, int misses) {

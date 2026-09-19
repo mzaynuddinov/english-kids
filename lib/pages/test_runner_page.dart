@@ -112,7 +112,31 @@ class _TestRunnerPageState extends State<TestRunnerPage> {
     final batch = ((number - 1) ~/ 5) + 1;
     final batches = (total + 4) ~/ 5;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        if (session.completed || session.answers.isEmpty) {
+          if (context.mounted) Navigator.pop(context);
+          return;
+        }
+        final leave = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Санҷиш идома дорад.'),
+            content: const Text('Оё мехоҳед бароед?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Идома')),
+              FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Баромадан')),
+            ],
+          ),
+        );
+        if (leave == true && context.mounted) {
+          await widget.onChanged(session);
+          if (context.mounted) Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: Text(session.kindLabel),
       ),
@@ -156,6 +180,7 @@ class _TestRunnerPageState extends State<TestRunnerPage> {
                 ),
               ),
       ),
+    ),
     );
   }
 

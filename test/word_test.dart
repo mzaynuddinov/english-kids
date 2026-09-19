@@ -17,32 +17,36 @@ void main() {
     expect(Word.tryParse(null), isNull);
   });
 
-  test('parses map records', () {
+  test('parses map records with day and example', () {
     final word = Word.tryParse({
       'english': 'cat',
       'pronunciation': 'кэт',
       'tajik': 'гурба',
       'week': 4,
       'topic': 'Animals',
+      'day': 2,
+      'difficulty': 1,
+      'example': 'I like my cat.',
+      'example_tajik': 'Ба ман гурбаам маъқул аст.',
     });
     expect(word?.english, 'cat');
     expect(word?.week, 4);
+    expect(word?.day, 2);
+    expect(word?.example, 'I like my cat.');
   });
 
-  test('bundled vocabulary.json is valid and complete', () {
+  test('bundled vocabulary.json is 500 unique valid words', () {
     final file = File('data/vocabulary.json');
     expect(file.existsSync(), isTrue);
     final decoded = jsonDecode(file.readAsStringSync());
     expect(decoded, isA<List>());
     final words = (decoded as List).map(Word.tryParse).whereType<Word>().toList();
-    expect(words.length, 150);
-    expect(words.map((w) => w.id).toSet().length, 150);
+    expect(words.length, 500);
+    expect(words.map((w) => w.id).toSet().length, 500);
     expect(words.where((w) => w.english.toLowerCase() == 'orange').length, 2);
     expect(words.every((w) => w.isValid), isTrue);
-    expect(words.where((w) => w.week == 1).length, 25);
-    expect(words.where((w) => w.week == 2).length, 25);
-    expect(words.where((w) => w.week == 3).length, 30);
-    expect(words.where((w) => w.week == 4).length, 30);
-    expect(words.where((w) => w.week == 5).length, 40);
+    for (var week = 1; week <= 10; week++) {
+      expect(words.where((w) => w.week == week).length, 50, reason: 'week $week');
+    }
   });
 }

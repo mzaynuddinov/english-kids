@@ -19,8 +19,8 @@ Future<void> pumpApp(WidgetTester tester) async {
   });
 
   await tester.pumpWidget(const EnglishKidsApp());
-  await tester.pump(); // first frame + post-frame load
-  await tester.pump(); // apply vocabulary setState
+  await tester.pump();
+  await tester.pump();
   for (var i = 0; i < 12; i++) {
     await tester.pump(const Duration(milliseconds: 16));
     if (find.textContaining('Нақшаи омӯзиш').evaluate().isNotEmpty) return;
@@ -60,6 +60,7 @@ void main() {
     expect(find.textContaining('Мушкилоти имрӯз'), findsOneWidget);
     expect(find.text('Алифбо'), findsOneWidget);
     expect(find.textContaining('Калимаи имрӯз'), findsOneWidget);
+    expect(find.textContaining('Грамматикаи асосӣ'), findsWidgets);
   });
 
   testWidgets('drawer contains required destinations', (tester) async {
@@ -72,10 +73,13 @@ void main() {
     expect(find.text('Асосӣ'), findsWidgets);
     expect(find.text('Алифбо'), findsWidgets);
     expect(find.text('Калимаҳо'), findsWidgets);
+    expect(find.text('Грамматикаи асосӣ'), findsWidgets);
     expect(find.text('Санҷиш'), findsOneWidget);
     expect(find.text('Ёдраскуниҳо'), findsOneWidget);
+    expect(find.text('Тақвими омӯзиш'), findsOneWidget);
     expect(find.text('Барои баъд'), findsWidgets);
     expect(find.text('Пешрафт'), findsWidgets);
+    expect(find.text('Таърихи санҷишҳо'), findsOneWidget);
     expect(find.text('Танзимот'), findsWidgets);
     expect(find.text('Таҳиягар'), findsOneWidget);
     expect(find.text('Дар бораи барнома'), findsOneWidget);

@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('parseRaw accepts the bundled 150-word list', () {
+  test('parseRaw accepts the bundled 500-word list', () {
     final raw = File('data/vocabulary.json').readAsStringSync();
     final result = VocabularyService.parseRaw(raw);
     expect(result.ok, isTrue);
-    expect(result.words.length, 150);
+    expect(result.words.length, 500);
     expect(result.words.where((w) => w.english.toLowerCase() == 'orange').length, 2);
+    expect(result.words.map((w) => w.id).toSet().length, 500);
     expect(result.error, isNull);
   });
 
@@ -28,7 +29,7 @@ void main() {
     final raw = await rootBundle.loadString('data/vocabulary.json');
     expect(jsonDecode(raw), isA<List>());
     final result = VocabularyService.parseRaw(raw);
-    expect(result.words.length, 150);
-    expect(result.words.map((w) => w.id).toSet().length, 150);
+    expect(result.words.length, 500);
+    expect(result.words.map((w) => w.id).toSet().length, 500);
   });
 }

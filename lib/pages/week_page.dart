@@ -104,18 +104,41 @@ class _WeekPageState extends State<WeekPage> {
                 title: 'Калима нест',
                 text: 'Барои ин ҳафта калима ёфт нашуд.',
               ),
-            ...widget.words.map(
-              (word) => WordCard(
-                key: ValueKey(word.id),
-                word: word,
-                learned: word.isMarked(learned),
-                saved: word.isMarked(saved),
-                onSpeak: widget.onSpeak,
-                onSave: _save,
-                onLearn: _learn,
-                onRemind: widget.onRemind,
-              ),
-            ),
+            for (var day = 1; day <= 5; day++) ...[
+              if (widget.words.any((w) => w.day == day)) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8, top: 6),
+                  child: Text(
+                    'Рӯзи $day • ${widget.words.where((w) => w.day == day).length} калима',
+                    style: const TextStyle(fontWeight: FontWeight.w900, color: cyan700),
+                  ),
+                ),
+                ...widget.words.where((w) => w.day == day).map(
+                      (word) => WordCard(
+                        key: ValueKey(word.id),
+                        word: word,
+                        learned: word.isMarked(learned),
+                        saved: word.isMarked(saved),
+                        onSpeak: widget.onSpeak,
+                        onSave: _save,
+                        onLearn: _learn,
+                        onRemind: widget.onRemind,
+                      ),
+                    ),
+              ],
+            ],
+            ...widget.words.where((w) => w.day < 1 || w.day > 5).map(
+                  (word) => WordCard(
+                    key: ValueKey(word.id),
+                    word: word,
+                    learned: word.isMarked(learned),
+                    saved: word.isMarked(saved),
+                    onSpeak: widget.onSpeak,
+                    onSave: _save,
+                    onLearn: _learn,
+                    onRemind: widget.onRemind,
+                  ),
+                ),
           ],
         ),
       ),

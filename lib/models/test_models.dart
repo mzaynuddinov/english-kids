@@ -1,3 +1,5 @@
+import 'activity.dart';
+
 enum TestKind { alphabet, vocabulary, daily }
 
 enum QuestionKind { listenType, tajikType, englishChoice, listenChoice, match }
@@ -183,6 +185,7 @@ class TestResult {
   final int total;
   final int correct;
   final List<String> review;
+  final List<ReviewLine> items;
 
   const TestResult({
     required this.id,
@@ -191,6 +194,7 @@ class TestResult {
     required this.total,
     required this.correct,
     this.review = const [],
+    this.items = const [],
   });
 
   int get incorrect => total - correct;
@@ -214,6 +218,7 @@ class TestResult {
         'total': total,
         'correct': correct,
         'review': review,
+        'items': items.map((e) => e.toJson()).toList(),
       };
 
   static TestResult fromJson(Map<String, dynamic> json) {
@@ -227,6 +232,10 @@ class TestResult {
       total: json['total'] is num ? (json['total'] as num).toInt() : 0,
       correct: json['correct'] is num ? (json['correct'] as num).toInt() : 0,
       review: (json['review'] as List?)?.map((e) => '$e').toList() ?? const [],
+      items: (json['items'] as List? ?? [])
+          .whereType<Map>()
+          .map((e) => ReviewLine.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
     );
   }
 }

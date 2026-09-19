@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const appName = 'Англисиро Омӯз';
-const appVersion = '2.0.0';
+const appVersion = '2.1.0';
 
 const emerald500 = Color(0xFF10B981);
 const emerald600 = Color(0xFF059669);

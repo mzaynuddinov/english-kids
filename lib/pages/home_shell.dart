@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/alphabet.dart';
+import '../models/activity.dart';
+import '../models/progress_rules.dart';
 import '../models/reminder.dart';
 import '../models/settings.dart';
 import '../models/test_models.dart';
@@ -18,12 +20,16 @@ import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
 import 'about_page.dart';
 import 'alphabet_page.dart';
+import 'calendar_page.dart';
 import 'developer_page.dart';
+import 'grammar_page.dart';
+import 'pin_gate.dart';
 import 'practice_page.dart';
 import 'progress_page.dart';
 import 'reminders_page.dart';
 import 'saved_page.dart';
 import 'settings_page.dart';
+import 'test_history_page.dart';
 import 'test_hub_page.dart';
 import 'test_result_page.dart';
 import 'test_runner_page.dart';
@@ -118,19 +124,6 @@ class _HomeShellState extends State<HomeShell> {
     }
   }
 
-  Future<void> _touchActivity() async {
-    try {
-      final snap = ProgressService.instance.withActivity(ProgressService.instance.snapshot);
-      final next = snap.copyWith(
-        achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
-      );
-      await ProgressService.instance.save(next);
-      if (mounted) setState(() {});
-    } catch (error) {
-      debugPrint('Activity save skipped: $error');
-    }
-  }
-
   Future<void> _speak(String text) async {
     await TtsService.instance.speak(
       text: text,
@@ -138,20 +131,24 @@ class _HomeShellState extends State<HomeShell> {
       rate: widget.settings.speechRate,
     );
     try {
-      final snap = ProgressService.instance.snapshot;
-      final next = snap.copyWith(
-        listens: snap.listens + 1,
-        achievements: ProgressService.instance.computeAchievements(
-          snap.copyWith(listens: snap.listens + 1),
-          learned: learned.length,
-        ),
+      var snap = ProgressService.instance.snapshot.copyWith(
+        listens: ProgressService.instance.snapshot.listens + 1,
       );
-      await ProgressService.instance.save(next);
+      snap = ProgressService.instance.bumpDay(snap, listened: 1);
+      final needle = text.trim().toLowerCase();
+      final match = words.where((w) => w.english.toLowerCase() == needle);
+      if (match.isNotEmpty) {
+        snap = ProgressService.instance.bumpWord(snap, match.first.id, listened: 1);
+      }
+      snap = snap.copyWith(
+        achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
+      );
+      await ProgressService.instance.save(snap);
     } catch (_) {}
     final selection = TtsService.instance.lastSelection;
     if (!mounted || selection == null || selection.genderMatched) return;
     if (widget.settings.voiceGender == 'male' && !selection.genderMatched) {
-      _feedback('Овози мардона дар ин дастгоҳ ёфт нашуд. Овози англисӣ истифода шуд.');
+      _feedback('Овози мардона дар дастгоҳи шумо дастрас нест.');
     }
   }
 
@@ -167,7 +164,7 @@ class _HomeShellState extends State<HomeShell> {
       return 'Дар ин дастгоҳ овози TTS ёфт нашуд.';
     }
     if (!selection.genderMatched && widget.settings.voiceGender == 'male') {
-      return 'Овози мардона дастрас нест. Овози англисӣ истифода шуд.';
+      return 'Овози мардона дар дастгоҳи шумо дастрас нест.';
     }
     if (!selection.genderMatched && widget.settings.voiceGender == 'female') {
       return 'Овози занона дастрас нест. Овози англисӣ истифода шуд.';
@@ -196,7 +193,14 @@ class _HomeShellState extends State<HomeShell> {
     await PreferencesService.instance.saveSet('learned', next);
     if (!mounted) return;
     setState(() => learned = next);
-    await _touchActivity();
+    try {
+      var snap = ProgressService.instance.withActivity(ProgressService.instance.snapshot);
+      snap = ProgressService.instance.bumpDay(snap, learned: 1, opened: 1);
+      snap = ProgressService.instance.bumpWord(snap, word.id, opened: 1);
+      snap = snap.copyWith(achievements: ProgressService.instance.computeAchievements(snap, learned: next.length));
+      await ProgressService.instance.save(snap);
+    } catch (_) {}
+    if (mounted) setState(() {});
     _feedback('🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.');
   }
 
@@ -213,6 +217,14 @@ class _HomeShellState extends State<HomeShell> {
     await ProgressService.instance.save(ProgressService.instance.withActivity(next));
     if (mounted) setState(() {});
     _feedback('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
+  }
+
+  Future<void> _saveAlphabetIndex(int index) async {
+    try {
+      await ProgressService.instance.save(
+        ProgressService.instance.snapshot.copyWith(alphabetIndex: index.clamp(0, 25)),
+      );
+    } catch (_) {}
   }
 
   Future<void> _scheduleWord(Word word) async {
@@ -234,8 +246,18 @@ class _HomeShellState extends State<HomeShell> {
     _feedback(message);
   }
 
+  Future<void> _markReminderDone() async {
+    try {
+      var snap = ProgressService.instance.snapshot;
+      snap = ProgressService.instance.bumpDay(snap, reminders: 1);
+      snap = snap.copyWith(reminderDone: snap.reminderDone + 1);
+      await ProgressService.instance.save(snap);
+    } catch (_) {}
+  }
+
   void _showInAppReminder(WordReminder reminder) {
     if (!mounted) return;
+    unawaited(_markReminderDone());
     setState(() {});
     showDialog<void>(
       context: context,
@@ -288,6 +310,15 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _openWeek(int week) async {
+    final snap = ProgressService.instance.snapshot;
+    if (!weekUnlocked(week, snap.letters, words, learned)) {
+      _feedback('🔒 Қадами оянда ҳоло қулф аст. ${lockReason(week)}');
+      return;
+    }
+    try {
+      await ProgressService.instance.save(ProgressService.instance.bumpDay(snap, opened: 1));
+    } catch (_) {}
+    if (!mounted) return;
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
@@ -308,19 +339,69 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   void _openSettings() {
-    Navigator.push<void>(
+    unawaited(_openSettingsAsync());
+  }
+
+  Future<void> _openSettingsAsync() async {
+    final ok = await unlockParent(context, title: 'Танзимот');
+    if (!ok || !mounted) return;
+    await Navigator.push<void>(
       context,
       MaterialPageRoute(
         builder: (_) => SettingsPage(
           settings: widget.settings,
           onChanged: widget.onSettingsChanged,
           onTestVoice: _testVoice,
+          words: words,
+          learned: learned,
+          onResetProgress: () async {
+            setState(() {
+              learned = {};
+              saved = {};
+            });
+          },
         ),
+      ),
+    );
+    if (mounted) await _loadData(silent: true);
+  }
+
+  Future<void> _openHistory() async {
+    final ok = await unlockParent(context, title: 'Таърихи санҷишҳо');
+    if (!ok || !mounted) return;
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TestHistoryPage(results: ProgressService.instance.snapshot.history),
       ),
     );
   }
 
+  Future<void> _openCalendar() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const CalendarPage()),
+    );
+  }
+
+  Future<void> _openGrammar() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GrammarPage(words: words, learned: learned, onSpeak: _speak),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   Future<void> _startTest(TestKind kind) async {
+    if (kind == TestKind.vocabulary) {
+      final n = words.where((w) => w.isMarked(learned)).length;
+      if (n < 25) {
+        _feedback('Барои санҷиш аввал ҳадди ақал 25 калима омӯзед.');
+        return;
+      }
+    }
     final snap = ProgressService.instance.snapshot;
     final active = snap.active;
     TestSession? session;
@@ -416,6 +497,7 @@ class _HomeShellState extends State<HomeShell> {
     final misses = {...snap.misses};
     final hits = {...snap.hits};
     final letters = {...snap.letters};
+    final mistakes = [...snap.mistakes];
     for (final answer in session.answers) {
       TestQuestion? q;
       for (final item in session.questions) {
@@ -428,8 +510,21 @@ class _HomeShellState extends State<HomeShell> {
       if (q.wordId != null) {
         if (answer.correct) {
           hits[q.wordId!] = (hits[q.wordId!] ?? 0) + 1;
+          snap = ProgressService.instance.bumpWord(snap, q.wordId!, correct: 1);
         } else {
           misses[q.wordId!] = (misses[q.wordId!] ?? 0) + 1;
+          snap = ProgressService.instance.bumpWord(snap, q.wordId!, mistake: 1);
+          mistakes.add(
+            MistakeRecord(
+              wordId: q.wordId!,
+              english: q.speakText,
+              kind: session.kind.name,
+              given: answer.given,
+              expected: q.expected,
+              timestamp: answer.timestamp,
+              count: misses[q.wordId!] ?? 1,
+            ),
+          );
         }
       }
       if (q.letter != null && answer.correct) {
@@ -440,10 +535,12 @@ class _HomeShellState extends State<HomeShell> {
       misses: misses,
       hits: hits,
       letters: letters,
+      mistakes: mistakes.take(200).toList(),
       history: [result, ...snap.history].take(40).toList(),
       clearActive: true,
       dailyDone: session.kind == TestKind.daily ? true : snap.dailyDone,
     );
+    snap = ProgressService.instance.bumpDay(snap, tests: 1);
     snap = ProgressService.instance.withActivity(snap);
     snap = snap.copyWith(
       achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
@@ -459,6 +556,25 @@ class _HomeShellState extends State<HomeShell> {
     final now = DateTime.now();
     final day = now.difference(DateTime(now.year)).inDays;
     return words[day % words.length];
+  }
+
+  Future<void> _continueLearning() async {
+    final snap = ProgressService.instance.snapshot;
+    if (!alphabetComplete(snap.letters)) {
+      await _openAlphabet();
+      return;
+    }
+    for (var week = 1; week <= weekCount; week++) {
+      if (!weekComplete(week, words, learned) && weekUnlocked(week, snap.letters, words, learned)) {
+        await _openWeek(week);
+        return;
+      }
+    }
+    if (grammarUnlocked(words, learned, snap.letters)) {
+      await _openGrammar();
+      return;
+    }
+    _feedback('🎉 Ҳама чиз омӯхта шуд!');
   }
 
   @override
@@ -481,6 +597,8 @@ class _HomeShellState extends State<HomeShell> {
         saved: saved,
         snapshot: snap,
         onPractice: _openPractice,
+        onHistory: () => unawaited(_openHistory()),
+        onCalendar: () => unawaited(_openCalendar()),
       ),
     ];
 
@@ -617,6 +735,8 @@ class _HomeShellState extends State<HomeShell> {
                 _dailyChallenge(snap),
                 const SizedBox(height: 12),
                 _alphabetCard(snap.letters.length),
+                const SizedBox(height: 12),
+                _grammarCard(snap),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -649,14 +769,15 @@ class _HomeShellState extends State<HomeShell> {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
           sliver: SliverList.builder(
-            itemCount: 5,
+            itemCount: weekCount,
             itemBuilder: (_, i) {
               final week = i + 1;
               final list = words.where((w) => w.week == week).toList();
               final done = list.where((w) => w.isMarked(learned)).length;
+              final locked = !weekUnlocked(week, snap.letters, words, learned);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 11),
-                child: _weekCard(week, weekTitles[week] ?? '', list.length, done),
+                child: _weekCard(week, weekTitles[week] ?? '', list.length, done, locked),
               );
             },
           ),
@@ -725,7 +846,7 @@ class _HomeShellState extends State<HomeShell> {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () => _openWeek(next.week),
+              onPressed: () => unawaited(_continueLearning()),
               icon: const Icon(Icons.play_arrow_rounded),
               label: Text('Идома: ${next.displayEnglish}'),
             ),
@@ -871,6 +992,52 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  Widget _grammarCard(ProgressSnapshot snap) {
+    final unlocked = grammarUnlocked(words, learned, snap.letters);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          if (!unlocked) {
+            _feedback('🔒 Қадами оянда ҳоло қулф аст. Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.');
+            return;
+          }
+          unawaited(_openGrammar());
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: unlocked ? const [indigo600, blue600] : [slate700, slate800]),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(unlocked ? Icons.menu_book_rounded : Icons.lock_rounded, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(unlocked ? 'Грамматикаи асосӣ' : '🔒 Грамматикаи асосӣ', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    Text(
+                      unlocked ? '${snap.grammar.length} / 10 дарс' : 'Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: cyan600),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _stat(IconData icon, String value, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 13),
@@ -890,7 +1057,7 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Widget _weekCard(int week, String title, int total, int done) {
+  Widget _weekCard(int week, String title, int total, int done, bool locked) {
     final pct = total == 0 ? 0.0 : done / total;
     return InkWell(
       borderRadius: BorderRadius.circular(22),
@@ -901,7 +1068,7 @@ class _HomeShellState extends State<HomeShell> {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: pct == 1
+            color: !locked && pct == 1
                 ? emerald500.withValues(alpha: 0.65)
                 : Theme.of(context).dividerColor.withValues(alpha: 0.3),
           ),
@@ -912,14 +1079,16 @@ class _HomeShellState extends State<HomeShell> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [teal600, cyan600]),
+                gradient: LinearGradient(colors: locked ? [slate700, slate800] : const [teal600, cyan600]),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
-                child: Text(
-                  '$week',
-                  style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
-                ),
+                child: locked
+                    ? const Icon(Icons.lock_rounded, color: Colors.white)
+                    : Text(
+                        '$week',
+                        style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
+                      ),
               ),
             ),
             const SizedBox(width: 14),
@@ -927,13 +1096,16 @@ class _HomeShellState extends State<HomeShell> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(99),
-                    child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
-                  ),
+                  if (locked)
+                    Text(lockReason(week), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))
+                  else
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
+                    ),
                 ],
               ),
             ),
@@ -955,9 +1127,9 @@ class _HomeShellState extends State<HomeShell> {
       context,
       MaterialPageRoute(
         builder: (_) => AlphabetPage(
-          learnedLetters: ProgressService.instance.snapshot.letters,
           onSpeak: _speak,
           onLearnLetter: _learnLetter,
+          onIndex: (index) => unawaited(_saveAlphabetIndex(index)),
         ),
       ),
     );
@@ -1013,15 +1185,25 @@ class _HomeShellState extends State<HomeShell> {
                     onSave: _toggleSave,
                     onLearn: _learn,
                     onRemind: _scheduleWord,
+                    onLocked: (message) => _feedback('🔒 Қадами оянда ҳоло қулф аст. $message'),
                   ),
                 ),
               );
+            }),
+            _item(Icons.spellcheck_rounded, 'Грамматикаи асосӣ', () {
+              Navigator.pop(context);
+              unawaited(_openGrammar());
             }),
             _item(Icons.extension_rounded, 'Санҷиш', () {
               Navigator.pop(context);
               Navigator.push<void>(
                 context,
-                MaterialPageRoute(builder: (_) => TestHubPage(onStart: _startTest)),
+                MaterialPageRoute(
+                  builder: (_) => TestHubPage(
+                    onStart: _startTest,
+                    onHistory: () => unawaited(_openHistory()),
+                  ),
+                ),
               );
             }),
             _item(Icons.alarm_rounded, 'Ёдраскуниҳо', () {
@@ -1051,6 +1233,10 @@ class _HomeShellState extends State<HomeShell> {
                 ),
               );
             }),
+            _item(Icons.calendar_month_rounded, 'Тақвими омӯзиш', () {
+              Navigator.pop(context);
+              unawaited(_openCalendar());
+            }),
             _item(Icons.bookmark_rounded, 'Барои баъд', () {
               Navigator.pop(context);
               setState(() => tab = 1);
@@ -1058,6 +1244,10 @@ class _HomeShellState extends State<HomeShell> {
             _item(Icons.insights_rounded, 'Пешрафт', () {
               Navigator.pop(context);
               setState(() => tab = 2);
+            }),
+            _item(Icons.history_rounded, 'Таърихи санҷишҳо', () {
+              Navigator.pop(context);
+              unawaited(_openHistory());
             }),
             const Divider(indent: 20, endIndent: 20),
             _item(Icons.settings_rounded, 'Танзимот', () {

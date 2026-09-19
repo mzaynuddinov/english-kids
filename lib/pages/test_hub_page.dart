@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import '../models/test_models.dart';
 import '../services/progress_service.dart';
 import '../theme.dart';
-import 'test_history_page.dart';
 
 class TestHubPage extends StatelessWidget {
   final Future<void> Function(TestKind kind) onStart;
+  final VoidCallback onHistory;
 
   const TestHubPage({
     super.key,
     required this.onStart,
+    required this.onHistory,
   });
 
   @override
   Widget build(BuildContext context) {
-    final history = ProgressService.instance.snapshot.history;
     final active = ProgressService.instance.snapshot.active;
     return Scaffold(
       appBar: AppBar(
@@ -23,12 +23,7 @@ class TestHubPage extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: 'Натиҷаҳои санҷиш',
-            onPressed: () {
-              Navigator.push<void>(
-                context,
-                MaterialPageRoute(builder: (_) => TestHistoryPage(results: history)),
-              );
-            },
+            onPressed: onHistory,
             icon: const Icon(Icons.history_rounded),
           ),
         ],
@@ -51,13 +46,13 @@ class TestHubPage extends StatelessWidget {
             _tile(
               icon: Icons.abc_rounded,
               title: 'Санҷиши Алифбо',
-              text: 'A → Z, як ҳарф дар як вақт',
+              text: 'Ҳарфҳо омехта, як ҳарф дар як вақт',
               onTap: () => onStart(TestKind.alphabet),
             ),
             _tile(
               icon: Icons.menu_book_rounded,
               title: 'Санҷиши калимаҳо',
-              text: 'Гӯш кун, нависед, интихоб кунед',
+              text: 'Танҳо калимаҳои омӯхта — то 25 савол',
               onTap: () => onStart(TestKind.vocabulary),
             ),
             _tile(

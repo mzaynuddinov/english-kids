@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/achievements.dart';
 import '../models/word.dart';
+import '../services/progress_service.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/word_card.dart';
 
@@ -31,10 +32,11 @@ class PracticePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final snap = ProgressService.instance.snapshot;
     final hard = [...words]..sort((a, b) => (misses[b.id] ?? 0).compareTo(misses[a.id] ?? 0));
     final list = hard.where((w) => (misses[w.id] ?? 0) > 0).take(20).toList();
     return Scaffold(
-      appBar: AppBar(title: const Text('Боз такрор кардан лозим')),
+      appBar: AppBar(title: const Text('Калимаҳое, ки боз такрор кардан лозим аст')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -49,7 +51,8 @@ class PracticePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  masteryLabel(hits[word.id] ?? 0, misses[word.id] ?? 0),
+                  '${masteryLabel(hits[word.id] ?? 0, misses[word.id] ?? 0)} • Хато: ${misses[word.id]} маротиба'
+                  '${snap.wordStats[word.id]?.lastMistakeAt == 0 ? '' : ' • Охирин: ${shortDate(snap.wordStats[word.id]!.lastMistakeAt)}'}',
                   style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
                 ),
               ),

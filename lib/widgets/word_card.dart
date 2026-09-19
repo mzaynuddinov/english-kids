@@ -89,6 +89,21 @@ class WordCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, height: 1.25),
               ),
+              if (word.example.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Ҷумлаи мисол', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: scheme.onSurface.withValues(alpha: 0.6))),
+                Text(word.example, style: const TextStyle(fontWeight: FontWeight.w800)),
+                if (word.exampleTajik.isNotEmpty) Text(word.exampleTajik),
+                const SizedBox(height: 6),
+                SizedBox(
+                  height: 40,
+                  child: OutlinedButton.icon(
+                    onPressed: () => onSpeak(word.example),
+                    icon: const Icon(Icons.volume_up_rounded, size: 18),
+                    label: const Text('Гӯш кардани ҷумла'),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,

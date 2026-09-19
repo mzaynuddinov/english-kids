@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 
 import '../models/settings.dart';
+import '../models/word.dart';
+import '../services/preferences_service.dart';
+import '../services/progress_service.dart';
+import '../services/reminder_service.dart';
 import '../theme.dart';
+import 'calendar_page.dart';
+import 'parent_stats_page.dart';
+import 'pin_gate.dart';
 
 class SettingsPage extends StatelessWidget {
   final AppSettings settings;
   final ValueChanged<AppSettings> onChanged;
   final Future<String?> Function() onTestVoice;
+  final List<Word> words;
+  final Set<String> learned;
+  final Future<void> Function() onResetProgress;
 
   const SettingsPage({
     super.key,
     required this.settings,
     required this.onChanged,
     required this.onTestVoice,
+    required this.words,
+    required this.learned,
+    required this.onResetProgress,
   });
+
+  bool get slow => settings.speechRate < 0.38;
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +43,9 @@ class SettingsPage extends StatelessWidget {
               title: 'Намуди барнома',
               child: SegmentedButton<ThemeMode>(
                 segments: const [
-                  ButtonSegment(
-                    value: ThemeMode.light,
-                    icon: Icon(Icons.light_mode_rounded),
-                    label: Text('Light'),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.dark,
-                    icon: Icon(Icons.dark_mode_rounded),
-                    label: Text('Dark'),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.system,
-                    icon: Icon(Icons.brightness_auto_rounded),
-                    label: Text('Auto'),
-                  ),
+                  ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_rounded), label: Text('Light')),
+                  ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_rounded), label: Text('Dark')),
+                  ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto_rounded), label: Text('Auto')),
                 ],
                 selected: {settings.themeMode},
                 onSelectionChanged: (value) => onChanged(settings.copyWith(themeMode: value.first)),
@@ -81,37 +84,24 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   SegmentedButton<String>(
                     segments: const [
-                      ButtonSegment(
-                        value: 'female',
-                        icon: Icon(Icons.female),
-                        label: Text('Зан'),
-                      ),
-                      ButtonSegment(
-                        value: 'male',
-                        icon: Icon(Icons.male),
-                        label: Text('Мард'),
-                      ),
+                      ButtonSegment(value: 'female', icon: Icon(Icons.female), label: Text('Зан')),
+                      ButtonSegment(value: 'male', icon: Icon(Icons.male), label: Text('Мард')),
                     ],
                     selected: {settings.voiceGender},
-                    onSelectionChanged: (value) =>
-                        onChanged(settings.copyWith(voiceGender: value.first)),
+                    onSelectionChanged: (value) => onChanged(settings.copyWith(voiceGender: value.first)),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.speed_rounded, color: cyan600),
-                      const SizedBox(width: 8),
-                      const Text('Суръати овоз'),
-                      Expanded(
-                        child: Slider(
-                          min: 0.25,
-                          max: 0.65,
-                          value: settings.speechRate,
-                          onChanged: (value) => onChanged(settings.copyWith(speechRate: value)),
-                        ),
-                      ),
+                  const Text('Суръати овоз', style: TextStyle(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  SegmentedButton<bool>(
+                    segments: const [
+                      ButtonSegment(value: false, label: Text('Одатӣ 1.0x')),
+                      ButtonSegment(value: true, label: Text('Суст 0.75x')),
                     ],
+                    selected: {slow},
+                    onSelectionChanged: (value) => onChanged(settings.copyWith(speechRate: value.first ? 0.32 : 0.45)),
                   ),
+                  const SizedBox(height: 12),
                   FilledButton.tonalIcon(
                     onPressed: () async {
                       final message = await onTestVoice();
@@ -126,17 +116,89 @@ class SettingsPage extends StatelessWidget {
                 ],
               ),
             ),
+            _section(
+              icon: Icons.lock_rounded,
+              title: 'Қулфи волидон',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.tonal(
+                    onPressed: () async {
+                      final ok = await unlockParent(context, title: 'Омори омӯзиш');
+                      if (!ok || !context.mounted) return;
+                      await Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(builder: (_) => ParentStatsPage(words: words, learned: learned)),
+                      );
+                    },
+                    child: const Text('Омори омӯзиш'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.push<void>(context, MaterialPageRoute(builder: (_) => const CalendarPage()));
+                    },
+                    child: const Text('Тақвими омӯзиш'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () => _reset(context),
+                    child: const Text('Пок кардани пешрафт'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _section({
-    required IconData icon,
-    required String title,
-    required Widget child,
-  }) {
+  Future<void> _reset(BuildContext context) async {
+    final pinOk = await unlockParent(context, title: 'Пок кардани пешрафт');
+    if (!pinOk || !context.mounted) return;
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ҳамаи пешрафт пок мешавад?'),
+        content: const Text('Ҳамаи пешрафт, натиҷаҳо ва захираҳо пок мешаванд.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Бекор кардан')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Пок кардан')),
+        ],
+      ),
+    );
+    if (sure != true || !context.mounted) return;
+    final again = await unlockParent(context, title: 'Тасдиқи ниҳоӣ');
+    if (!again || !context.mounted) return;
+    final resetSettings = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Танзимотро ҳам пок кунем?'),
+        content: const Text('Мавзӯъ, андозаи матн ва овоз ба ҳолати аввала бармегардад. PIN нигоҳ дошта мешавад.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Не')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Ҳа')),
+        ],
+      ),
+    );
+    try {
+      await PreferencesService.instance.saveSet('learned', {});
+      await PreferencesService.instance.saveSet('saved', {});
+      await ProgressService.instance.resetLearning();
+      await ReminderService.instance.initialize();
+      await onResetProgress();
+      if (resetSettings == true) {
+        onChanged(const AppSettings());
+      }
+    } catch (error) {
+      debugPrint('Reset failed: $error');
+    }
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пешрафт пок шуд.')));
+  }
+
+  Widget _section({required IconData icon, required String title, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Card(

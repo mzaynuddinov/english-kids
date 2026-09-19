@@ -4,7 +4,6 @@ import '../models/achievements.dart';
 import '../models/word.dart';
 import '../services/progress_service.dart';
 import '../theme.dart';
-import 'test_history_page.dart';
 
 class ProgressPage extends StatelessWidget {
   final List<Word> words;
@@ -12,6 +11,8 @@ class ProgressPage extends StatelessWidget {
   final Set<String> saved;
   final ProgressSnapshot snapshot;
   final VoidCallback onPractice;
+  final VoidCallback onHistory;
+  final VoidCallback onCalendar;
 
   const ProgressPage({
     super.key,
@@ -20,6 +21,8 @@ class ProgressPage extends StatelessWidget {
     required this.saved,
     required this.snapshot,
     required this.onPractice,
+    required this.onHistory,
+    required this.onCalendar,
   });
 
   @override
@@ -103,17 +106,18 @@ class ProgressPage extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(builder: (_) => TestHistoryPage(results: snapshot.history)),
-                  );
-                },
+                onPressed: onHistory,
                 icon: const Icon(Icons.history_rounded),
                 label: const Text('Натиҷаҳо'),
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: onCalendar,
+          icon: const Icon(Icons.calendar_month_rounded),
+          label: const Text('Тақвими омӯзиш'),
         ),
         const SizedBox(height: 18),
         const Text('Мукофотҳо', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
@@ -134,7 +138,7 @@ class ProgressPage extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 10),
-        ...List.generate(5, (i) {
+        ...List.generate(weekCount, (i) {
           final week = i + 1;
           final list = words.where((w) => w.week == week).toList();
           final done = list.where((w) => w.isMarked(learned)).length;
