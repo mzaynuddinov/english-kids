@@ -7,8 +7,9 @@
     "topic": "Greetings",
     "day": 1,
     "difficulty": 1,
-    "example": "I like hello.",
-    "example_tajik": "Ба ман салом маъқул аст."
+    "example": "Hello! How are you?",
+    "example_tajik": "Салом! Ҳол чӣ тавр?",
+    "id": 1
   },
   {
     "english": "hi",
@@ -18,8 +19,9 @@
     "topic": "Greetings",
     "day": 2,
     "difficulty": 1,
-    "example": "I like hi.",
-    "example_tajik": "Ба ман салом (ғайрирасмӣ) маъқул аст."
+    "example": "Hi, my friend!",
+    "example_tajik": "Салом, дӯстам!",
+    "id": 2
   },
   {
     "english": "goodbye",
@@ -29,8 +31,9 @@
     "topic": "Greetings",
     "day": 3,
     "difficulty": 1,
-    "example": "I like goodbye.",
-    "example_tajik": "Ба ман хайр маъқул аст."
+    "example": "Goodbye, mum.",
+    "example_tajik": "Хайр, модар.",
+    "id": 3
   },
   {
     "english": "bye",
@@ -40,8 +43,9 @@
     "topic": "Greetings",
     "day": 4,
     "difficulty": 1,
-    "example": "I like bye.",
-    "example_tajik": "Ба ман хайр (ғайрирасмӣ) маъқул аст."
+    "example": "Bye, see you!",
+    "example_tajik": "Хайр, то дидор!",
+    "id": 4
   },
   {
     "english": "good morning",
@@ -51,8 +55,9 @@
     "topic": "Greetings",
     "day": 5,
     "difficulty": 1,
-    "example": "I like good morning.",
-    "example_tajik": "Ба ман субҳ ба хайр маъқул аст."
+    "example": "Good morning, teacher.",
+    "example_tajik": "Субҳ ба хайр, муаллим.",
+    "id": 5
   },
   {
     "english": "good night",
@@ -62,8 +67,9 @@
     "topic": "Greetings",
     "day": 1,
     "difficulty": 1,
-    "example": "I like good night.",
-    "example_tajik": "Ба ман шаб ба хайр маъқул аст."
+    "example": "Good night, dad.",
+    "example_tajik": "Шаб ба хайр, падар.",
+    "id": 6
   },
   {
     "english": "yes",
@@ -73,8 +79,9 @@
     "topic": "Greetings",
     "day": 2,
     "difficulty": 1,
-    "example": "I like yes.",
-    "example_tajik": "Ба ман ҳа маъқул аст."
+    "example": "Yes, I can.",
+    "example_tajik": "Ҳа, метавонам.",
+    "id": 7
   },
   {
     "english": "no",
@@ -84,8 +91,9 @@
     "topic": "Greetings",
     "day": 3,
     "difficulty": 1,
-    "example": "I like no.",
-    "example_tajik": "Ба ман не маъқул аст."
+    "example": "No, thank you.",
+    "example_tajik": "Не, ташаккур.",
+    "id": 8
   },
   {
     "english": "please",
@@ -95,8 +103,9 @@
     "topic": "Greetings",
     "day": 4,
     "difficulty": 1,
-    "example": "I like please.",
-    "example_tajik": "Ба ман лутфан маъқул аст."
+    "example": "Please sit down.",
+    "example_tajik": "Лутфан нишинед.",
+    "id": 9
   },
   {
     "english": "thank you",
@@ -106,8 +115,9 @@
     "topic": "Greetings",
     "day": 5,
     "difficulty": 1,
-    "example": "I like thank you.",
-    "example_tajik": "Ба ман ташаккур маъқул аст."
+    "example": "Thank you, mum.",
+    "example_tajik": "Ташаккур, модар.",
+    "id": 10
   },
   {
     "english": "happy",
@@ -117,8 +127,9 @@
     "topic": "Feelings",
     "day": 1,
     "difficulty": 1,
-    "example": "I like happy.",
-    "example_tajik": "Ба ман хушбахт маъқул аст."
+    "example": "I am happy.",
+    "example_tajik": "Ман хушҳол ҳастам.",
+    "id": 11
   },
   {
     "english": "sad",
@@ -128,8 +139,9 @@
     "topic": "Feelings",
     "day": 2,
     "difficulty": 1,
-    "example": "I like sad.",
-    "example_tajik": "Ба ман ғамгин маъқул аст."
+    "example": "I am sad.",
+    "example_tajik": "Ман ғамгин ҳастам.",
+    "id": 12
   },
   {
     "english": "tired",
@@ -139,8 +151,9 @@
     "topic": "Feelings",
     "day": 3,
     "difficulty": 1,
-    "example": "I like tired.",
-    "example_tajik": "Ба ман хаста маъқул аст."
+    "example": "I am tired.",
+    "example_tajik": "Ман хаста ҳастам.",
+    "id": 13
   },
   {
     "english": "angry",
@@ -150,8 +163,9 @@
     "topic": "Feelings",
     "day": 4,
     "difficulty": 1,
-    "example": "I like angry.",
-    "example_tajik": "Ба ман хашмгин маъқул аст."
+    "example": "He is angry.",
+    "example_tajik": "Ӯ хашмгин аст.",
+    "id": 14
   },
   {
     "english": "sleepy",
@@ -161,8 +175,9 @@
     "topic": "Feelings",
     "day": 5,
     "difficulty": 1,
-    "example": "I like sleepy.",
-    "example_tajik": "Ба ман хоболуд маъқул аст."
+    "example": "I am sleepy.",
+    "example_tajik": "Ман хоболудам.",
+    "id": 15
   },
   {
     "english": "hungry",
@@ -172,8 +187,9 @@
     "topic": "Feelings",
     "day": 1,
     "difficulty": 1,
-    "example": "I like hungry.",
-    "example_tajik": "Ба ман гурусна маъқул аст."
+    "example": "I am hungry.",
+    "example_tajik": "Ман гуруснаам.",
+    "id": 16
   },
   {
     "english": "thirsty",
@@ -183,8 +199,9 @@
     "topic": "Feelings",
     "day": 2,
     "difficulty": 1,
-    "example": "I like thirsty.",
-    "example_tajik": "Ба ман ташна маъқул аст."
+    "example": "I am thirsty.",
+    "example_tajik": "Ман ташнаам.",
+    "id": 17
   },
   {
     "english": "scared",
@@ -194,8 +211,9 @@
     "topic": "Feelings",
     "day": 3,
     "difficulty": 1,
-    "example": "I like scared.",
-    "example_tajik": "Ба ман тарсида маъқул аст."
+    "example": "I am scared.",
+    "example_tajik": "Ман тарсидаам.",
+    "id": 18
   },
   {
     "english": "fine",
@@ -205,8 +223,9 @@
     "topic": "Feelings",
     "day": 4,
     "difficulty": 1,
-    "example": "I like fine.",
-    "example_tajik": "Ба ман хуб маъқул аст."
+    "example": "I am fine.",
+    "example_tajik": "Ман хубам.",
+    "id": 19
   },
   {
     "english": "great",
@@ -216,8 +235,9 @@
     "topic": "Feelings",
     "day": 5,
     "difficulty": 1,
-    "example": "I like great.",
-    "example_tajik": "Ба ман олӣ маъқул аст."
+    "example": "That is great!",
+    "example_tajik": "Ин олӣ аст!",
+    "id": 20
   },
   {
     "english": "I",
@@ -227,8 +247,9 @@
     "topic": "Basics",
     "day": 1,
     "difficulty": 1,
-    "example": "I like I.",
-    "example_tajik": "Ба ман ман маъқул аст."
+    "example": "I am a student.",
+    "example_tajik": "Ман хонанда ҳастам.",
+    "id": 21
   },
   {
     "english": "you",
@@ -238,8 +259,9 @@
     "topic": "Basics",
     "day": 2,
     "difficulty": 1,
-    "example": "I like you.",
-    "example_tajik": "Ба ман ту / Шумо маъқул аст."
+    "example": "You are kind.",
+    "example_tajik": "Ту меҳрубон ҳастӣ.",
+    "id": 22
   },
   {
     "english": "my",
@@ -249,8 +271,9 @@
     "topic": "Basics",
     "day": 3,
     "difficulty": 1,
-    "example": "I like my.",
-    "example_tajik": "Ба ман ман (ба ман тааллуқ дорад) маъқул аст."
+    "example": "This is my book.",
+    "example_tajik": "Ин китоби ман аст.",
+    "id": 23
   },
   {
     "english": "your",
@@ -260,8 +283,9 @@
     "topic": "Basics",
     "day": 4,
     "difficulty": 1,
-    "example": "I like your.",
-    "example_tajik": "Ба ман ту (ба ту тааллуқ дорад) маъқул аст."
+    "example": "What is your name?",
+    "example_tajik": "Номи ту чист?",
+    "id": 24
   },
   {
     "english": "name",
@@ -271,8 +295,9 @@
     "topic": "Basics",
     "day": 5,
     "difficulty": 1,
-    "example": "I like name.",
-    "example_tajik": "Ба ман ном маъқул аст."
+    "example": "My name is Ali.",
+    "example_tajik": "Номи ман Алӣ аст.",
+    "id": 25
   },
   {
     "english": "one",
@@ -282,8 +307,9 @@
     "topic": "Numbers",
     "day": 1,
     "difficulty": 1,
-    "example": "I like one.",
-    "example_tajik": "Ба ман як маъқул аст."
+    "example": "I have one cat.",
+    "example_tajik": "Ман як гурба дорам.",
+    "id": 26
   },
   {
     "english": "two",
@@ -293,8 +319,9 @@
     "topic": "Numbers",
     "day": 2,
     "difficulty": 1,
-    "example": "I like two.",
-    "example_tajik": "Ба ман ду маъқул аст."
+    "example": "I have two hands.",
+    "example_tajik": "Ман ду даст дорам.",
+    "id": 27
   },
   {
     "english": "three",
@@ -304,8 +331,9 @@
     "topic": "Numbers",
     "day": 3,
     "difficulty": 1,
-    "example": "I like three.",
-    "example_tajik": "Ба ман се маъқул аст."
+    "example": "I see three birds.",
+    "example_tajik": "Ман се парранда мебинам.",
+    "id": 28
   },
   {
     "english": "four",
@@ -315,8 +343,9 @@
     "topic": "Numbers",
     "day": 4,
     "difficulty": 1,
-    "example": "I like four.",
-    "example_tajik": "Ба ман чор маъқул аст."
+    "example": "I have four books.",
+    "example_tajik": "Ман чор китоб дорам.",
+    "id": 29
   },
   {
     "english": "five",
@@ -326,8 +355,9 @@
     "topic": "Numbers",
     "day": 5,
     "difficulty": 1,
-    "example": "I like five.",
-    "example_tajik": "Ба ман панҷ маъқул аст."
+    "example": "I have five fingers.",
+    "example_tajik": "Ман панҷ ангушт дорам.",
+    "id": 30
   },
   {
     "english": "six",
@@ -337,8 +367,9 @@
     "topic": "Numbers",
     "day": 1,
     "difficulty": 1,
-    "example": "I like six.",
-    "example_tajik": "Ба ман шаш маъқул аст."
+    "example": "I see six stars.",
+    "example_tajik": "Ман шаш ситора мебинам.",
+    "id": 31
   },
   {
     "english": "seven",
@@ -348,8 +379,9 @@
     "topic": "Numbers",
     "day": 2,
     "difficulty": 1,
-    "example": "I like seven.",
-    "example_tajik": "Ба ман ҳафт маъқул аст."
+    "example": "A week has seven days.",
+    "example_tajik": "Ҳафта ҳафт рӯз дорад.",
+    "id": 32
   },
   {
     "english": "eight",
@@ -359,8 +391,9 @@
     "topic": "Numbers",
     "day": 3,
     "difficulty": 1,
-    "example": "I like eight.",
-    "example_tajik": "Ба ман ҳашт маъқул аст."
+    "example": "I have eight crayons.",
+    "example_tajik": "Ман ҳашт қалами ранг дорам.",
+    "id": 33
   },
   {
     "english": "nine",
@@ -370,8 +403,9 @@
     "topic": "Numbers",
     "day": 4,
     "difficulty": 1,
-    "example": "I like nine.",
-    "example_tajik": "Ба ман нӯҳ маъқул аст."
+    "example": "I count nine apples.",
+    "example_tajik": "Ман нӯҳ себро ҳисоб мекунам.",
+    "id": 34
   },
   {
     "english": "ten",
@@ -381,8 +415,9 @@
     "topic": "Numbers",
     "day": 5,
     "difficulty": 1,
-    "example": "I like ten.",
-    "example_tajik": "Ба ман даҳ маъқул аст."
+    "example": "I can count to ten.",
+    "example_tajik": "Ман то даҳ ҳисоб карда метавонам.",
+    "id": 35
   },
   {
     "english": "red",
@@ -392,8 +427,9 @@
     "topic": "Colors",
     "day": 1,
     "difficulty": 1,
-    "example": "I like red.",
-    "example_tajik": "Ба ман сурх маъқул аст."
+    "example": "The apple is red.",
+    "example_tajik": "Себ сурх аст.",
+    "id": 36
   },
   {
     "english": "blue",
@@ -403,8 +439,9 @@
     "topic": "Colors",
     "day": 2,
     "difficulty": 1,
-    "example": "I like blue.",
-    "example_tajik": "Ба ман кабуд маъқул аст."
+    "example": "The sky is blue.",
+    "example_tajik": "Осмон кабуд аст.",
+    "id": 37
   },
   {
     "english": "yellow",
@@ -414,8 +451,9 @@
     "topic": "Colors",
     "day": 3,
     "difficulty": 1,
-    "example": "I like yellow.",
-    "example_tajik": "Ба ман зард маъқул аст."
+    "example": "The sun is yellow.",
+    "example_tajik": "Офтоб зард аст.",
+    "id": 38
   },
   {
     "english": "green",
@@ -425,8 +463,9 @@
     "topic": "Colors",
     "day": 4,
     "difficulty": 1,
-    "example": "I like green.",
-    "example_tajik": "Ба ман сабз маъқул аст."
+    "example": "The tree is green.",
+    "example_tajik": "Дарахт сабз аст.",
+    "id": 39
   },
   {
     "english": "orange",
@@ -436,8 +475,9 @@
     "topic": "Colors",
     "day": 5,
     "difficulty": 1,
-    "example": "I like orange.",
-    "example_tajik": "Ба ман норанҷӣ маъқул аст."
+    "example": "The ball is orange.",
+    "example_tajik": "Тӯб норанҷӣ аст.",
+    "id": 40
   },
   {
     "english": "purple",
@@ -447,8 +487,9 @@
     "topic": "Colors",
     "day": 1,
     "difficulty": 1,
-    "example": "I like purple.",
-    "example_tajik": "Ба ман бунафш маъқул аст."
+    "example": "The flower is purple.",
+    "example_tajik": "Гул бунафш аст.",
+    "id": 41
   },
   {
     "english": "pink",
@@ -458,8 +499,9 @@
     "topic": "Colors",
     "day": 2,
     "difficulty": 1,
-    "example": "I like pink.",
-    "example_tajik": "Ба ман гулобӣ маъқул аст."
+    "example": "The bag is pink.",
+    "example_tajik": "Сумка гулобӣ аст.",
+    "id": 42
   },
   {
     "english": "brown",
@@ -469,8 +511,9 @@
     "topic": "Colors",
     "day": 3,
     "difficulty": 1,
-    "example": "I like brown.",
-    "example_tajik": "Ба ман қаҳваранг маъқул аст."
+    "example": "The dog is brown.",
+    "example_tajik": "Саг қаҳваранг аст.",
+    "id": 43
   },
   {
     "english": "black",
@@ -480,8 +523,9 @@
     "topic": "Colors",
     "day": 4,
     "difficulty": 1,
-    "example": "I like black.",
-    "example_tajik": "Ба ман сиёҳ маъқул аст."
+    "example": "The cat is black.",
+    "example_tajik": "Гурба сиёҳ аст.",
+    "id": 44
   },
   {
     "english": "white",
@@ -491,8 +535,9 @@
     "topic": "Colors",
     "day": 5,
     "difficulty": 1,
-    "example": "I like white.",
-    "example_tajik": "Ба ман сафед маъқул аст."
+    "example": "The snow is white.",
+    "example_tajik": "Барф сафед аст.",
+    "id": 45
   },
   {
     "english": "gray",
@@ -502,8 +547,9 @@
     "topic": "Colors",
     "day": 1,
     "difficulty": 1,
-    "example": "I like gray.",
-    "example_tajik": "Ба ман хокистарранг маъқул аст."
+    "example": "The cloud is gray.",
+    "example_tajik": "Абр хокистарранг аст.",
+    "id": 46
   },
   {
     "english": "color / colour",
@@ -513,8 +559,9 @@
     "topic": "Colors",
     "day": 2,
     "difficulty": 1,
-    "example": "I like color / colour.",
-    "example_tajik": "Ба ман ранг маъқул аст."
+    "example": "What color is this?",
+    "example_tajik": "Ин чӣ ранг аст?",
+    "id": 47
   },
   {
     "english": "what",
@@ -524,8 +571,9 @@
     "topic": "Questions",
     "day": 3,
     "difficulty": 1,
-    "example": "I like what.",
-    "example_tajik": "Ба ман чӣ / кадом маъқул аст."
+    "example": "What is this?",
+    "example_tajik": "Ин чист?",
+    "id": 48
   },
   {
     "english": "how many",
@@ -535,8 +583,9 @@
     "topic": "Questions",
     "day": 4,
     "difficulty": 1,
-    "example": "I like how many.",
-    "example_tajik": "Ба ман чандто маъқул аст."
+    "example": "How many apples?",
+    "example_tajik": "Чандто себ?",
+    "id": 49
   },
   {
     "english": "count",
@@ -546,8 +595,9 @@
     "topic": "Numbers",
     "day": 5,
     "difficulty": 1,
-    "example": "I like count.",
-    "example_tajik": "Ба ман ҳисоб кардан маъқул аст."
+    "example": "Count to ten.",
+    "example_tajik": "То даҳ ҳисоб кун.",
+    "id": 50
   },
   {
     "english": "mother",
@@ -557,8 +607,9 @@
     "topic": "Family",
     "day": 1,
     "difficulty": 2,
-    "example": "I like mother.",
-    "example_tajik": "Ба ман модар маъқул аст."
+    "example": "This is my mother.",
+    "example_tajik": "Ин модари ман аст.",
+    "id": 51
   },
   {
     "english": "mom",
@@ -568,8 +619,9 @@
     "topic": "Family",
     "day": 2,
     "difficulty": 2,
-    "example": "I like mom.",
-    "example_tajik": "Ба ман модар (ғайрирасмӣ) маъқул аст."
+    "example": "I love my mom.",
+    "example_tajik": "Ман модарамро дӯст медорам.",
+    "id": 52
   },
   {
     "english": "father",
@@ -579,8 +631,9 @@
     "topic": "Family",
     "day": 3,
     "difficulty": 2,
-    "example": "I like father.",
-    "example_tajik": "Ба ман падар маъқул аст."
+    "example": "This is my father.",
+    "example_tajik": "Ин падари ман аст.",
+    "id": 53
   },
   {
     "english": "dad",
@@ -590,8 +643,9 @@
     "topic": "Family",
     "day": 4,
     "difficulty": 2,
-    "example": "I like dad.",
-    "example_tajik": "Ба ман падар (ғайрирасмӣ) маъқул аст."
+    "example": "My dad is kind.",
+    "example_tajik": "Падарам меҳрубон аст.",
+    "id": 54
   },
   {
     "english": "brother",
@@ -601,8 +655,9 @@
     "topic": "Family",
     "day": 5,
     "difficulty": 2,
-    "example": "I like brother.",
-    "example_tajik": "Ба ман бародар маъқул аст."
+    "example": "I have a brother.",
+    "example_tajik": "Ман бародар дорам.",
+    "id": 55
   },
   {
     "english": "sister",
@@ -612,8 +667,9 @@
     "topic": "Family",
     "day": 1,
     "difficulty": 2,
-    "example": "I like sister.",
-    "example_tajik": "Ба ман хоҳар маъқул аст."
+    "example": "I have a sister.",
+    "example_tajik": "Ман хоҳар дорам.",
+    "id": 56
   },
   {
     "english": "baby",
@@ -623,8 +679,9 @@
     "topic": "Family",
     "day": 2,
     "difficulty": 2,
-    "example": "I like baby.",
-    "example_tajik": "Ба ман кӯдаки хурд маъқул аст."
+    "example": "The baby is small.",
+    "example_tajik": "Кӯдак хурд аст.",
+    "id": 57
   },
   {
     "english": "grandpa",
@@ -634,8 +691,9 @@
     "topic": "Family",
     "day": 3,
     "difficulty": 2,
-    "example": "I like grandpa.",
-    "example_tajik": "Ба ман бобо маъқул аст."
+    "example": "Grandpa is old.",
+    "example_tajik": "Бобо калонсол аст.",
+    "id": 58
   },
   {
     "english": "grandma",
@@ -645,8 +703,9 @@
     "topic": "Family",
     "day": 4,
     "difficulty": 2,
-    "example": "I like grandma.",
-    "example_tajik": "Ба ман бибӣ маъқул аст."
+    "example": "Grandma is kind.",
+    "example_tajik": "Бибӣ меҳрубон аст.",
+    "id": 59
   },
   {
     "english": "family",
@@ -656,8 +715,9 @@
     "topic": "Family",
     "day": 5,
     "difficulty": 2,
-    "example": "I like family.",
-    "example_tajik": "Ба ман оила маъқул аст."
+    "example": "I love my family.",
+    "example_tajik": "Ман оилаамро дӯст медорам.",
+    "id": 60
   },
   {
     "english": "me",
@@ -667,8 +727,9 @@
     "topic": "Basics",
     "day": 1,
     "difficulty": 2,
-    "example": "I like me.",
-    "example_tajik": "Ба ман ман (ба ман) маъқул аст."
+    "example": "Look at me.",
+    "example_tajik": "Ба ман нигар.",
+    "id": 61
   },
   {
     "english": "you (plural)",
@@ -678,8 +739,9 @@
     "topic": "Basics",
     "day": 2,
     "difficulty": 2,
-    "example": "I like you (plural).",
-    "example_tajik": "Ба ман шумо (ба шумо) маъқул аст."
+    "example": "You are my friends.",
+    "example_tajik": "Шумо дӯстони ман ҳастед.",
+    "id": 62
   },
   {
     "english": "head",
@@ -689,8 +751,9 @@
     "topic": "Body",
     "day": 3,
     "difficulty": 2,
-    "example": "I like head.",
-    "example_tajik": "Ба ман сар маъқул аст."
+    "example": "This is my head.",
+    "example_tajik": "Ин сари ман аст.",
+    "id": 63
   },
   {
     "english": "hair",
@@ -700,8 +763,9 @@
     "topic": "Body",
     "day": 4,
     "difficulty": 2,
-    "example": "I like hair.",
-    "example_tajik": "Ба ман мӯй маъқул аст."
+    "example": "My hair is long.",
+    "example_tajik": "Мӯям дароз аст.",
+    "id": 64
   },
   {
     "english": "eyes",
@@ -711,8 +775,9 @@
     "topic": "Body",
     "day": 5,
     "difficulty": 2,
-    "example": "I like eyes.",
-    "example_tajik": "Ба ман чашмҳо маъқул аст."
+    "example": "I have two eyes.",
+    "example_tajik": "Ман ду чашм дорам.",
+    "id": 65
   },
   {
     "english": "ears",
@@ -722,8 +787,9 @@
     "topic": "Body",
     "day": 1,
     "difficulty": 2,
-    "example": "I like ears.",
-    "example_tajik": "Ба ман гӯш маъқул аст."
+    "example": "I have two ears.",
+    "example_tajik": "Ман ду гӯш дорам.",
+    "id": 66
   },
   {
     "english": "nose",
@@ -733,8 +799,9 @@
     "topic": "Body",
     "day": 2,
     "difficulty": 2,
-    "example": "I like nose.",
-    "example_tajik": "Ба ман бинӣ маъқул аст."
+    "example": "This is my nose.",
+    "example_tajik": "Ин бинии ман аст.",
+    "id": 67
   },
   {
     "english": "mouth",
@@ -744,8 +811,9 @@
     "topic": "Body",
     "day": 3,
     "difficulty": 2,
-    "example": "I like mouth.",
-    "example_tajik": "Ба ман даҳон маъқул аст."
+    "example": "Open your mouth.",
+    "example_tajik": "Даҳонатро кушо.",
+    "id": 68
   },
   {
     "english": "teeth",
@@ -755,8 +823,9 @@
     "topic": "Body",
     "day": 4,
     "difficulty": 2,
-    "example": "I like teeth.",
-    "example_tajik": "Ба ман дандон маъқул аст."
+    "example": "Brush your teeth.",
+    "example_tajik": "Дандонатро шона кун.",
+    "id": 69
   },
   {
     "english": "tongue",
@@ -766,8 +835,9 @@
     "topic": "Body",
     "day": 5,
     "difficulty": 2,
-    "example": "I like tongue.",
-    "example_tajik": "Ба ман забон (узви бадан) маъқул аст."
+    "example": "My tongue is pink.",
+    "example_tajik": "Забонам гулобӣ аст.",
+    "id": 70
   },
   {
     "english": "hands",
@@ -777,8 +847,9 @@
     "topic": "Body",
     "day": 1,
     "difficulty": 2,
-    "example": "I like hands.",
-    "example_tajik": "Ба ман дастҳо маъқул аст."
+    "example": "Wash your hands.",
+    "example_tajik": "Дастонатро шӯй.",
+    "id": 71
   },
   {
     "english": "arms",
@@ -788,8 +859,9 @@
     "topic": "Body",
     "day": 2,
     "difficulty": 2,
-    "example": "I like arms.",
-    "example_tajik": "Ба ман бозӯ маъқул аст."
+    "example": "Raise your arms.",
+    "example_tajik": "Дастонатро бардор.",
+    "id": 72
   },
   {
     "english": "feet",
@@ -799,8 +871,9 @@
     "topic": "Body",
     "day": 3,
     "difficulty": 2,
-    "example": "I like feet.",
-    "example_tajik": "Ба ман пойҳо маъқул аст."
+    "example": "My feet are small.",
+    "example_tajik": "Пойҳоям хурданд.",
+    "id": 73
   },
   {
     "english": "legs",
@@ -810,8 +883,9 @@
     "topic": "Body",
     "day": 4,
     "difficulty": 2,
-    "example": "I like legs.",
-    "example_tajik": "Ба ман пой маъқул аст."
+    "example": "I have two legs.",
+    "example_tajik": "Ман ду пой дорам.",
+    "id": 74
   },
   {
     "english": "fingers",
@@ -821,8 +895,9 @@
     "topic": "Body",
     "day": 5,
     "difficulty": 2,
-    "example": "I like fingers.",
-    "example_tajik": "Ба ман ангуштҳо маъқул аст."
+    "example": "I have ten fingers.",
+    "example_tajik": "Ман даҳ ангушт дорам.",
+    "id": 75
   },
   {
     "english": "belly / tummy",
@@ -832,8 +907,9 @@
     "topic": "Body",
     "day": 1,
     "difficulty": 2,
-    "example": "I like belly / tummy.",
-    "example_tajik": "Ба ман шикам маъқул аст."
+    "example": "My tummy is full.",
+    "example_tajik": "Шикам пур аст.",
+    "id": 76
   },
   {
     "english": "back",
@@ -843,8 +919,9 @@
     "topic": "Body",
     "day": 2,
     "difficulty": 2,
-    "example": "I like back.",
-    "example_tajik": "Ба ман пушт маъқул аст."
+    "example": "My back is straight.",
+    "example_tajik": "Пуштам рост аст.",
+    "id": 77
   },
   {
     "english": "and",
@@ -854,8 +931,9 @@
     "topic": "Connectors",
     "day": 3,
     "difficulty": 2,
-    "example": "I like and.",
-    "example_tajik": "Ба ман ва маъқул аст."
+    "example": "You and I are friends.",
+    "example_tajik": "Ту ва ман дӯст ҳастем.",
+    "id": 78
   },
   {
     "english": "or",
@@ -865,8 +943,9 @@
     "topic": "Connectors",
     "day": 4,
     "difficulty": 2,
-    "example": "I like or.",
-    "example_tajik": "Ба ман ё маъқул аст."
+    "example": "Tea or milk?",
+    "example_tajik": "Чой ё шир?",
+    "id": 79
   },
   {
     "english": "but",
@@ -876,8 +955,9 @@
     "topic": "Connectors",
     "day": 5,
     "difficulty": 2,
-    "example": "I like but.",
-    "example_tajik": "Ба ман аммо маъқул аст."
+    "example": "I am small, but strong.",
+    "example_tajik": "Ман хурдам, аммо қуввамандам.",
+    "id": 80
   },
   {
     "english": "very",
@@ -887,8 +967,9 @@
     "topic": "Grammar",
     "day": 1,
     "difficulty": 2,
-    "example": "I like very.",
-    "example_tajik": "Ба ман хеле маъқул аст."
+    "example": "It is very hot.",
+    "example_tajik": "Хеле гарм аст.",
+    "id": 81
   },
   {
     "english": "too",
@@ -898,8 +979,9 @@
     "topic": "Grammar",
     "day": 2,
     "difficulty": 2,
-    "example": "I like too.",
-    "example_tajik": "Ба ман низ / ҳам маъқул аст."
+    "example": "I like apples too.",
+    "example_tajik": "Ба ман ҳам себ маъқул аст.",
+    "id": 82
   },
   {
     "english": "cat",
@@ -909,8 +991,9 @@
     "topic": "Pets",
     "day": 3,
     "difficulty": 2,
-    "example": "I like cat.",
-    "example_tajik": "Ба ман гурба маъқул аст."
+    "example": "I have a cat.",
+    "example_tajik": "Ман гурба дорам.",
+    "id": 83
   },
   {
     "english": "dog",
@@ -920,8 +1003,9 @@
     "topic": "Pets",
     "day": 4,
     "difficulty": 2,
-    "example": "I like dog.",
-    "example_tajik": "Ба ман саг маъқул аст."
+    "example": "The dog is big.",
+    "example_tajik": "Саг калон аст.",
+    "id": 84
   },
   {
     "english": "bird",
@@ -931,8 +1015,9 @@
     "topic": "Pets",
     "day": 5,
     "difficulty": 2,
-    "example": "I like bird.",
-    "example_tajik": "Ба ман парранда маъқул аст."
+    "example": "The bird can fly.",
+    "example_tajik": "Парранда парвоз карда метавонад.",
+    "id": 85
   },
   {
     "english": "fish",
@@ -942,8 +1027,9 @@
     "topic": "Pets",
     "day": 1,
     "difficulty": 2,
-    "example": "I like fish.",
-    "example_tajik": "Ба ман моҳӣ маъқул аст."
+    "example": "The fish is in water.",
+    "example_tajik": "Моҳӣ дар об аст.",
+    "id": 86
   },
   {
     "english": "rabbit",
@@ -953,8 +1039,9 @@
     "topic": "Pets",
     "day": 2,
     "difficulty": 2,
-    "example": "I like rabbit.",
-    "example_tajik": "Ба ман харгӯш маъқул аст."
+    "example": "The rabbit is white.",
+    "example_tajik": "Харгӯш сафед аст.",
+    "id": 87
   },
   {
     "english": "hamster",
@@ -964,8 +1051,9 @@
     "topic": "Pets",
     "day": 3,
     "difficulty": 2,
-    "example": "I like hamster.",
-    "example_tajik": "Ба ман хомяк маъқул аст."
+    "example": "The hamster is small.",
+    "example_tajik": "Хомяк хурд аст.",
+    "id": 88
   },
   {
     "english": "turtle",
@@ -975,8 +1063,9 @@
     "topic": "Pets",
     "day": 4,
     "difficulty": 2,
-    "example": "I like turtle.",
-    "example_tajik": "Ба ман сангпушт маъқул аст."
+    "example": "The turtle is slow.",
+    "example_tajik": "Сангпушт суст аст.",
+    "id": 89
   },
   {
     "english": "mouse",
@@ -986,8 +1075,9 @@
     "topic": "Pets",
     "day": 5,
     "difficulty": 2,
-    "example": "I like mouse.",
-    "example_tajik": "Ба ман муш маъқул аст."
+    "example": "The mouse is tiny.",
+    "example_tajik": "Муш хеле хурд аст.",
+    "id": 90
   },
   {
     "english": "pet",
@@ -997,8 +1087,9 @@
     "topic": "Pets",
     "day": 1,
     "difficulty": 2,
-    "example": "I like pet.",
-    "example_tajik": "Ба ман ҳайвони хонагӣ маъқул аст."
+    "example": "I have a pet.",
+    "example_tajik": "Ман ҳайвони хонагӣ дорам.",
+    "id": 91
   },
   {
     "english": "animal",
@@ -1008,8 +1099,9 @@
     "topic": "Animals",
     "day": 2,
     "difficulty": 2,
-    "example": "I like animal.",
-    "example_tajik": "Ба ман ҳайвон маъқул аст."
+    "example": "A cow is an animal.",
+    "example_tajik": "Гов ҳайвон аст.",
+    "id": 92
   },
   {
     "english": "cow",
@@ -1019,8 +1111,9 @@
     "topic": "Farm",
     "day": 3,
     "difficulty": 2,
-    "example": "I like cow.",
-    "example_tajik": "Ба ман гов маъқул аст."
+    "example": "The cow is on the farm.",
+    "example_tajik": "Гов дар ферма аст.",
+    "id": 93
   },
   {
     "english": "pig",
@@ -1030,8 +1123,9 @@
     "topic": "Farm",
     "day": 4,
     "difficulty": 2,
-    "example": "I like pig.",
-    "example_tajik": "Ба ман хук маъқул аст."
+    "example": "The pig is pink.",
+    "example_tajik": "Хук гулобӣ аст.",
+    "id": 94
   },
   {
     "english": "chicken",
@@ -1041,8 +1135,9 @@
     "topic": "Farm",
     "day": 5,
     "difficulty": 2,
-    "example": "I like chicken.",
-    "example_tajik": "Ба ман мурғ маъқул аст."
+    "example": "The chicken lays eggs.",
+    "example_tajik": "Мурғ тухм мегузорад.",
+    "id": 95
   },
   {
     "english": "duck",
@@ -1052,8 +1147,9 @@
     "topic": "Farm",
     "day": 1,
     "difficulty": 2,
-    "example": "I like duck.",
-    "example_tajik": "Ба ман мурғобӣ маъқул аст."
+    "example": "The duck can swim.",
+    "example_tajik": "Мурғобӣ шино карда метавонад.",
+    "id": 96
   },
   {
     "english": "horse",
@@ -1063,8 +1159,9 @@
     "topic": "Farm",
     "day": 2,
     "difficulty": 2,
-    "example": "I like horse.",
-    "example_tajik": "Ба ман асп маъқул аст."
+    "example": "The horse is fast.",
+    "example_tajik": "Асп тез аст.",
+    "id": 97
   },
   {
     "english": "sheep",
@@ -1074,8 +1171,9 @@
     "topic": "Farm",
     "day": 3,
     "difficulty": 2,
-    "example": "I like sheep.",
-    "example_tajik": "Ба ман гӯсфанд маъқул аст."
+    "example": "The sheep is white.",
+    "example_tajik": "Гӯсфанд сафед аст.",
+    "id": 98
   },
   {
     "english": "goat",
@@ -1085,8 +1183,9 @@
     "topic": "Farm",
     "day": 4,
     "difficulty": 2,
-    "example": "I like goat.",
-    "example_tajik": "Ба ман буз маъқул аст."
+    "example": "The goat is on the hill.",
+    "example_tajik": "Буз дар теппа аст.",
+    "id": 99
   },
   {
     "english": "farm",
@@ -1096,8 +1195,9 @@
     "topic": "Farm",
     "day": 5,
     "difficulty": 2,
-    "example": "I like farm.",
-    "example_tajik": "Ба ман ферма маъқул аст."
+    "example": "We live on a farm.",
+    "example_tajik": "Мо дар ферма зиндагӣ мекунем.",
+    "id": 100
   },
   {
     "english": "big",
@@ -1107,8 +1207,9 @@
     "topic": "Adjectives",
     "day": 1,
     "difficulty": 2,
-    "example": "I like big.",
-    "example_tajik": "Ба ман калон маъқул аст."
+    "example": "The elephant is big.",
+    "example_tajik": "Фил калон аст.",
+    "id": 101
   },
   {
     "english": "small",
@@ -1118,8 +1219,9 @@
     "topic": "Adjectives",
     "day": 2,
     "difficulty": 2,
-    "example": "I like small.",
-    "example_tajik": "Ба ман хурд маъқул аст."
+    "example": "The ant is small.",
+    "example_tajik": "Морча хурд аст.",
+    "id": 102
   },
   {
     "english": "this",
@@ -1129,8 +1231,9 @@
     "topic": "Grammar",
     "day": 3,
     "difficulty": 2,
-    "example": "I like this.",
-    "example_tajik": "Ба ман ин (наздик) маъқул аст."
+    "example": "This is a book.",
+    "example_tajik": "Ин китоб аст.",
+    "id": 103
   },
   {
     "english": "that",
@@ -1140,8 +1243,9 @@
     "topic": "Grammar",
     "day": 4,
     "difficulty": 2,
-    "example": "I like that.",
-    "example_tajik": "Ба ман он (дур) маъқул аст."
+    "example": "That is a tree.",
+    "example_tajik": "Он дарахт аст.",
+    "id": 104
   },
   {
     "english": "here",
@@ -1151,8 +1255,9 @@
     "topic": "Grammar",
     "day": 5,
     "difficulty": 2,
-    "example": "I like here.",
-    "example_tajik": "Ба ман инҷо маъқул аст."
+    "example": "Come here, please.",
+    "example_tajik": "Инҷо биё, лутфан.",
+    "id": 105
   },
   {
     "english": "there",
@@ -1162,8 +1267,9 @@
     "topic": "Grammar",
     "day": 1,
     "difficulty": 2,
-    "example": "I like there.",
-    "example_tajik": "Ба ман онҷо маъқул аст."
+    "example": "Look there!",
+    "example_tajik": "Онҷо нигар!",
+    "id": 106
   },
   {
     "english": "is",
@@ -1173,8 +1279,9 @@
     "topic": "Grammar",
     "day": 2,
     "difficulty": 2,
-    "example": "I like is.",
-    "example_tajik": "Ба ман аст (феъл) маъқул аст."
+    "example": "She is a girl.",
+    "example_tajik": "Ӯ духтар аст.",
+    "id": 107
   },
   {
     "english": "are",
@@ -1184,8 +1291,9 @@
     "topic": "Grammar",
     "day": 3,
     "difficulty": 2,
-    "example": "I like are.",
-    "example_tajik": "Ба ман ҳастанд маъқул аст."
+    "example": "We are happy.",
+    "example_tajik": "Мо хушҳолем.",
+    "id": 108
   },
   {
     "english": "a / an",
@@ -1195,8 +1303,9 @@
     "topic": "Grammar",
     "day": 4,
     "difficulty": 2,
-    "example": "I like a / an.",
-    "example_tajik": "Ба ман як (муайян нест) маъқул аст."
+    "example": "I see an apple.",
+    "example_tajik": "Ман як себ мебинам.",
+    "id": 109
   },
   {
     "english": "the",
@@ -1206,8 +1315,9 @@
     "topic": "Grammar",
     "day": 5,
     "difficulty": 2,
-    "example": "I like the.",
-    "example_tajik": "Ба ман ҳамон (муайян) маъқул аст."
+    "example": "The sun is hot.",
+    "example_tajik": "Офтоб гарм аст.",
+    "id": 110
   },
   {
     "english": "see",
@@ -1217,8 +1327,9 @@
     "topic": "Verbs",
     "day": 1,
     "difficulty": 2,
-    "example": "I like see.",
-    "example_tajik": "Ба ман дидан маъқул аст."
+    "example": "I see a bird.",
+    "example_tajik": "Ман парранда мебинам.",
+    "id": 111
   },
   {
     "english": "have / has",
@@ -1228,8 +1339,9 @@
     "topic": "Verbs",
     "day": 2,
     "difficulty": 2,
-    "example": "I like have / has.",
-    "example_tajik": "Ба ман доштан маъқул аст."
+    "example": "I have a bag.",
+    "example_tajik": "Ман сумка дорам.",
+    "id": 112
   },
   {
     "english": "apple",
@@ -1239,8 +1351,9 @@
     "topic": "Fruit",
     "day": 3,
     "difficulty": 2,
-    "example": "I like apple.",
-    "example_tajik": "Ба ман себ маъқул аст."
+    "example": "I eat an apple.",
+    "example_tajik": "Ман себ мехӯрам.",
+    "id": 113
   },
   {
     "english": "banana",
@@ -1250,8 +1363,9 @@
     "topic": "Fruit",
     "day": 4,
     "difficulty": 2,
-    "example": "I like banana.",
-    "example_tajik": "Ба ман банан маъқул аст."
+    "example": "I eat a banana.",
+    "example_tajik": "Ман банан мехӯрам.",
+    "id": 114
   },
   {
     "english": "orange",
@@ -1261,8 +1375,9 @@
     "topic": "Fruit",
     "day": 5,
     "difficulty": 2,
-    "example": "I like orange.",
-    "example_tajik": "Ба ман апельсин маъқул аст."
+    "example": "I eat an orange.",
+    "example_tajik": "Ман апельсин мехӯрам.",
+    "id": 115
   },
   {
     "english": "grapes",
@@ -1272,8 +1387,9 @@
     "topic": "Fruit",
     "day": 1,
     "difficulty": 2,
-    "example": "I like grapes.",
-    "example_tajik": "Ба ман ангур маъқул аст."
+    "example": "I eat grapes.",
+    "example_tajik": "Ман ангур мехӯрам.",
+    "id": 116
   },
   {
     "english": "strawberry",
@@ -1283,8 +1399,9 @@
     "topic": "Fruit",
     "day": 2,
     "difficulty": 2,
-    "example": "I like strawberry.",
-    "example_tajik": "Ба ман тути заминӣ маъқул аст."
+    "example": "The strawberry is red.",
+    "example_tajik": "Тути заминӣ сурх аст.",
+    "id": 117
   },
   {
     "english": "watermelon",
@@ -1294,8 +1411,9 @@
     "topic": "Fruit",
     "day": 3,
     "difficulty": 2,
-    "example": "I like watermelon.",
-    "example_tajik": "Ба ман тарбуз маъқул аст."
+    "example": "The watermelon is big.",
+    "example_tajik": "Тарбуз калон аст.",
+    "id": 118
   },
   {
     "english": "fruit",
@@ -1306,7 +1424,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "I like fruit.",
-    "example_tajik": "Ба ман мева маъқул аст."
+    "example_tajik": "Ба ман мева маъқул аст.",
+    "id": 119
   },
   {
     "english": "yummy",
@@ -1316,8 +1435,9 @@
     "topic": "Food",
     "day": 5,
     "difficulty": 2,
-    "example": "I like yummy.",
-    "example_tajik": "Ба ман маза (лаззат) маъқул аст."
+    "example": "This cake is yummy.",
+    "example_tajik": "Ин торт маза аст.",
+    "id": 120
   },
   {
     "english": "yucky",
@@ -1327,8 +1447,9 @@
     "topic": "Food",
     "day": 1,
     "difficulty": 2,
-    "example": "I like yucky.",
-    "example_tajik": "Ба ман бадмаза маъқул аст."
+    "example": "This soup is yucky.",
+    "example_tajik": "Ин шӯрбо бадмаза аст.",
+    "id": 121
   },
   {
     "english": "eat",
@@ -1338,8 +1459,9 @@
     "topic": "Verbs",
     "day": 2,
     "difficulty": 2,
-    "example": "I like eat.",
-    "example_tajik": "Ба ман хӯрдан маъқул аст."
+    "example": "I eat bread.",
+    "example_tajik": "Ман нон мехӯрам.",
+    "id": 122
   },
   {
     "english": "carrot",
@@ -1349,8 +1471,9 @@
     "topic": "Vegetables",
     "day": 3,
     "difficulty": 2,
-    "example": "I like carrot.",
-    "example_tajik": "Ба ман сабзӣ маъқул аст."
+    "example": "I eat a carrot.",
+    "example_tajik": "Ман сабзӣ мехӯрам.",
+    "id": 123
   },
   {
     "english": "tomato",
@@ -1360,8 +1483,9 @@
     "topic": "Vegetables",
     "day": 4,
     "difficulty": 2,
-    "example": "I like tomato.",
-    "example_tajik": "Ба ман помидор маъқул аст."
+    "example": "The tomato is red.",
+    "example_tajik": "Помидор сурх аст.",
+    "id": 124
   },
   {
     "english": "potato",
@@ -1371,8 +1495,9 @@
     "topic": "Vegetables",
     "day": 5,
     "difficulty": 2,
-    "example": "I like potato.",
-    "example_tajik": "Ба ман картошка маъқул аст."
+    "example": "I eat a potato.",
+    "example_tajik": "Ман картошка мехӯрам.",
+    "id": 125
   },
   {
     "english": "bread",
@@ -1382,8 +1507,9 @@
     "topic": "Food",
     "day": 1,
     "difficulty": 2,
-    "example": "I like bread.",
-    "example_tajik": "Ба ман нон маъқул аст."
+    "example": "I eat bread.",
+    "example_tajik": "Ман нон мехӯрам.",
+    "id": 126
   },
   {
     "english": "rice",
@@ -1393,8 +1519,9 @@
     "topic": "Food",
     "day": 2,
     "difficulty": 2,
-    "example": "I like rice.",
-    "example_tajik": "Ба ман биринҷ маъқул аст."
+    "example": "I eat rice.",
+    "example_tajik": "Ман биринҷ мехӯрам.",
+    "id": 127
   },
   {
     "english": "soup",
@@ -1404,8 +1531,9 @@
     "topic": "Food",
     "day": 3,
     "difficulty": 2,
-    "example": "I like soup.",
-    "example_tajik": "Ба ман шӯрбо маъқул аст."
+    "example": "I eat soup.",
+    "example_tajik": "Ман шӯрбо мехӯрам.",
+    "id": 128
   },
   {
     "english": "egg",
@@ -1415,8 +1543,9 @@
     "topic": "Food",
     "day": 4,
     "difficulty": 2,
-    "example": "I like egg.",
-    "example_tajik": "Ба ман тухм маъқул аст."
+    "example": "I eat an egg.",
+    "example_tajik": "Ман тухм мехӯрам.",
+    "id": 129
   },
   {
     "english": "cheese",
@@ -1427,7 +1556,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I like cheese.",
-    "example_tajik": "Ба ман панир маъқул аст."
+    "example_tajik": "Ба ман панир маъқул аст.",
+    "id": 130
   },
   {
     "english": "meat",
@@ -1437,8 +1567,9 @@
     "topic": "Food",
     "day": 1,
     "difficulty": 2,
-    "example": "I like meat.",
-    "example_tajik": "Ба ман гӯшт маъқул аст."
+    "example": "We eat meat.",
+    "example_tajik": "Мо гӯшт мехӯрем.",
+    "id": 131
   },
   {
     "english": "vegetable",
@@ -1448,8 +1579,9 @@
     "topic": "Vegetables",
     "day": 2,
     "difficulty": 2,
-    "example": "I like vegetable.",
-    "example_tajik": "Ба ман сабзавот маъқул аст."
+    "example": "Eat a vegetable.",
+    "example_tajik": "Сабзавот хӯр.",
+    "id": 132
   },
   {
     "english": "water",
@@ -1459,8 +1591,9 @@
     "topic": "Drinks",
     "day": 3,
     "difficulty": 2,
-    "example": "I like water.",
-    "example_tajik": "Ба ман об маъқул аст."
+    "example": "I drink water.",
+    "example_tajik": "Ман об менӯшам.",
+    "id": 133
   },
   {
     "english": "milk",
@@ -1470,8 +1603,9 @@
     "topic": "Drinks",
     "day": 4,
     "difficulty": 2,
-    "example": "I like milk.",
-    "example_tajik": "Ба ман шир маъқул аст."
+    "example": "I drink milk.",
+    "example_tajik": "Ман шир менӯшам.",
+    "id": 134
   },
   {
     "english": "juice",
@@ -1481,8 +1615,9 @@
     "topic": "Drinks",
     "day": 5,
     "difficulty": 2,
-    "example": "I like juice.",
-    "example_tajik": "Ба ман афшура маъқул аст."
+    "example": "I drink juice.",
+    "example_tajik": "Ман афшура менӯшам.",
+    "id": 135
   },
   {
     "english": "drink",
@@ -1492,8 +1627,9 @@
     "topic": "Verbs",
     "day": 1,
     "difficulty": 2,
-    "example": "I like drink.",
-    "example_tajik": "Ба ман нӯшидан маъқул аст."
+    "example": "I drink water.",
+    "example_tajik": "Ман об менӯшам.",
+    "id": 136
   },
   {
     "english": "cup",
@@ -1503,8 +1639,9 @@
     "topic": "Drinks",
     "day": 2,
     "difficulty": 2,
-    "example": "I like cup.",
-    "example_tajik": "Ба ман коса / пиёла маъқул аст."
+    "example": "This is my cup.",
+    "example_tajik": "Ин пиёлаи ман аст.",
+    "id": 137
   },
   {
     "english": "go",
@@ -1514,8 +1651,9 @@
     "topic": "Verbs",
     "day": 3,
     "difficulty": 2,
-    "example": "I like go.",
-    "example_tajik": "Ба ман рафтан маъқул аст."
+    "example": "I go to school.",
+    "example_tajik": "Ман ба мактаб меравам.",
+    "id": 138
   },
   {
     "english": "come",
@@ -1525,8 +1663,9 @@
     "topic": "Verbs",
     "day": 4,
     "difficulty": 2,
-    "example": "I like come.",
-    "example_tajik": "Ба ман омадан маъқул аст."
+    "example": "Come here, please.",
+    "example_tajik": "Инҷо биё, лутфан.",
+    "id": 139
   },
   {
     "english": "sit",
@@ -1536,8 +1675,9 @@
     "topic": "Verbs",
     "day": 5,
     "difficulty": 2,
-    "example": "I like sit.",
-    "example_tajik": "Ба ман нишастан маъқул аст."
+    "example": "Please sit down.",
+    "example_tajik": "Лутфан нишинед.",
+    "id": 140
   },
   {
     "english": "stand",
@@ -1547,8 +1687,9 @@
     "topic": "Verbs",
     "day": 1,
     "difficulty": 2,
-    "example": "I like stand.",
-    "example_tajik": "Ба ман истодан маъқул аст."
+    "example": "Please stand up.",
+    "example_tajik": "Лутфан истоед.",
+    "id": 141
   },
   {
     "english": "run",
@@ -1558,8 +1699,9 @@
     "topic": "Verbs",
     "day": 2,
     "difficulty": 2,
-    "example": "I like run.",
-    "example_tajik": "Ба ман давидан маъқул аст."
+    "example": "I can run.",
+    "example_tajik": "Ман давида метавонам.",
+    "id": 142
   },
   {
     "english": "walk",
@@ -1569,8 +1711,9 @@
     "topic": "Verbs",
     "day": 3,
     "difficulty": 2,
-    "example": "I like walk.",
-    "example_tajik": "Ба ман роҳ рафтан маъқул аст."
+    "example": "I walk to school.",
+    "example_tajik": "Ман пиёда ба мактаб меравам.",
+    "id": 143
   },
   {
     "english": "jump",
@@ -1580,8 +1723,9 @@
     "topic": "Verbs",
     "day": 4,
     "difficulty": 2,
-    "example": "I like jump.",
-    "example_tajik": "Ба ман ҷаҳидан маъқул аст."
+    "example": "I can jump.",
+    "example_tajik": "Ман ҷаҳида метавонам.",
+    "id": 144
   },
   {
     "english": "play",
@@ -1591,8 +1735,9 @@
     "topic": "Verbs",
     "day": 5,
     "difficulty": 2,
-    "example": "I like play.",
-    "example_tajik": "Ба ман бозӣ кардан маъқул аст."
+    "example": "I play every day.",
+    "example_tajik": "Ман ҳар рӯз бозӣ мекунам.",
+    "id": 145
   },
   {
     "english": "sleep",
@@ -1602,8 +1747,9 @@
     "topic": "Verbs",
     "day": 1,
     "difficulty": 2,
-    "example": "I like sleep.",
-    "example_tajik": "Ба ман хобидан маъқул аст."
+    "example": "I sleep at night.",
+    "example_tajik": "Ман шаб мехобам.",
+    "id": 146
   },
   {
     "english": "wake up",
@@ -1613,8 +1759,9 @@
     "topic": "Verbs",
     "day": 2,
     "difficulty": 2,
-    "example": "I like wake up.",
-    "example_tajik": "Ба ман бедор шудан маъқул аст."
+    "example": "I wake up early.",
+    "example_tajik": "Ман барвақт бедор мешавам.",
+    "id": 147
   },
   {
     "english": "now",
@@ -1624,8 +1771,9 @@
     "topic": "Time",
     "day": 3,
     "difficulty": 2,
-    "example": "I like now.",
-    "example_tajik": "Ба ман ҳозир маъқул аст."
+    "example": "I am ready now.",
+    "example_tajik": "Ман ҳозир тайёрам.",
+    "id": 148
   },
   {
     "english": "today",
@@ -1635,8 +1783,9 @@
     "topic": "Time",
     "day": 4,
     "difficulty": 2,
-    "example": "I like today.",
-    "example_tajik": "Ба ман имрӯз маъқул аст."
+    "example": "Today is a good day.",
+    "example_tajik": "Имрӯз рӯзи хуб аст.",
+    "id": 149
   },
   {
     "english": "again",
@@ -1646,8 +1795,9 @@
     "topic": "Time",
     "day": 5,
     "difficulty": 2,
-    "example": "I like again.",
-    "example_tajik": "Ба ман боз / дубора маъқул аст."
+    "example": "Try again.",
+    "example_tajik": "Боз кӯшиш кун.",
+    "id": 150
   },
   {
     "english": "sorry",
@@ -1658,7 +1808,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "I am sorry.",
-    "example_tajik": "Ман бубахшед мегӯям."
+    "example_tajik": "Ман бубахшед мегӯям.",
+    "id": 151
   },
   {
     "english": "excuse me",
@@ -1669,7 +1820,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "Excuse me, please.",
-    "example_tajik": "Мебахшед, лутфан."
+    "example_tajik": "Мебахшед, лутфан.",
+    "id": 152
   },
   {
     "english": "welcome",
@@ -1680,7 +1832,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Welcome to class!",
-    "example_tajik": "Хуш омадед ба дарс!"
+    "example_tajik": "Хуш омадед ба дарс!",
+    "id": 153
   },
   {
     "english": "friend",
@@ -1691,7 +1844,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "You are my friend.",
-    "example_tajik": "Ту дӯсти ман ҳастӣ."
+    "example_tajik": "Ту дӯсти ман ҳастӣ.",
+    "id": 154
   },
   {
     "english": "boy",
@@ -1702,7 +1856,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "The boy is happy.",
-    "example_tajik": "Писар хушҳол аст."
+    "example_tajik": "Писар хушҳол аст.",
+    "id": 155
   },
   {
     "english": "girl",
@@ -1713,7 +1868,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "The girl is kind.",
-    "example_tajik": "Духтар меҳрубон аст."
+    "example_tajik": "Духтар меҳрубон аст.",
+    "id": 156
   },
   {
     "english": "child",
@@ -1724,7 +1880,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "I am a child.",
-    "example_tajik": "Ман кӯдак ҳастам."
+    "example_tajik": "Ман кӯдак ҳастам.",
+    "id": 157
   },
   {
     "english": "smile",
@@ -1735,7 +1892,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Please smile.",
-    "example_tajik": "Лутфан табассум кунед."
+    "example_tajik": "Лутфан табассум кунед.",
+    "id": 158
   },
   {
     "english": "laugh",
@@ -1746,7 +1904,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "We laugh together.",
-    "example_tajik": "Мо якҷо ханда мекунем."
+    "example_tajik": "Мо якҷо ханда мекунем.",
+    "id": 159
   },
   {
     "english": "cry",
@@ -1757,7 +1916,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "Do not cry.",
-    "example_tajik": "Нагир."
+    "example_tajik": "Нагир.",
+    "id": 160
   },
   {
     "english": "love",
@@ -1768,7 +1928,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "I love my family.",
-    "example_tajik": "Ман оилаамро дӯст медорам."
+    "example_tajik": "Ман оилаамро дӯст медорам.",
+    "id": 161
   },
   {
     "english": "like",
@@ -1779,7 +1940,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "I like English.",
-    "example_tajik": "Ба ман англисӣ маъқул аст."
+    "example_tajik": "Ба ман англисӣ маъқул аст.",
+    "id": 162
   },
   {
     "english": "good",
@@ -1790,7 +1952,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "This is good.",
-    "example_tajik": "Ин хуб аст."
+    "example_tajik": "Ин хуб аст.",
+    "id": 163
   },
   {
     "english": "bad",
@@ -1801,7 +1964,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "That is bad.",
-    "example_tajik": "Он бад аст."
+    "example_tajik": "Он бад аст.",
+    "id": 164
   },
   {
     "english": "nice",
@@ -1812,7 +1976,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "You are nice.",
-    "example_tajik": "Ту хуб ҳастӣ."
+    "example_tajik": "Ту хуб ҳастӣ.",
+    "id": 165
   },
   {
     "english": "kind",
@@ -1823,7 +1988,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "Be kind.",
-    "example_tajik": "Меҳрубон бош."
+    "example_tajik": "Меҳрубон бош.",
+    "id": 166
   },
   {
     "english": "funny",
@@ -1834,7 +2000,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "The joke is funny.",
-    "example_tajik": "Шӯхӣ хандаовар аст."
+    "example_tajik": "Шӯхӣ хандаовар аст.",
+    "id": 167
   },
   {
     "english": "brave",
@@ -1845,7 +2012,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "The girl is brave.",
-    "example_tajik": "Духтар шуҷоъ аст."
+    "example_tajik": "Духтар шуҷоъ аст.",
+    "id": 168
   },
   {
     "english": "help",
@@ -1856,7 +2024,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "Please help me.",
-    "example_tajik": "Лутфан ба ман ёрӣ диҳед."
+    "example_tajik": "Лутфан ба ман ёрӣ диҳед.",
+    "id": 169
   },
   {
     "english": "stop",
@@ -1867,7 +2036,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "Stop, please.",
-    "example_tajik": "Ист, лутфан."
+    "example_tajik": "Ист, лутфан.",
+    "id": 170
   },
   {
     "english": "wait",
@@ -1878,7 +2048,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "Wait a minute.",
-    "example_tajik": "Як дақиқа интизор шав."
+    "example_tajik": "Як дақиқа интизор шав.",
+    "id": 171
   },
   {
     "english": "ok",
@@ -1889,7 +2060,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "OK, let's go.",
-    "example_tajik": "Хуб, рафтем."
+    "example_tajik": "Хуб, рафтем.",
+    "id": 172
   },
   {
     "english": "wow",
@@ -1900,7 +2072,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Wow, a star!",
-    "example_tajik": "Вой, ситора!"
+    "example_tajik": "Вой, ситора!",
+    "id": 173
   },
   {
     "english": "hello friend",
@@ -1911,7 +2084,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "Hello, friend!",
-    "example_tajik": "Салом, дӯст!"
+    "example_tajik": "Салом, дӯст!",
+    "id": 174
   },
   {
     "english": "see you",
@@ -1922,7 +2096,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "See you tomorrow.",
-    "example_tajik": "То пагоҳ."
+    "example_tajik": "То пагоҳ.",
+    "id": 175
   },
   {
     "english": "eleven",
@@ -1933,7 +2108,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "I am eleven.",
-    "example_tajik": "Ман ёздаҳсола ҳастам."
+    "example_tajik": "Ман ёздаҳсола ҳастам.",
+    "id": 176
   },
   {
     "english": "twelve",
@@ -1944,7 +2120,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "There are twelve eggs.",
-    "example_tajik": "Дувоздаҳ тухм ҳаст."
+    "example_tajik": "Дувоздаҳ тухм ҳаст.",
+    "id": 177
   },
   {
     "english": "thirteen",
@@ -1955,7 +2132,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Thirteen birds fly.",
-    "example_tajik": "Сездаҳ парранда парвоз мекунанд."
+    "example_tajik": "Сездаҳ парранда парвоз мекунанд.",
+    "id": 178
   },
   {
     "english": "fourteen",
@@ -1966,7 +2144,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "I see fourteen cars.",
-    "example_tajik": "Ман чордаҳ мошин мебинам."
+    "example_tajik": "Ман чордаҳ мошин мебинам.",
+    "id": 179
   },
   {
     "english": "fifteen",
@@ -1977,7 +2156,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "Fifteen is a number.",
-    "example_tajik": "Понздаҳ як рақам аст."
+    "example_tajik": "Понздаҳ як рақам аст.",
+    "id": 180
   },
   {
     "english": "sixteen",
@@ -1988,7 +2168,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "She is sixteen.",
-    "example_tajik": "Ӯ шонздаҳсола аст."
+    "example_tajik": "Ӯ шонздаҳсола аст.",
+    "id": 181
   },
   {
     "english": "seventeen",
@@ -1999,7 +2180,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "Seventeen books.",
-    "example_tajik": "Ҳабдаҳ китоб."
+    "example_tajik": "Ҳабдаҳ китоб.",
+    "id": 182
   },
   {
     "english": "eighteen",
@@ -2010,7 +2192,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Eighteen chairs.",
-    "example_tajik": "Ҳаждаҳ курсӣ."
+    "example_tajik": "Ҳаждаҳ курсӣ.",
+    "id": 183
   },
   {
     "english": "nineteen",
@@ -2021,7 +2204,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "Nineteen trees.",
-    "example_tajik": "Нуздаҳ дарахт."
+    "example_tajik": "Нуздаҳ дарахт.",
+    "id": 184
   },
   {
     "english": "twenty",
@@ -2032,7 +2216,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "I can count to twenty.",
-    "example_tajik": "Ман то бист ҳисоб карда метавонам."
+    "example_tajik": "Ман то бист ҳисоб карда метавонам.",
+    "id": 185
   },
   {
     "english": "round",
@@ -2043,7 +2228,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "The ball is round.",
-    "example_tajik": "Тӯб гирд аст."
+    "example_tajik": "Тӯб гирд аст.",
+    "id": 186
   },
   {
     "english": "square",
@@ -2054,7 +2240,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "A square has four sides.",
-    "example_tajik": "Чоркунҷа чор тараф дорад."
+    "example_tajik": "Чоркунҷа чор тараф дорад.",
+    "id": 187
   },
   {
     "english": "triangle",
@@ -2065,7 +2252,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "Draw a triangle.",
-    "example_tajik": "Секунҷа кашед."
+    "example_tajik": "Секунҷа кашед.",
+    "id": 188
   },
   {
     "english": "star",
@@ -2076,7 +2264,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "A star is bright.",
-    "example_tajik": "Ситора дурахшон аст."
+    "example_tajik": "Ситора дурахшон аст.",
+    "id": 189
   },
   {
     "english": "dark",
@@ -2087,7 +2276,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "The night is dark.",
-    "example_tajik": "Шаб торик аст."
+    "example_tajik": "Шаб торик аст.",
+    "id": 190
   },
   {
     "english": "light",
@@ -2098,7 +2288,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "The room is light.",
-    "example_tajik": "Ҳуҷра равшан аст."
+    "example_tajik": "Ҳуҷра равшан аст.",
+    "id": 191
   },
   {
     "english": "bright",
@@ -2109,7 +2300,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "The sun is bright.",
-    "example_tajik": "Офтоб дурахшон аст."
+    "example_tajik": "Офтоб дурахшон аст.",
+    "id": 192
   },
   {
     "english": "many",
@@ -2120,7 +2312,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "I have many toys.",
-    "example_tajik": "Ман бозичаҳои зиёд дорам."
+    "example_tajik": "Ман бозичаҳои зиёд дорам.",
+    "id": 193
   },
   {
     "english": "few",
@@ -2131,7 +2324,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "A few apples.",
-    "example_tajik": "Чанд себи кам."
+    "example_tajik": "Чанд себи кам.",
+    "id": 194
   },
   {
     "english": "more",
@@ -2142,7 +2336,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "I want more water.",
-    "example_tajik": "Ман оби бештар мехоҳам."
+    "example_tajik": "Ман оби бештар мехоҳам.",
+    "id": 195
   },
   {
     "english": "less",
@@ -2153,7 +2348,8 @@
     "day": 1,
     "difficulty": 1,
     "example": "Less sugar, please.",
-    "example_tajik": "Қанди камтар, лутфан."
+    "example_tajik": "Қанди камтар, лутфан.",
+    "id": 196
   },
   {
     "english": "first",
@@ -2164,7 +2360,8 @@
     "day": 2,
     "difficulty": 1,
     "example": "I am first.",
-    "example_tajik": "Ман аввал ҳастам."
+    "example_tajik": "Ман аввал ҳастам.",
+    "id": 197
   },
   {
     "english": "last",
@@ -2175,7 +2372,8 @@
     "day": 3,
     "difficulty": 1,
     "example": "She is last.",
-    "example_tajik": "Ӯ охирин аст."
+    "example_tajik": "Ӯ охирин аст.",
+    "id": 198
   },
   {
     "english": "next",
@@ -2186,7 +2384,8 @@
     "day": 4,
     "difficulty": 1,
     "example": "Who is next?",
-    "example_tajik": "Кӣ навбатӣ аст?"
+    "example_tajik": "Кӣ навбатӣ аст?",
+    "id": 199
   },
   {
     "english": "number",
@@ -2197,7 +2396,8 @@
     "day": 5,
     "difficulty": 1,
     "example": "What number is this?",
-    "example_tajik": "Ин кадом рақам аст?"
+    "example_tajik": "Ин кадом рақам аст?",
+    "id": 200
   },
   {
     "english": "aunt",
@@ -2208,7 +2408,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "My aunt is kind.",
-    "example_tajik": "Аммаам меҳрубон аст."
+    "example_tajik": "Аммаам меҳрубон аст.",
+    "id": 201
   },
   {
     "english": "uncle",
@@ -2219,7 +2420,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "My uncle is tall.",
-    "example_tajik": "Амакам қадбаланд аст."
+    "example_tajik": "Амакам қадбаланд аст.",
+    "id": 202
   },
   {
     "english": "cousin",
@@ -2230,7 +2432,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "This is my cousin.",
-    "example_tajik": "Ин ҷияни ман аст."
+    "example_tajik": "Ин ҷияни ман аст.",
+    "id": 203
   },
   {
     "english": "son",
@@ -2241,7 +2444,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "He is their son.",
-    "example_tajik": "Ӯ писари онҳост."
+    "example_tajik": "Ӯ писари онҳост.",
+    "id": 204
   },
   {
     "english": "daughter",
@@ -2252,7 +2456,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "She is their daughter.",
-    "example_tajik": "Ӯ духтари онҳост."
+    "example_tajik": "Ӯ духтари онҳост.",
+    "id": 205
   },
   {
     "english": "parents",
@@ -2263,7 +2468,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "I love my parents.",
-    "example_tajik": "Ман падару модарамро дӯст медорам."
+    "example_tajik": "Ман падару модарамро дӯст медорам.",
+    "id": 206
   },
   {
     "english": "people",
@@ -2274,7 +2480,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Many people smile.",
-    "example_tajik": "Одамони зиёд табассум мекунанд."
+    "example_tajik": "Одамони зиёд табассум мекунанд.",
+    "id": 207
   },
   {
     "english": "home",
@@ -2285,7 +2492,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "I go home.",
-    "example_tajik": "Ман ба хона меравам."
+    "example_tajik": "Ман ба хона меравам.",
+    "id": 208
   },
   {
     "english": "house",
@@ -2296,7 +2504,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Our house is small.",
-    "example_tajik": "Хонаи мо хурд аст."
+    "example_tajik": "Хонаи мо хурд аст.",
+    "id": 209
   },
   {
     "english": "shoulder",
@@ -2307,7 +2516,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "My shoulder hurts.",
-    "example_tajik": "Кифтам дард мекунад."
+    "example_tajik": "Кифтам дард мекунад.",
+    "id": 210
   },
   {
     "english": "knee",
@@ -2318,7 +2528,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Bend your knee.",
-    "example_tajik": "Зонуятро хам кун."
+    "example_tajik": "Зонуятро хам кун.",
+    "id": 211
   },
   {
     "english": "neck",
@@ -2329,7 +2540,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "A scarf on my neck.",
-    "example_tajik": "Дар гарданам рӯймол."
+    "example_tajik": "Дар гарданам рӯймол.",
+    "id": 212
   },
   {
     "english": "face",
@@ -2340,7 +2552,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Wash your face.",
-    "example_tajik": "Рӯятро шӯй."
+    "example_tajik": "Рӯятро шӯй.",
+    "id": 213
   },
   {
     "english": "skin",
@@ -2351,7 +2564,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Skin can be brown.",
-    "example_tajik": "Пӯст қаҳваранг шуда метавонад."
+    "example_tajik": "Пӯст қаҳваранг шуда метавонад.",
+    "id": 214
   },
   {
     "english": "heart",
@@ -2362,7 +2576,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "My heart is happy.",
-    "example_tajik": "Дили ман хушҳол аст."
+    "example_tajik": "Дили ман хушҳол аст.",
+    "id": 215
   },
   {
     "english": "body",
@@ -2373,7 +2588,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Take care of your body.",
-    "example_tajik": "Баданатро нигоҳубин кун."
+    "example_tajik": "Баданатро нигоҳубин кун.",
+    "id": 216
   },
   {
     "english": "hug",
@@ -2384,7 +2600,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Give me a hug.",
-    "example_tajik": "Маро оғӯш кун."
+    "example_tajik": "Маро оғӯш кун.",
+    "id": 217
   },
   {
     "english": "kiss",
@@ -2395,7 +2612,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "A kiss for mum.",
-    "example_tajik": "Барои модар як бӯса."
+    "example_tajik": "Барои модар як бӯса.",
+    "id": 218
   },
   {
     "english": "people we love",
@@ -2406,7 +2624,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "We love our family.",
-    "example_tajik": "Мо оиларо дӯст медорем."
+    "example_tajik": "Мо оиларо дӯст медорем.",
+    "id": 219
   },
   {
     "english": "us",
@@ -2417,7 +2636,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Come with us.",
-    "example_tajik": "Бо мо биё."
+    "example_tajik": "Бо мо биё.",
+    "id": 220
   },
   {
     "english": "lion",
@@ -2428,7 +2648,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "The lion is big.",
-    "example_tajik": "Шер калон аст."
+    "example_tajik": "Шер калон аст.",
+    "id": 221
   },
   {
     "english": "tiger",
@@ -2439,7 +2660,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "A tiger has stripes.",
-    "example_tajik": "Паланг хат дорад."
+    "example_tajik": "Паланг хат дорад.",
+    "id": 222
   },
   {
     "english": "elephant",
@@ -2450,7 +2672,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The elephant is huge.",
-    "example_tajik": "Фил хеле калон аст."
+    "example_tajik": "Фил хеле калон аст.",
+    "id": 223
   },
   {
     "english": "monkey",
@@ -2461,7 +2684,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "The monkey can jump.",
-    "example_tajik": "Маймун ҷаҳида метавонад."
+    "example_tajik": "Маймун ҷаҳида метавонад.",
+    "id": 224
   },
   {
     "english": "bear",
@@ -2472,7 +2696,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "The bear is strong.",
-    "example_tajik": "Хирс қувваманд аст."
+    "example_tajik": "Хирс қувваманд аст.",
+    "id": 225
   },
   {
     "english": "zebra",
@@ -2483,7 +2708,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "A zebra is black and white.",
-    "example_tajik": "Зебра сиёҳ ва сафед аст."
+    "example_tajik": "Зебра сиёҳ ва сафед аст.",
+    "id": 226
   },
   {
     "english": "giraffe",
@@ -2494,7 +2720,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "The giraffe is tall.",
-    "example_tajik": "Заррофа қадбаланд аст."
+    "example_tajik": "Заррофа қадбаланд аст.",
+    "id": 227
   },
   {
     "english": "snake",
@@ -2505,7 +2732,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The snake is long.",
-    "example_tajik": "Мор дароз аст."
+    "example_tajik": "Мор дароз аст.",
+    "id": 228
   },
   {
     "english": "frog",
@@ -2516,7 +2744,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "The frog can jump.",
-    "example_tajik": "Қурбоққа ҷаҳида метавонад."
+    "example_tajik": "Қурбоққа ҷаҳида метавонад.",
+    "id": 229
   },
   {
     "english": "bee",
@@ -2527,7 +2756,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "A bee makes honey.",
-    "example_tajik": "Занбӯр асал месозад."
+    "example_tajik": "Занбӯр асал месозад.",
+    "id": 230
   },
   {
     "english": "ant",
@@ -2538,7 +2768,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "An ant is small.",
-    "example_tajik": "Мӯрча хурд аст."
+    "example_tajik": "Мӯрча хурд аст.",
+    "id": 231
   },
   {
     "english": "butterfly",
@@ -2549,7 +2780,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "A butterfly is pretty.",
-    "example_tajik": "Шапарак зебо аст."
+    "example_tajik": "Шапарак зебо аст.",
+    "id": 232
   },
   {
     "english": "whale",
@@ -2560,7 +2792,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The whale is in the sea.",
-    "example_tajik": "Кит дар баҳр аст."
+    "example_tajik": "Кит дар баҳр аст.",
+    "id": 233
   },
   {
     "english": "dolphin",
@@ -2571,7 +2804,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Dolphins can swim.",
-    "example_tajik": "Делфинҳо шино карда метавонанд."
+    "example_tajik": "Делфинҳо шино карда метавонанд.",
+    "id": 234
   },
   {
     "english": "fox",
@@ -2582,7 +2816,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "The fox is clever.",
-    "example_tajik": "Рӯбоҳ зирак аст."
+    "example_tajik": "Рӯбоҳ зирак аст.",
+    "id": 235
   },
   {
     "english": "wolf",
@@ -2593,7 +2828,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "The wolf lives in the forest.",
-    "example_tajik": "Гург дар ҷангал зиндагӣ мекунад."
+    "example_tajik": "Гург дар ҷангал зиндагӣ мекунад.",
+    "id": 236
   },
   {
     "english": "camel",
@@ -2604,7 +2840,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "A camel lives in the desert.",
-    "example_tajik": "Шутур дар биёбон зиндагӣ мекунад."
+    "example_tajik": "Шутур дар биёбон зиндагӣ мекунад.",
+    "id": 237
   },
   {
     "english": "panda",
@@ -2615,7 +2852,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The panda eats bamboo.",
-    "example_tajik": "Панда бамбук мехӯрад."
+    "example_tajik": "Панда бамбук мехӯрад.",
+    "id": 238
   },
   {
     "english": "zoo",
@@ -2626,7 +2864,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "We go to the zoo.",
-    "example_tajik": "Мо ба боғи ҳайвонот меравем."
+    "example_tajik": "Мо ба боғи ҳайвонот меравем.",
+    "id": 239
   },
   {
     "english": "wild",
@@ -2637,7 +2876,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "A lion is a wild animal.",
-    "example_tajik": "Шер ҳайвони ваҳшӣ аст."
+    "example_tajik": "Шер ҳайвони ваҳшӣ аст.",
+    "id": 240
   },
   {
     "english": "breakfast",
@@ -2648,7 +2888,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "I eat breakfast.",
-    "example_tajik": "Ман наҳорӣ мехӯрам."
+    "example_tajik": "Ман наҳорӣ мехӯрам.",
+    "id": 241
   },
   {
     "english": "lunch",
@@ -2659,7 +2900,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Lunch is ready.",
-    "example_tajik": "Хӯроки нисфирӯзӣ тайёр аст."
+    "example_tajik": "Хӯроки нисфирӯзӣ тайёр аст.",
+    "id": 242
   },
   {
     "english": "dinner",
@@ -2670,7 +2912,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Dinner is at seven.",
-    "example_tajik": "Шом соати ҳафт аст."
+    "example_tajik": "Шом соати ҳафт аст.",
+    "id": 243
   },
   {
     "english": "cake",
@@ -2681,7 +2924,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "The cake is sweet.",
-    "example_tajik": "Торт ширин аст."
+    "example_tajik": "Торт ширин аст.",
+    "id": 244
   },
   {
     "english": "cookie",
@@ -2692,7 +2936,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I like a cookie.",
-    "example_tajik": "Ба ман печенье маъқул аст."
+    "example_tajik": "Ба ман печенье маъқул аст.",
+    "id": 245
   },
   {
     "english": "sugar",
@@ -2703,7 +2948,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Less sugar, please.",
-    "example_tajik": "Қанди камтар, лутфан."
+    "example_tajik": "Қанди камтар, лутфан.",
+    "id": 246
   },
   {
     "english": "salt",
@@ -2714,7 +2960,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Add a little salt.",
-    "example_tajik": "Каме намак андоз."
+    "example_tajik": "Каме намак андоз.",
+    "id": 247
   },
   {
     "english": "sweet",
@@ -2725,7 +2972,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Honey is sweet.",
-    "example_tajik": "Асал ширин аст."
+    "example_tajik": "Асал ширин аст.",
+    "id": 248
   },
   {
     "english": "plate",
@@ -2736,7 +2984,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Put rice on the plate.",
-    "example_tajik": "Биринҷро ба табақ гузор."
+    "example_tajik": "Биринҷро ба табақ гузор.",
+    "id": 249
   },
   {
     "english": "hungry now",
@@ -2747,7 +2996,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I am hungry now.",
-    "example_tajik": "Ман ҳозир гуруснаам."
+    "example_tajik": "Ман ҳозир гуруснаам.",
+    "id": 250
   },
   {
     "english": "school",
@@ -2758,7 +3008,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "I go to school.",
-    "example_tajik": "Ман ба мактаб меравам."
+    "example_tajik": "Ман ба мактаб меравам.",
+    "id": 251
   },
   {
     "english": "classroom",
@@ -2769,7 +3020,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Our classroom is bright.",
-    "example_tajik": "Синфхонаи мо равшан аст."
+    "example_tajik": "Синфхонаи мо равшан аст.",
+    "id": 252
   },
   {
     "english": "book",
@@ -2780,7 +3032,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "This is my book.",
-    "example_tajik": "Ин китоби ман аст."
+    "example_tajik": "Ин китоби ман аст.",
+    "id": 253
   },
   {
     "english": "pencil",
@@ -2791,7 +3044,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "I write with a pencil.",
-    "example_tajik": "Ман бо қалам менависам."
+    "example_tajik": "Ман бо қалам менависам.",
+    "id": 254
   },
   {
     "english": "paper",
@@ -2802,7 +3056,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Draw on the paper.",
-    "example_tajik": "Дар қоғаз каш."
+    "example_tajik": "Дар қоғаз каш.",
+    "id": 255
   },
   {
     "english": "desk",
@@ -2813,7 +3068,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Sit at your desk.",
-    "example_tajik": "Дар парта нишин."
+    "example_tajik": "Дар парта нишин.",
+    "id": 256
   },
   {
     "english": "chair",
@@ -2824,7 +3080,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "This chair is small.",
-    "example_tajik": "Ин курсӣ хурд аст."
+    "example_tajik": "Ин курсӣ хурд аст.",
+    "id": 257
   },
   {
     "english": "bag",
@@ -2835,7 +3092,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "My bag is blue.",
-    "example_tajik": "Сумкаам кабуд аст."
+    "example_tajik": "Сумкаам кабуд аст.",
+    "id": 258
   },
   {
     "english": "teacher",
@@ -2846,7 +3104,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "The teacher is kind.",
-    "example_tajik": "Муаллим меҳрубон аст."
+    "example_tajik": "Муаллим меҳрубон аст.",
+    "id": 259
   },
   {
     "english": "student",
@@ -2857,7 +3116,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I am a student.",
-    "example_tajik": "Ман хонанда ҳастам."
+    "example_tajik": "Ман хонанда ҳастам.",
+    "id": 260
   },
   {
     "english": "lesson",
@@ -2868,7 +3128,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "The lesson is fun.",
-    "example_tajik": "Дарс шавқовар аст."
+    "example_tajik": "Дарс шавқовар аст.",
+    "id": 261
   },
   {
     "english": "homework",
@@ -2879,7 +3140,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "I do my homework.",
-    "example_tajik": "Ман вазифаамро мекунам."
+    "example_tajik": "Ман вазифаамро мекунам.",
+    "id": 262
   },
   {
     "english": "window",
@@ -2890,7 +3152,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Open the window.",
-    "example_tajik": "Тирезаро кушо."
+    "example_tajik": "Тирезаро кушо.",
+    "id": 263
   },
   {
     "english": "door",
@@ -2901,7 +3164,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Close the door.",
-    "example_tajik": "Дарро пӯш."
+    "example_tajik": "Дарро пӯш.",
+    "id": 264
   },
   {
     "english": "table",
@@ -2912,7 +3176,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "The book is on the table.",
-    "example_tajik": "Китоб рӯи миз аст."
+    "example_tajik": "Китоб рӯи миз аст.",
+    "id": 265
   },
   {
     "english": "bed",
@@ -2923,7 +3188,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "I sleep in my bed.",
-    "example_tajik": "Ман дар кат мехобам."
+    "example_tajik": "Ман дар кат мехобам.",
+    "id": 266
   },
   {
     "english": "room",
@@ -2934,7 +3200,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "This is my room.",
-    "example_tajik": "Ин ҳуҷраи ман аст."
+    "example_tajik": "Ин ҳуҷраи ман аст.",
+    "id": 267
   },
   {
     "english": "kitchen",
@@ -2945,7 +3212,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Mum is in the kitchen.",
-    "example_tajik": "Модар дар ошхона аст."
+    "example_tajik": "Модар дар ошхона аст.",
+    "id": 268
   },
   {
     "english": "bathroom",
@@ -2956,7 +3224,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Wash in the bathroom.",
-    "example_tajik": "Дар ҳаммом шӯй."
+    "example_tajik": "Дар ҳаммом шӯй.",
+    "id": 269
   },
   {
     "english": "garden",
@@ -2967,7 +3236,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Flowers are in the garden.",
-    "example_tajik": "Гулҳо дар боғчаанд."
+    "example_tajik": "Гулҳо дар боғчаанд.",
+    "id": 270
   },
   {
     "english": "floor",
@@ -2978,7 +3248,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Sit on the floor.",
-    "example_tajik": "Рӯи фарш нишин."
+    "example_tajik": "Рӯи фарш нишин.",
+    "id": 271
   },
   {
     "english": "wall",
@@ -2989,7 +3260,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "A picture on the wall.",
-    "example_tajik": "Дар девор расм аст."
+    "example_tajik": "Дар девор расм аст.",
+    "id": 272
   },
   {
     "english": "lamp",
@@ -3000,7 +3272,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Turn on the lamp.",
-    "example_tajik": "Чароғро фурӯзон кун."
+    "example_tajik": "Чароғро фурӯзон кун.",
+    "id": 273
   },
   {
     "english": "phone",
@@ -3011,7 +3284,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "The phone is ringing.",
-    "example_tajik": "Телефон занг мезанад."
+    "example_tajik": "Телефон занг мезанад.",
+    "id": 274
   },
   {
     "english": "computer",
@@ -3022,7 +3296,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I use a computer.",
-    "example_tajik": "Ман компютер истифода мебарам."
+    "example_tajik": "Ман компютер истифода мебарам.",
+    "id": 275
   },
   {
     "english": "toy",
@@ -3033,7 +3308,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "This toy is new.",
-    "example_tajik": "Ин бозича нав аст."
+    "example_tajik": "Ин бозича нав аст.",
+    "id": 276
   },
   {
     "english": "ball",
@@ -3044,7 +3320,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Kick the ball.",
-    "example_tajik": "Тӯбро зад."
+    "example_tajik": "Тӯбро зад.",
+    "id": 277
   },
   {
     "english": "doll",
@@ -3055,7 +3332,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The doll is pretty.",
-    "example_tajik": "Лухтак зебо аст."
+    "example_tajik": "Лухтак зебо аст.",
+    "id": 278
   },
   {
     "english": "game",
@@ -3066,7 +3344,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Let's play a game.",
-    "example_tajik": "Биё бозӣ кунем."
+    "example_tajik": "Биё бозӣ кунем.",
+    "id": 279
   },
   {
     "english": "draw",
@@ -3077,7 +3356,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "I draw a cat.",
-    "example_tajik": "Ман гурба мекашам."
+    "example_tajik": "Ман гурба мекашам.",
+    "id": 280
   },
   {
     "english": "write",
@@ -3088,7 +3368,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Write your name.",
-    "example_tajik": "Номатро нависед."
+    "example_tajik": "Номатро нависед.",
+    "id": 281
   },
   {
     "english": "read",
@@ -3099,7 +3380,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "I read a book.",
-    "example_tajik": "Ман китоб мехонам."
+    "example_tajik": "Ман китоб мехонам.",
+    "id": 282
   },
   {
     "english": "listen",
@@ -3110,7 +3392,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Listen to the teacher.",
-    "example_tajik": "Ба муаллим гӯш кун."
+    "example_tajik": "Ба муаллим гӯш кун.",
+    "id": 283
   },
   {
     "english": "speak",
@@ -3121,7 +3404,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Speak English.",
-    "example_tajik": "Англисӣ гап зан."
+    "example_tajik": "Англисӣ гап зан.",
+    "id": 284
   },
   {
     "english": "ask",
@@ -3132,7 +3416,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Ask a question.",
-    "example_tajik": "Савол пурс."
+    "example_tajik": "Савол пурс.",
+    "id": 285
   },
   {
     "english": "answer",
@@ -3143,7 +3428,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Answer the question.",
-    "example_tajik": "Ба савол ҷавоб деҳ."
+    "example_tajik": "Ба савол ҷавоб деҳ.",
+    "id": 286
   },
   {
     "english": "open",
@@ -3154,7 +3440,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Open the book.",
-    "example_tajik": "Китобро кушо."
+    "example_tajik": "Китобро кушо.",
+    "id": 287
   },
   {
     "english": "close",
@@ -3165,7 +3452,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Close the bag.",
-    "example_tajik": "Сумкаро пӯш."
+    "example_tajik": "Сумкаро пӯш.",
+    "id": 288
   },
   {
     "english": "clean",
@@ -3176,7 +3464,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Keep your room clean.",
-    "example_tajik": "Ҳуҷраатро тоза нигоҳ дор."
+    "example_tajik": "Ҳуҷраатро тоза нигоҳ дор.",
+    "id": 289
   },
   {
     "english": "dirty",
@@ -3187,7 +3476,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "The floor is dirty.",
-    "example_tajik": "Фарш ифлос аст."
+    "example_tajik": "Фарш ифлос аст.",
+    "id": 290
   },
   {
     "english": "new",
@@ -3198,7 +3488,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "I have a new bag.",
-    "example_tajik": "Ман сумкаи нав дорам."
+    "example_tajik": "Ман сумкаи нав дорам.",
+    "id": 291
   },
   {
     "english": "old",
@@ -3209,7 +3500,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "This book is old.",
-    "example_tajik": "Ин китоб кӯҳна аст."
+    "example_tajik": "Ин китоб кӯҳна аст.",
+    "id": 292
   },
   {
     "english": "fast",
@@ -3220,7 +3512,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "The car is fast.",
-    "example_tajik": "Мошин тез аст."
+    "example_tajik": "Мошин тез аст.",
+    "id": 293
   },
   {
     "english": "slow",
@@ -3231,7 +3524,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Please speak slow.",
-    "example_tajik": "Лутфан суст гап зан."
+    "example_tajik": "Лутфан суст гап зан.",
+    "id": 294
   },
   {
     "english": "quiet",
@@ -3242,7 +3536,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Be quiet, please.",
-    "example_tajik": "Ором бошед, лутфан."
+    "example_tajik": "Ором бошед, лутфан.",
+    "id": 295
   },
   {
     "english": "loud",
@@ -3253,7 +3548,8 @@
     "day": 1,
     "difficulty": 2,
     "example": "Do not be loud.",
-    "example_tajik": "Баланд гап назан."
+    "example_tajik": "Баланд гап назан.",
+    "id": 296
   },
   {
     "english": "ready",
@@ -3264,7 +3560,8 @@
     "day": 2,
     "difficulty": 2,
     "example": "Are you ready?",
-    "example_tajik": "Ту тайёр ҳастӣ?"
+    "example_tajik": "Ту тайёр ҳастӣ?",
+    "id": 297
   },
   {
     "english": "start",
@@ -3275,7 +3572,8 @@
     "day": 3,
     "difficulty": 2,
     "example": "Let's start the lesson.",
-    "example_tajik": "Биё дарсро сар кунем."
+    "example_tajik": "Биё дарсро сар кунем.",
+    "id": 298
   },
   {
     "english": "finish",
@@ -3286,7 +3584,8 @@
     "day": 4,
     "difficulty": 2,
     "example": "Finish your work.",
-    "example_tajik": "Коратро тамом кун."
+    "example_tajik": "Коратро тамом кун.",
+    "id": 299
   },
   {
     "english": "class",
@@ -3297,7 +3596,8 @@
     "day": 5,
     "difficulty": 2,
     "example": "Our class is happy.",
-    "example_tajik": "Синфи мо хушҳол аст."
+    "example_tajik": "Синфи мо хушҳол аст.",
+    "id": 300
   },
   {
     "english": "city",
@@ -3308,7 +3608,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I live in a city.",
-    "example_tajik": "Ман дар шаҳр зиндагӣ мекунам."
+    "example_tajik": "Ман дар шаҳр зиндагӣ мекунам.",
+    "id": 301
   },
   {
     "english": "street",
@@ -3319,7 +3620,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The street is long.",
-    "example_tajik": "Кӯча дароз аст."
+    "example_tajik": "Кӯча дароз аст.",
+    "id": 302
   },
   {
     "english": "car",
@@ -3330,7 +3632,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The car is red.",
-    "example_tajik": "Мошин сурх аст."
+    "example_tajik": "Мошин сурх аст.",
+    "id": 303
   },
   {
     "english": "bus",
@@ -3341,7 +3644,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "I take the bus.",
-    "example_tajik": "Ман бо автобус меравам."
+    "example_tajik": "Ман бо автобус меравам.",
+    "id": 304
   },
   {
     "english": "train",
@@ -3352,7 +3656,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The train is fast.",
-    "example_tajik": "Қатора тез аст."
+    "example_tajik": "Қатора тез аст.",
+    "id": 305
   },
   {
     "english": "plane",
@@ -3363,7 +3668,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The plane is in the sky.",
-    "example_tajik": "Ҳавопаймо дар осмон аст."
+    "example_tajik": "Ҳавопаймо дар осмон аст.",
+    "id": 306
   },
   {
     "english": "bike",
@@ -3374,7 +3680,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I ride a bike.",
-    "example_tajik": "Ман велосипед меронам."
+    "example_tajik": "Ман велосипед меронам.",
+    "id": 307
   },
   {
     "english": "road",
@@ -3385,7 +3692,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The road is wide.",
-    "example_tajik": "Роҳ васеъ аст."
+    "example_tajik": "Роҳ васеъ аст.",
+    "id": 308
   },
   {
     "english": "park",
@@ -3396,7 +3704,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "We play in the park.",
-    "example_tajik": "Мо дар боғ бозӣ мекунем."
+    "example_tajik": "Мо дар боғ бозӣ мекунем.",
+    "id": 309
   },
   {
     "english": "tree",
@@ -3407,7 +3716,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The tree is green.",
-    "example_tajik": "Дарахт сабз аст."
+    "example_tajik": "Дарахт сабз аст.",
+    "id": 310
   },
   {
     "english": "flower",
@@ -3418,7 +3728,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "This flower is pretty.",
-    "example_tajik": "Ин гул зебо аст."
+    "example_tajik": "Ин гул зебо аст.",
+    "id": 311
   },
   {
     "english": "grass",
@@ -3429,7 +3740,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The grass is soft.",
-    "example_tajik": "Алаф нарм аст."
+    "example_tajik": "Алаф нарм аст.",
+    "id": 312
   },
   {
     "english": "mountain",
@@ -3440,7 +3752,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The mountain is high.",
-    "example_tajik": "Кӯҳ баланд аст."
+    "example_tajik": "Кӯҳ баланд аст.",
+    "id": 313
   },
   {
     "english": "river",
@@ -3451,7 +3764,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The river is long.",
-    "example_tajik": "Дарё дароз аст."
+    "example_tajik": "Дарё дароз аст.",
+    "id": 314
   },
   {
     "english": "sea",
@@ -3462,7 +3776,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The sea is blue.",
-    "example_tajik": "Баҳр кабуд аст."
+    "example_tajik": "Баҳр кабуд аст.",
+    "id": 315
   },
   {
     "english": "sky",
@@ -3473,7 +3788,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The sky is clear.",
-    "example_tajik": "Осмон соф аст."
+    "example_tajik": "Осмон соф аст.",
+    "id": 316
   },
   {
     "english": "sun",
@@ -3484,7 +3800,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The sun is hot.",
-    "example_tajik": "Офтоб гарм аст."
+    "example_tajik": "Офтоб гарм аст.",
+    "id": 317
   },
   {
     "english": "moon",
@@ -3495,7 +3812,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The moon is bright.",
-    "example_tajik": "Моҳ дурахшон аст."
+    "example_tajik": "Моҳ дурахшон аст.",
+    "id": 318
   },
   {
     "english": "rain",
@@ -3506,7 +3824,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The rain is cold.",
-    "example_tajik": "Борон хунук аст."
+    "example_tajik": "Борон хунук аст.",
+    "id": 319
   },
   {
     "english": "snow",
@@ -3516,8 +3835,9 @@
     "topic": "Weather",
     "day": 5,
     "difficulty": 3,
-    "example": "I like snow.",
-    "example_tajik": "Ба ман барф маъқул аст."
+    "example": "The snow is cold.",
+    "example_tajik": "Барф хунук аст.",
+    "id": 320
   },
   {
     "english": "wind",
@@ -3528,7 +3848,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The wind is strong.",
-    "example_tajik": "Шамол сахт аст."
+    "example_tajik": "Шамол сахт аст.",
+    "id": 321
   },
   {
     "english": "cloud",
@@ -3539,7 +3860,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "A cloud is in the sky.",
-    "example_tajik": "Дар осмон абр аст."
+    "example_tajik": "Дар осмон абр аст.",
+    "id": 322
   },
   {
     "english": "stone",
@@ -3550,7 +3872,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "A small stone.",
-    "example_tajik": "Санги хурд."
+    "example_tajik": "Санги хурд.",
+    "id": 323
   },
   {
     "english": "sand",
@@ -3561,7 +3884,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Sand is at the sea.",
-    "example_tajik": "Рег дар соҳил аст."
+    "example_tajik": "Рег дар соҳил аст.",
+    "id": 324
   },
   {
     "english": "island",
@@ -3572,7 +3896,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The island is small.",
-    "example_tajik": "Ҷазира хурд аст."
+    "example_tajik": "Ҷазира хурд аст.",
+    "id": 325
   },
   {
     "english": "forest",
@@ -3583,7 +3908,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Animals live in the forest.",
-    "example_tajik": "Ҳайвонот дар ҷангал зиндагӣ мекунанд."
+    "example_tajik": "Ҳайвонот дар ҷангал зиндагӣ мекунанд.",
+    "id": 326
   },
   {
     "english": "leaf",
@@ -3594,7 +3920,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "A green leaf.",
-    "example_tajik": "Барги сабз."
+    "example_tajik": "Барги сабз.",
+    "id": 327
   },
   {
     "english": "shop",
@@ -3605,7 +3932,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "We go to the shop.",
-    "example_tajik": "Мо ба мағоза меравем."
+    "example_tajik": "Мо ба мағоза меравем.",
+    "id": 328
   },
   {
     "english": "market",
@@ -3616,7 +3944,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The market is busy.",
-    "example_tajik": "Бозор серодам аст."
+    "example_tajik": "Бозор серодам аст.",
+    "id": 329
   },
   {
     "english": "money",
@@ -3627,7 +3956,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "I have some money.",
-    "example_tajik": "Ман каме пул дорам."
+    "example_tajik": "Ман каме пул дорам.",
+    "id": 330
   },
   {
     "english": "ticket",
@@ -3638,7 +3968,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I need a ticket.",
-    "example_tajik": "Ба ман чипта лозим аст."
+    "example_tajik": "Ба ман чипта лозим аст.",
+    "id": 331
   },
   {
     "english": "map",
@@ -3649,7 +3980,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Look at the map.",
-    "example_tajik": "Ба харита нигар."
+    "example_tajik": "Ба харита нигар.",
+    "id": 332
   },
   {
     "english": "left",
@@ -3660,7 +3992,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Turn left.",
-    "example_tajik": "Ба чап гарда."
+    "example_tajik": "Ба чап гарда.",
+    "id": 333
   },
   {
     "english": "right",
@@ -3671,7 +4004,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Turn right.",
-    "example_tajik": "Ба рост гарда."
+    "example_tajik": "Ба рост гарда.",
+    "id": 334
   },
   {
     "english": "up",
@@ -3682,7 +4016,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Look up.",
-    "example_tajik": "Ба боло нигар."
+    "example_tajik": "Ба боло нигар.",
+    "id": 335
   },
   {
     "english": "down",
@@ -3693,7 +4028,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Sit down.",
-    "example_tajik": "Поён нишин."
+    "example_tajik": "Поён нишин.",
+    "id": 336
   },
   {
     "english": "near",
@@ -3704,7 +4040,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The park is near.",
-    "example_tajik": "Боғ наздик аст."
+    "example_tajik": "Боғ наздик аст.",
+    "id": 337
   },
   {
     "english": "far",
@@ -3715,7 +4052,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The mountain is far.",
-    "example_tajik": "Кӯҳ дур аст."
+    "example_tajik": "Кӯҳ дур аст.",
+    "id": 338
   },
   {
     "english": "inside",
@@ -3726,7 +4064,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Come inside.",
-    "example_tajik": "Ба дарун биё."
+    "example_tajik": "Ба дарун биё.",
+    "id": 339
   },
   {
     "english": "outside",
@@ -3737,7 +4076,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Play outside.",
-    "example_tajik": "Берун бозӣ кун."
+    "example_tajik": "Берун бозӣ кун.",
+    "id": 340
   },
   {
     "english": "bridge",
@@ -3748,7 +4088,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The bridge is long.",
-    "example_tajik": "Пул дароз аст."
+    "example_tajik": "Пул дароз аст.",
+    "id": 341
   },
   {
     "english": "hospital",
@@ -3759,7 +4100,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The doctor is at the hospital.",
-    "example_tajik": "Духтур дар беморхона аст."
+    "example_tajik": "Духтур дар беморхона аст.",
+    "id": 342
   },
   {
     "english": "mosque",
@@ -3770,7 +4112,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The mosque is quiet.",
-    "example_tajik": "Масҷид ором аст."
+    "example_tajik": "Масҷид ором аст.",
+    "id": 343
   },
   {
     "english": "village",
@@ -3781,7 +4124,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "My grandma lives in a village.",
-    "example_tajik": "Бибиам дар деҳа зиндагӣ мекунад."
+    "example_tajik": "Бибиам дар деҳа зиндагӣ мекунад.",
+    "id": 344
   },
   {
     "english": "country",
@@ -3792,7 +4136,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Tajikistan is my country.",
-    "example_tajik": "Тоҷикистон кишвари ман аст."
+    "example_tajik": "Тоҷикистон кишвари ман аст.",
+    "id": 345
   },
   {
     "english": "world",
@@ -3803,7 +4148,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The world is big.",
-    "example_tajik": "Ҷаҳон калон аст."
+    "example_tajik": "Ҷаҳон калон аст.",
+    "id": 346
   },
   {
     "english": "earth",
@@ -3814,7 +4160,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "We live on Earth.",
-    "example_tajik": "Мо дар Замин зиндагӣ мекунем."
+    "example_tajik": "Мо дар Замин зиндагӣ мекунем.",
+    "id": 347
   },
   {
     "english": "fire",
@@ -3825,7 +4172,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Fire is hot.",
-    "example_tajik": "Оташ гарм аст."
+    "example_tajik": "Оташ гарм аст.",
+    "id": 348
   },
   {
     "english": "ice",
@@ -3836,7 +4184,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Ice is cold.",
-    "example_tajik": "Ях хунук аст."
+    "example_tajik": "Ях хунук аст.",
+    "id": 349
   },
   {
     "english": "shopkeeper",
@@ -3847,7 +4196,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The shopkeeper is kind.",
-    "example_tajik": "Фӯрушанда меҳрубон аст."
+    "example_tajik": "Фӯрушанда меҳрубон аст.",
+    "id": 350
   },
   {
     "english": "morning",
@@ -3858,7 +4208,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Good morning!",
-    "example_tajik": "Субҳ ба хайр!"
+    "example_tajik": "Субҳ ба хайр!",
+    "id": 351
   },
   {
     "english": "afternoon",
@@ -3869,7 +4220,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "See you in the afternoon.",
-    "example_tajik": "Нисфирӯзӣ мебинем."
+    "example_tajik": "Нисфирӯзӣ мебинем.",
+    "id": 352
   },
   {
     "english": "evening",
@@ -3880,7 +4232,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "In the evening I read.",
-    "example_tajik": "Бегоҳ ман мехонам."
+    "example_tajik": "Бегоҳ ман мехонам.",
+    "id": 353
   },
   {
     "english": "night",
@@ -3891,7 +4244,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The night is quiet.",
-    "example_tajik": "Шаб ором аст."
+    "example_tajik": "Шаб ором аст.",
+    "id": 354
   },
   {
     "english": "day",
@@ -3902,7 +4256,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Have a nice day.",
-    "example_tajik": "Рӯзи хуш."
+    "example_tajik": "Рӯзи хуш.",
+    "id": 355
   },
   {
     "english": "week",
@@ -3913,7 +4268,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "There are seven days in a week.",
-    "example_tajik": "Дар ҳафта ҳафт рӯз аст."
+    "example_tajik": "Дар ҳафта ҳафт рӯз аст.",
+    "id": 356
   },
   {
     "english": "month",
@@ -3924,7 +4280,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "This month is warm.",
-    "example_tajik": "Ин моҳ гарм аст."
+    "example_tajik": "Ин моҳ гарм аст.",
+    "id": 357
   },
   {
     "english": "year",
@@ -3935,7 +4292,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "A year has twelve months.",
-    "example_tajik": "Сол дувоздаҳ моҳ дорад."
+    "example_tajik": "Сол дувоздаҳ моҳ дорад.",
+    "id": 358
   },
   {
     "english": "hour",
@@ -3946,7 +4304,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Wait one hour.",
-    "example_tajik": "Як соат интизор шав."
+    "example_tajik": "Як соат интизор шав.",
+    "id": 359
   },
   {
     "english": "minute",
@@ -3957,7 +4316,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "One minute, please.",
-    "example_tajik": "Як дақиқа, лутфан."
+    "example_tajik": "Як дақиқа, лутфан.",
+    "id": 360
   },
   {
     "english": "time",
@@ -3968,7 +4328,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "What time is it?",
-    "example_tajik": "Соат чанд аст?"
+    "example_tajik": "Соат чанд аст?",
+    "id": 361
   },
   {
     "english": "early",
@@ -3979,7 +4340,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I wake up early.",
-    "example_tajik": "Ман барвақт бедор мешавам."
+    "example_tajik": "Ман барвақт бедор мешавам.",
+    "id": 362
   },
   {
     "english": "late",
@@ -3990,7 +4352,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Do not be late.",
-    "example_tajik": "Дер накун."
+    "example_tajik": "Дер накун.",
+    "id": 363
   },
   {
     "english": "yesterday",
@@ -4001,7 +4364,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Yesterday was fun.",
-    "example_tajik": "Дирӯз шавқовар буд."
+    "example_tajik": "Дирӯз шавқовар буд.",
+    "id": 364
   },
   {
     "english": "tomorrow",
@@ -4012,7 +4376,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "See you tomorrow.",
-    "example_tajik": "То фардо."
+    "example_tajik": "То фардо.",
+    "id": 365
   },
   {
     "english": "always",
@@ -4023,7 +4388,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I always say please.",
-    "example_tajik": "Ман ҳамеша «лутфан» мегӯям."
+    "example_tajik": "Ман ҳамеша «лутфан» мегӯям.",
+    "id": 366
   },
   {
     "english": "never",
@@ -4034,7 +4400,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Never run in class.",
-    "example_tajik": "Дар синф ҳеҷ гоҳ надав."
+    "example_tajik": "Дар синф ҳеҷ гоҳ надав.",
+    "id": 367
   },
   {
     "english": "sometimes",
@@ -4045,7 +4412,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Sometimes I draw.",
-    "example_tajik": "Баъзан ман мекашам."
+    "example_tajik": "Баъзан ман мекашам.",
+    "id": 368
   },
   {
     "english": "weather",
@@ -4056,7 +4424,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The weather is nice.",
-    "example_tajik": "Обу ҳаво хуб аст."
+    "example_tajik": "Обу ҳаво хуб аст.",
+    "id": 369
   },
   {
     "english": "sunny",
@@ -4067,7 +4436,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "It is sunny today.",
-    "example_tajik": "Имрӯз офтобӣ аст."
+    "example_tajik": "Имрӯз офтобӣ аст.",
+    "id": 370
   },
   {
     "english": "cloudy",
@@ -4078,7 +4448,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "It is cloudy.",
-    "example_tajik": "Ҳаво абрнок аст."
+    "example_tajik": "Ҳаво абрнок аст.",
+    "id": 371
   },
   {
     "english": "rainy",
@@ -4089,7 +4460,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "It is a rainy day.",
-    "example_tajik": "Рӯзи боронӣ аст."
+    "example_tajik": "Рӯзи боронӣ аст.",
+    "id": 372
   },
   {
     "english": "windy",
@@ -4100,7 +4472,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "It is windy.",
-    "example_tajik": "Шамолнок аст."
+    "example_tajik": "Шамолнок аст.",
+    "id": 373
   },
   {
     "english": "snowy",
@@ -4111,7 +4484,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "It is snowy.",
-    "example_tajik": "Барфӣ аст."
+    "example_tajik": "Барфӣ аст.",
+    "id": 374
   },
   {
     "english": "warm",
@@ -4122,7 +4496,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The tea is warm.",
-    "example_tajik": "Чой гарм аст."
+    "example_tajik": "Чой гарм аст.",
+    "id": 375
   },
   {
     "english": "cool",
@@ -4133,7 +4508,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The wind is cool.",
-    "example_tajik": "Шамол хунукча аст."
+    "example_tajik": "Шамол хунукча аст.",
+    "id": 376
   },
   {
     "english": "spring",
@@ -4144,7 +4520,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Flowers come in spring.",
-    "example_tajik": "Дар баҳор гул мешукуфад."
+    "example_tajik": "Дар баҳор гул мешукуфад.",
+    "id": 377
   },
   {
     "english": "summer",
@@ -4155,7 +4532,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Summer is hot.",
-    "example_tajik": "Тобистон гарм аст."
+    "example_tajik": "Тобистон гарм аст.",
+    "id": 378
   },
   {
     "english": "autumn",
@@ -4166,7 +4544,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Leaves fall in autumn.",
-    "example_tajik": "Дар тирамоҳ барг мерезад."
+    "example_tajik": "Дар тирамоҳ барг мерезад.",
+    "id": 379
   },
   {
     "english": "winter",
@@ -4177,7 +4556,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Winter is cold.",
-    "example_tajik": "Зимистон хунук аст."
+    "example_tajik": "Зимистон хунук аст.",
+    "id": 380
   },
   {
     "english": "season",
@@ -4188,7 +4568,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "What season is it?",
-    "example_tajik": "Кадом фасл аст?"
+    "example_tajik": "Кадом фасл аст?",
+    "id": 381
   },
   {
     "english": "birthday",
@@ -4199,7 +4580,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Happy birthday!",
-    "example_tajik": "Зодрӯзат муборак!"
+    "example_tajik": "Зодрӯзат муборак!",
+    "id": 382
   },
   {
     "english": "holiday",
@@ -4210,7 +4592,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Today is a holiday.",
-    "example_tajik": "Имрӯз рӯзи истироҳат аст."
+    "example_tajik": "Имрӯз рӯзи истироҳат аст.",
+    "id": 383
   },
   {
     "english": "party",
@@ -4221,7 +4604,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "We have a party.",
-    "example_tajik": "Мо зиёфат дорем."
+    "example_tajik": "Мо зиёфат дорем.",
+    "id": 384
   },
   {
     "english": "gift",
@@ -4232,7 +4616,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "This gift is for you.",
-    "example_tajik": "Ин тӯҳфа барои туст."
+    "example_tajik": "Ин тӯҳфа барои туст.",
+    "id": 385
   },
   {
     "english": "song",
@@ -4243,7 +4628,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Sing a song.",
-    "example_tajik": "Суруд хон."
+    "example_tajik": "Суруд хон.",
+    "id": 386
   },
   {
     "english": "music",
@@ -4254,7 +4640,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I like music.",
-    "example_tajik": "Ба ман мусиқӣ маъқул аст."
+    "example_tajik": "Ба ман мусиқӣ маъқул аст.",
+    "id": 387
   },
   {
     "english": "dance",
@@ -4265,7 +4652,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Let's dance.",
-    "example_tajik": "Биё рақс кунем."
+    "example_tajik": "Биё рақс кунем.",
+    "id": 388
   },
   {
     "english": "sport",
@@ -4276,7 +4664,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Sport is good.",
-    "example_tajik": "Варзиш хуб аст."
+    "example_tajik": "Варзиш хуб аст.",
+    "id": 389
   },
   {
     "english": "football",
@@ -4287,7 +4676,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "We play football.",
-    "example_tajik": "Мо футбол бозӣ мекунем."
+    "example_tajik": "Мо футбол бозӣ мекунем.",
+    "id": 390
   },
   {
     "english": "swim",
@@ -4298,7 +4688,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I can swim.",
-    "example_tajik": "Ман шино карда метавонам."
+    "example_tajik": "Ман шино карда метавонам.",
+    "id": 391
   },
   {
     "english": "ride",
@@ -4309,7 +4700,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I ride a bike.",
-    "example_tajik": "Ман велосипед меронам."
+    "example_tajik": "Ман велосипед меронам.",
+    "id": 392
   },
   {
     "english": "fly",
@@ -4320,7 +4712,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Birds can fly.",
-    "example_tajik": "Паррандаҳо парвоз мекунанд."
+    "example_tajik": "Паррандаҳо парвоз мекунанд.",
+    "id": 393
   },
   {
     "english": "drive",
@@ -4331,7 +4724,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Dad can drive.",
-    "example_tajik": "Падар ронда метавонад."
+    "example_tajik": "Падар ронда метавонад.",
+    "id": 394
   },
   {
     "english": "cook",
@@ -4342,7 +4736,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Mum can cook.",
-    "example_tajik": "Модар пухта метавонад."
+    "example_tajik": "Модар пухта метавонад.",
+    "id": 395
   },
   {
     "english": "wash",
@@ -4353,7 +4748,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Wash your hands.",
-    "example_tajik": "Дастонатро шӯй."
+    "example_tajik": "Дастонатро шӯй.",
+    "id": 396
   },
   {
     "english": "brush",
@@ -4364,7 +4760,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Brush your teeth.",
-    "example_tajik": "Дандонатро шона кун."
+    "example_tajik": "Дандонатро шона кун.",
+    "id": 397
   },
   {
     "english": "watch",
@@ -4375,7 +4772,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Watch the birds.",
-    "example_tajik": "Паррандаҳоро тамошо кун."
+    "example_tajik": "Паррандаҳоро тамошо кун.",
+    "id": 398
   },
   {
     "english": "clock",
@@ -4386,7 +4784,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Look at the clock.",
-    "example_tajik": "Ба соат нигар."
+    "example_tajik": "Ба соат нигар.",
+    "id": 399
   },
   {
     "english": "calendar",
@@ -4397,7 +4796,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "See the calendar.",
-    "example_tajik": "Ба тақвим нигар."
+    "example_tajik": "Ба тақвим нигар.",
+    "id": 400
   },
   {
     "english": "doctor",
@@ -4408,7 +4808,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The doctor helps us.",
-    "example_tajik": "Духтур ба мо ёрӣ медиҳад."
+    "example_tajik": "Духтур ба мо ёрӣ медиҳад.",
+    "id": 401
   },
   {
     "english": "nurse",
@@ -4419,7 +4820,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The nurse is kind.",
-    "example_tajik": "Ҳамшира меҳрубон аст."
+    "example_tajik": "Ҳамшира меҳрубон аст.",
+    "id": 402
   },
   {
     "english": "farmer",
@@ -4430,7 +4832,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The farmer grows rice.",
-    "example_tajik": "Деҳқон биринҷ мекорад."
+    "example_tajik": "Деҳқон биринҷ мекорад.",
+    "id": 403
   },
   {
     "english": "driver",
@@ -4441,7 +4844,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The driver is careful.",
-    "example_tajik": "Ронанда эҳтиёткор аст."
+    "example_tajik": "Ронанда эҳтиёткор аст.",
+    "id": 404
   },
   {
     "english": "police",
@@ -4452,7 +4856,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The police help people.",
-    "example_tajik": "Полис ба одамон ёрӣ медиҳад."
+    "example_tajik": "Полис ба одамон ёрӣ медиҳад.",
+    "id": 405
   },
   {
     "english": "firefighter",
@@ -4463,7 +4868,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "A firefighter is brave.",
-    "example_tajik": "Оташнишон шуҷоъ аст."
+    "example_tajik": "Оташнишон шуҷоъ аст.",
+    "id": 406
   },
   {
     "english": "singer",
@@ -4474,7 +4880,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The singer is loud.",
-    "example_tajik": "Сароянда баланд мехонад."
+    "example_tajik": "Сароянда баланд мехонад.",
+    "id": 407
   },
   {
     "english": "player",
@@ -4485,7 +4892,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "He is a football player.",
-    "example_tajik": "Ӯ бозингари футбол аст."
+    "example_tajik": "Ӯ бозингари футбол аст.",
+    "id": 408
   },
   {
     "english": "worker",
@@ -4496,7 +4904,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The worker is strong.",
-    "example_tajik": "Коргар қувваманд аст."
+    "example_tajik": "Коргар қувваманд аст.",
+    "id": 409
   },
   {
     "english": "job",
@@ -4507,7 +4916,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "What is your job?",
-    "example_tajik": "Касби ту чист?"
+    "example_tajik": "Касби ту чист?",
+    "id": 410
   },
   {
     "english": "work",
@@ -4518,7 +4928,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I work at home.",
-    "example_tajik": "Ман дар хона кор мекунам."
+    "example_tajik": "Ман дар хона кор мекунам.",
+    "id": 411
   },
   {
     "english": "library",
@@ -4529,7 +4940,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The library is quiet.",
-    "example_tajik": "Китобхона ором аст."
+    "example_tajik": "Китобхона ором аст.",
+    "id": 412
   },
   {
     "english": "museum",
@@ -4540,7 +4952,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "We visit the museum.",
-    "example_tajik": "Мо ба осорхона меравем."
+    "example_tajik": "Мо ба осорхона меравем.",
+    "id": 413
   },
   {
     "english": "cinema",
@@ -4551,7 +4964,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Let's go to the cinema.",
-    "example_tajik": "Биё ба кино равем."
+    "example_tajik": "Биё ба кино равем.",
+    "id": 414
   },
   {
     "english": "restaurant",
@@ -4562,7 +4976,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The restaurant is busy.",
-    "example_tajik": "Ресторан серодам аст."
+    "example_tajik": "Ресторан серодам аст.",
+    "id": 415
   },
   {
     "english": "cafe",
@@ -4573,7 +4988,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "We sit in a cafe.",
-    "example_tajik": "Мо дар қаҳвахона менишинем."
+    "example_tajik": "Мо дар қаҳвахона менишинем.",
+    "id": 416
   },
   {
     "english": "hotel",
@@ -4584,7 +5000,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The hotel is big.",
-    "example_tajik": "Меҳмонхона калон аст."
+    "example_tajik": "Меҳмонхона калон аст.",
+    "id": 417
   },
   {
     "english": "airport",
@@ -4595,7 +5012,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Planes are at the airport.",
-    "example_tajik": "Ҳавопаймоҳо дар фурудгоҳанд."
+    "example_tajik": "Ҳавопаймоҳо дар фурудгоҳанд.",
+    "id": 418
   },
   {
     "english": "station",
@@ -4606,7 +5024,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Wait at the station.",
-    "example_tajik": "Дар истгоҳ интизор шав."
+    "example_tajik": "Дар истгоҳ интизор шав.",
+    "id": 419
   },
   {
     "english": "bank",
@@ -4617,7 +5036,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The bank is closed.",
-    "example_tajik": "Бонк пӯшида аст."
+    "example_tajik": "Бонк пӯшида аст.",
+    "id": 420
   },
   {
     "english": "letter",
@@ -4628,7 +5048,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I write a letter.",
-    "example_tajik": "Ман нома менависам."
+    "example_tajik": "Ман нома менависам.",
+    "id": 421
   },
   {
     "english": "news",
@@ -4639,7 +5060,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "This is good news.",
-    "example_tajik": "Ин хабари хуб аст."
+    "example_tajik": "Ин хабари хуб аст.",
+    "id": 422
   },
   {
     "english": "radio",
@@ -4650,7 +5072,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Listen to the radio.",
-    "example_tajik": "Ба радио гӯш кун."
+    "example_tajik": "Ба радио гӯш кун.",
+    "id": 423
   },
   {
     "english": "camera",
@@ -4661,7 +5084,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Smile for the camera.",
-    "example_tajik": "Барои камера табассум кун."
+    "example_tajik": "Барои камера табассум кун.",
+    "id": 424
   },
   {
     "english": "photo",
@@ -4672,7 +5096,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "This photo is nice.",
-    "example_tajik": "Ин акс хуб аст."
+    "example_tajik": "Ин акс хуб аст.",
+    "id": 425
   },
   {
     "english": "picture",
@@ -4683,7 +5108,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Draw a picture.",
-    "example_tajik": "Расм каш."
+    "example_tajik": "Расм каш.",
+    "id": 426
   },
   {
     "english": "paint",
@@ -4694,7 +5120,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I paint a house.",
-    "example_tajik": "Ман хона ранг мекунам."
+    "example_tajik": "Ман хона ранг мекунам.",
+    "id": 427
   },
   {
     "english": "story",
@@ -4705,7 +5132,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Tell me a story.",
-    "example_tajik": "Ба ман ҳикоя гӯ."
+    "example_tajik": "Ба ман ҳикоя гӯ.",
+    "id": 428
   },
   {
     "english": "king",
@@ -4716,7 +5144,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The king is just.",
-    "example_tajik": "Подшоҳ адолатпеша аст."
+    "example_tajik": "Подшоҳ адолатпеша аст.",
+    "id": 429
   },
   {
     "english": "queen",
@@ -4727,7 +5156,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "The queen is kind.",
-    "example_tajik": "Малика меҳрубон аст."
+    "example_tajik": "Малика меҳрубон аст.",
+    "id": 430
   },
   {
     "english": "prince",
@@ -4738,7 +5168,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "The prince is brave.",
-    "example_tajik": "Шоҳзода шуҷоъ аст."
+    "example_tajik": "Шоҳзода шуҷоъ аст.",
+    "id": 431
   },
   {
     "english": "princess",
@@ -4749,7 +5180,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "The princess smiles.",
-    "example_tajik": "Маликаи ҷавон табассум мекунад."
+    "example_tajik": "Маликаи ҷавон табассум мекунад.",
+    "id": 432
   },
   {
     "english": "castle",
@@ -4760,7 +5192,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "The castle is old.",
-    "example_tajik": "Қалъа кӯҳна аст."
+    "example_tajik": "Қалъа кӯҳна аст.",
+    "id": 433
   },
   {
     "english": "magic",
@@ -4771,7 +5204,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "The story has magic.",
-    "example_tajik": "Ҳикоя сеҳр дорад."
+    "example_tajik": "Ҳикоя сеҳр дорад.",
+    "id": 434
   },
   {
     "english": "dream",
@@ -4782,7 +5216,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "I have a dream.",
-    "example_tajik": "Ман як орзу дорам."
+    "example_tajik": "Ман як орзу дорам.",
+    "id": 435
   },
   {
     "english": "wish",
@@ -4793,7 +5228,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Make a wish.",
-    "example_tajik": "Хоҳиш кун."
+    "example_tajik": "Хоҳиш кун.",
+    "id": 436
   },
   {
     "english": "hope",
@@ -4804,7 +5240,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I hope you are well.",
-    "example_tajik": "Умедворам хуб ҳастӣ."
+    "example_tajik": "Умедворам хуб ҳастӣ.",
+    "id": 437
   },
   {
     "english": "peace",
@@ -4815,7 +5252,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "We want peace.",
-    "example_tajik": "Мо сулҳ мехоҳем."
+    "example_tajik": "Мо сулҳ мехоҳем.",
+    "id": 438
   },
   {
     "english": "rule",
@@ -4826,7 +5264,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Follow the rule.",
-    "example_tajik": "Қоидаро риоя кун."
+    "example_tajik": "Қоидаро риоя кун.",
+    "id": 439
   },
   {
     "english": "line",
@@ -4837,7 +5276,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Stand in a line.",
-    "example_tajik": "Дар саф ист."
+    "example_tajik": "Дар саф ист.",
+    "id": 440
   },
   {
     "english": "circle",
@@ -4848,7 +5288,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Draw a circle.",
-    "example_tajik": "Доира каш."
+    "example_tajik": "Доира каш.",
+    "id": 441
   },
   {
     "english": "shape",
@@ -4859,7 +5300,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "What shape is this?",
-    "example_tajik": "Ин чӣ шакл аст?"
+    "example_tajik": "Ин чӣ шакл аст?",
+    "id": 442
   },
   {
     "english": "neighbor",
@@ -4870,7 +5312,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "My neighbor is nice.",
-    "example_tajik": "Ҳамсояам хуб аст."
+    "example_tajik": "Ҳамсояам хуб аст.",
+    "id": 443
   },
   {
     "english": "helper",
@@ -4881,7 +5324,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Be a helper at home.",
-    "example_tajik": "Дар хона ёрдамчӣ бош."
+    "example_tajik": "Дар хона ёрдамчӣ бош.",
+    "id": 444
   },
   {
     "english": "team",
@@ -4892,7 +5336,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Our team is strong.",
-    "example_tajik": "Дастаи мо қувваманд аст."
+    "example_tajik": "Дастаи мо қувваманд аст.",
+    "id": 445
   },
   {
     "english": "win",
@@ -4903,7 +5348,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "We can win.",
-    "example_tajik": "Мо ғолиб шуда метавонем."
+    "example_tajik": "Мо ғолиб шуда метавонем.",
+    "id": 446
   },
   {
     "english": "fair",
@@ -4914,7 +5360,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Play fair.",
-    "example_tajik": "Одилона бозӣ кун."
+    "example_tajik": "Одилона бозӣ кун.",
+    "id": 447
   },
   {
     "english": "share",
@@ -4925,7 +5372,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Share your toys.",
-    "example_tajik": "Бозичаҳоятро тақсим кун."
+    "example_tajik": "Бозичаҳоятро тақсим кун.",
+    "id": 448
   },
   {
     "english": "together",
@@ -4936,7 +5384,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "We learn together.",
-    "example_tajik": "Мо якҷо меомӯзем."
+    "example_tajik": "Мо якҷо меомӯзем.",
+    "id": 449
   },
   {
     "english": "alone",
@@ -4947,7 +5396,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Do not sit alone.",
-    "example_tajik": "Танҳо нанишин."
+    "example_tajik": "Танҳо нанишин.",
+    "id": 450
   },
   {
     "english": "can",
@@ -4958,7 +5408,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I can run.",
-    "example_tajik": "Ман давида метавонам."
+    "example_tajik": "Ман давида метавонам.",
+    "id": 451
   },
   {
     "english": "cannot",
@@ -4969,7 +5420,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I cannot fly.",
-    "example_tajik": "Ман парвоз карда наметавонам."
+    "example_tajik": "Ман парвоз карда наметавонам.",
+    "id": 452
   },
   {
     "english": "want",
@@ -4980,7 +5432,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "I want water.",
-    "example_tajik": "Ман об мехоҳам."
+    "example_tajik": "Ман об мехоҳам.",
+    "id": 453
   },
   {
     "english": "need",
@@ -4991,7 +5444,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "I need a pencil.",
-    "example_tajik": "Ба ман қалам лозим аст."
+    "example_tajik": "Ба ман қалам лозим аст.",
+    "id": 454
   },
   {
     "english": "know",
@@ -5002,7 +5456,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "I know my name.",
-    "example_tajik": "Ман номамро медонам."
+    "example_tajik": "Ман номамро медонам.",
+    "id": 455
   },
   {
     "english": "think",
@@ -5013,7 +5468,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I think it is good.",
-    "example_tajik": "Фикр мекунам хуб аст."
+    "example_tajik": "Фикр мекунам хуб аст.",
+    "id": 456
   },
   {
     "english": "feel",
@@ -5024,7 +5480,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I feel happy.",
-    "example_tajik": "Ман хушҳол ҳастам."
+    "example_tajik": "Ман хушҳол ҳастам.",
+    "id": 457
   },
   {
     "english": "make",
@@ -5035,7 +5492,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "I make a cake.",
-    "example_tajik": "Ман торт месозам."
+    "example_tajik": "Ман торт месозам.",
+    "id": 458
   },
   {
     "english": "take",
@@ -5046,7 +5504,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Take your bag.",
-    "example_tajik": "Сумкаатро гир."
+    "example_tajik": "Сумкаатро гир.",
+    "id": 459
   },
   {
     "english": "give",
@@ -5057,7 +5516,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Give me the book.",
-    "example_tajik": "Китобро ба ман деҳ."
+    "example_tajik": "Китобро ба ман деҳ.",
+    "id": 460
   },
   {
     "english": "put",
@@ -5068,7 +5528,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Put it here.",
-    "example_tajik": "Онро ин ҷо гузор."
+    "example_tajik": "Онро ин ҷо гузор.",
+    "id": 461
   },
   {
     "english": "find",
@@ -5079,7 +5540,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Find the cat.",
-    "example_tajik": "Гурбаро ёб."
+    "example_tajik": "Гурбаро ёб.",
+    "id": 462
   },
   {
     "english": "lose",
@@ -5090,7 +5552,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Do not lose your book.",
-    "example_tajik": "Китобатро гум накун."
+    "example_tajik": "Китобатро гум накун.",
+    "id": 463
   },
   {
     "english": "keep",
@@ -5101,7 +5564,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Keep it safe.",
-    "example_tajik": "Онро бехатар нигоҳ дор."
+    "example_tajik": "Онро бехатар нигоҳ дор.",
+    "id": 464
   },
   {
     "english": "show",
@@ -5112,7 +5576,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Show me the picture.",
-    "example_tajik": "Расмро нишон деҳ."
+    "example_tajik": "Расмро нишон деҳ.",
+    "id": 465
   },
   {
     "english": "tell",
@@ -5123,7 +5588,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Tell me your name.",
-    "example_tajik": "Номатро гӯ."
+    "example_tajik": "Номатро гӯ.",
+    "id": 466
   },
   {
     "english": "call",
@@ -5134,7 +5600,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Call your mum.",
-    "example_tajik": "Модаратро садо кун."
+    "example_tajik": "Модаратро садо кун.",
+    "id": 467
   },
   {
     "english": "live",
@@ -5145,7 +5612,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "I live in Tajikistan.",
-    "example_tajik": "Ман дар Тоҷикистон зиндагӣ мекунам."
+    "example_tajik": "Ман дар Тоҷикистон зиндагӣ мекунам.",
+    "id": 468
   },
   {
     "english": "grow",
@@ -5156,7 +5624,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Trees grow tall.",
-    "example_tajik": "Дарахтон қад мекашанд."
+    "example_tajik": "Дарахтон қад мекашанд.",
+    "id": 469
   },
   {
     "english": "try",
@@ -5167,7 +5636,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Try again.",
-    "example_tajik": "Боз кӯшиш кун."
+    "example_tajik": "Боз кӯшиш кун.",
+    "id": 470
   },
   {
     "english": "begin",
@@ -5178,7 +5648,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Begin the lesson.",
-    "example_tajik": "Дарсро оғоз кун."
+    "example_tajik": "Дарсро оғоз кун.",
+    "id": 471
   },
   {
     "english": "end",
@@ -5189,7 +5660,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "This is the end.",
-    "example_tajik": "Ин охир аст."
+    "example_tajik": "Ин охир аст.",
+    "id": 472
   },
   {
     "english": "use",
@@ -5200,7 +5672,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Use a pencil.",
-    "example_tajik": "Қаламро истифода бар."
+    "example_tajik": "Қаламро истифода бар.",
+    "id": 473
   },
   {
     "english": "buy",
@@ -5211,7 +5684,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "I buy milk.",
-    "example_tajik": "Ман шир мехарам."
+    "example_tajik": "Ман шир мехарам.",
+    "id": 474
   },
   {
     "english": "sell",
@@ -5222,7 +5696,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "They sell fruit.",
-    "example_tajik": "Онҳо мева мефурӯшанд."
+    "example_tajik": "Онҳо мева мефурӯшанд.",
+    "id": 475
   },
   {
     "english": "pay",
@@ -5233,7 +5708,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I pay at the shop.",
-    "example_tajik": "Ман дар мағоза пул медиҳам."
+    "example_tajik": "Ман дар мағоза пул медиҳам.",
+    "id": 476
   },
   {
     "english": "wear",
@@ -5244,7 +5720,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I wear a hat.",
-    "example_tajik": "Ман кулоҳ мепӯшам."
+    "example_tajik": "Ман кулоҳ мепӯшам.",
+    "id": 477
   },
   {
     "english": "hold",
@@ -5255,7 +5732,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Hold my hand.",
-    "example_tajik": "Дастамро гир."
+    "example_tajik": "Дастамро гир.",
+    "id": 478
   },
   {
     "english": "push",
@@ -5266,7 +5744,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Do not push.",
-    "example_tajik": "Тела надиҳ."
+    "example_tajik": "Тела надиҳ.",
+    "id": 479
   },
   {
     "english": "pull",
@@ -5277,7 +5756,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Pull the door.",
-    "example_tajik": "Дарро каш."
+    "example_tajik": "Дарро каш.",
+    "id": 480
   },
   {
     "english": "throw",
@@ -5288,7 +5768,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Throw the ball.",
-    "example_tajik": "Тӯбро парто."
+    "example_tajik": "Тӯбро парто.",
+    "id": 481
   },
   {
     "english": "catch",
@@ -5299,7 +5780,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Catch the ball.",
-    "example_tajik": "Тӯбро дор."
+    "example_tajik": "Тӯбро дор.",
+    "id": 482
   },
   {
     "english": "kick",
@@ -5310,7 +5792,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Kick the ball.",
-    "example_tajik": "Тӯбро бо по зад."
+    "example_tajik": "Тӯбро бо по зад.",
+    "id": 483
   },
   {
     "english": "cut",
@@ -5321,7 +5804,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Cut the paper.",
-    "example_tajik": "Қоғазро бур."
+    "example_tajik": "Қоғазро бур.",
+    "id": 484
   },
   {
     "english": "break",
@@ -5332,7 +5816,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Do not break it.",
-    "example_tajik": "Онро нашакан."
+    "example_tajik": "Онро нашакан.",
+    "id": 485
   },
   {
     "english": "build",
@@ -5343,7 +5828,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "Build a house.",
-    "example_tajik": "Хона соз."
+    "example_tajik": "Хона соз.",
+    "id": 486
   },
   {
     "english": "fix",
@@ -5354,7 +5840,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Dad can fix it.",
-    "example_tajik": "Падар онро таъмир карда метавонад."
+    "example_tajik": "Падар онро таъмир карда метавонад.",
+    "id": 487
   },
   {
     "english": "choose",
@@ -5365,7 +5852,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Choose a book.",
-    "example_tajik": "Китоб интихоб кун."
+    "example_tajik": "Китоб интихоб кун.",
+    "id": 488
   },
   {
     "english": "remember",
@@ -5376,7 +5864,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Remember this word.",
-    "example_tajik": "Ин калимаро дар ёд дор."
+    "example_tajik": "Ин калимаро дар ёд дор.",
+    "id": 489
   },
   {
     "english": "forget",
@@ -5387,7 +5876,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Do not forget homework.",
-    "example_tajik": "Вазифаро фаромӯш накун."
+    "example_tajik": "Вазифаро фаромӯш накун.",
+    "id": 490
   },
   {
     "english": "understand",
@@ -5398,7 +5888,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "I understand you.",
-    "example_tajik": "Ман туро мефаҳмам."
+    "example_tajik": "Ман туро мефаҳмам.",
+    "id": 491
   },
   {
     "english": "learn",
@@ -5409,7 +5900,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "I learn English.",
-    "example_tajik": "Ман англисӣ меомӯзам."
+    "example_tajik": "Ман англисӣ меомӯзам.",
+    "id": 492
   },
   {
     "english": "teach",
@@ -5420,7 +5912,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "Teach me please.",
-    "example_tajik": "Маро омӯзон, лутфан."
+    "example_tajik": "Маро омӯзон, лутфан.",
+    "id": 493
   },
   {
     "english": "study",
@@ -5431,7 +5924,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "I study every day.",
-    "example_tajik": "Ман ҳар рӯз таҳсил мекунам."
+    "example_tajik": "Ман ҳар рӯз таҳсил мекунам.",
+    "id": 494
   },
   {
     "english": "practice",
@@ -5442,7 +5936,8 @@
     "day": 5,
     "difficulty": 3,
     "example": "Practice the word.",
-    "example_tajik": "Калимаро машқ кун."
+    "example_tajik": "Калимаро машқ кун.",
+    "id": 495
   },
   {
     "english": "must",
@@ -5453,7 +5948,8 @@
     "day": 1,
     "difficulty": 3,
     "example": "You must be kind.",
-    "example_tajik": "Ту бояд меҳрубон бошӣ."
+    "example_tajik": "Ту бояд меҳрубон бошӣ.",
+    "id": 496
   },
   {
     "english": "let",
@@ -5464,7 +5960,8 @@
     "day": 2,
     "difficulty": 3,
     "example": "Let us learn.",
-    "example_tajik": "Бигузор омӯзем."
+    "example_tajik": "Бигузор омӯзем.",
+    "id": 497
   },
   {
     "english": "because",
@@ -5475,7 +5972,8 @@
     "day": 3,
     "difficulty": 3,
     "example": "I drink because I am thirsty.",
-    "example_tajik": "Менӯшам, зеро ташнаам."
+    "example_tajik": "Менӯшам, зеро ташнаам.",
+    "id": 498
   },
   {
     "english": "with",
@@ -5486,7 +5984,8 @@
     "day": 4,
     "difficulty": 3,
     "example": "Come with me.",
-    "example_tajik": "Бо ман биё."
+    "example_tajik": "Бо ман биё.",
+    "id": 499
   },
   {
     "english": "without",
@@ -5497,6 +5996,7 @@
     "day": 5,
     "difficulty": 3,
     "example": "Do not go without mum.",
-    "example_tajik": "Бе модар нарава."
+    "example_tajik": "Бе модар нарава.",
+    "id": 500
   }
 ]

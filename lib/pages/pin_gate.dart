@@ -97,14 +97,18 @@ class _PinGateState extends State<PinGate> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 16),
+            _PinDots(value: pin.text),
+            const SizedBox(height: 10),
             TextField(
               controller: pin,
               keyboardType: TextInputType.number,
               obscureText: true,
               maxLength: 6,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
                 labelText: 'PIN',
+                hintText: '• • • •',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -153,4 +157,30 @@ Future<bool> unlockParent(BuildContext context, {String title = 'Қисмати 
     ),
   );
   return ok;
+}
+
+
+class _PinDots extends StatelessWidget {
+  final String value;
+  const _PinDots({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < 6; i++)
+          Container(
+            width: 14,
+            height: 14,
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: i < value.length ? cyan700 : Colors.transparent,
+              border: Border.all(color: cyan700, width: 2),
+            ),
+          ),
+      ],
+    );
+  }
 }

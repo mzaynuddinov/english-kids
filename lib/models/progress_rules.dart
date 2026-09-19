@@ -24,3 +24,14 @@ String lockReason(int week) {
   if (week <= 1) return 'Аввал алифборо ба анҷом расонед.';
   return 'Аввал Ҳафтаи ${week - 1}-ро ба анҷом расонед.';
 }
+
+String continueLabel(Set<String> letters, List<Word> words, Set<String> learned) {
+  if (!alphabetComplete(letters)) return 'Идома: Алифбо';
+  for (var week = 1; week <= weekCount; week++) {
+    if (!weekComplete(week, words, learned) && weekUnlocked(week, letters, words, learned)) {
+      return 'Идома: Ҳафтаи $week';
+    }
+  }
+  if (grammarUnlocked(words, learned, letters)) return 'Идома: Грамматика';
+  return 'Идома: такрор';
+}

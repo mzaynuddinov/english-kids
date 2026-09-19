@@ -48,5 +48,9 @@ void main() {
     for (var week = 1; week <= 10; week++) {
       expect(words.where((w) => w.week == week).length, 50, reason: 'week $week');
     }
+    expect(words.every((w) => w.example.trim().isNotEmpty), isTrue);
+    expect(words.every((w) => w.exampleTajik.trim().isNotEmpty), isTrue);
+    expect(words.any((w) => w.english.toLowerCase() == 'hello' && w.example.startsWith('Hello!')), isTrue);
+    expect(words.any((w) => w.english.toLowerCase() == 'apple' && w.example.toLowerCase().contains('apple')), isTrue);
   });
 }

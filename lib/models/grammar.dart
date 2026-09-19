@@ -42,6 +42,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ман хушҳол ҳастам.', expected: 'I am happy.', options: ['I am happy.', 'You are happy.', 'He is happy.']),
+      GrammarQuiz(prompt: 'Ман хонанда ҳастам.', expected: 'I am a student.', options: ['I am a student.', 'You are a student.', 'He is a student.']),
     ],
   ),
   GrammarLesson(
@@ -56,6 +57,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ту меҳрубон ҳастӣ.', expected: 'You are kind.', options: ['I am kind.', 'You are kind.', 'She is kind.']),
+      GrammarQuiz(prompt: 'Ту дӯсти ман ҳастӣ.', expected: 'You are my friend.', options: ['I am my friend.', 'You are my friend.', 'He is my friend.']),
     ],
   ),
   GrammarLesson(
@@ -70,6 +72,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ӯ писар аст.', expected: 'He is a boy.', options: ['She is a boy.', 'He is a boy.', 'I am a boy.']),
+      GrammarQuiz(prompt: 'Ӯ бародари ман аст.', expected: 'He is my brother.', options: ['She is my brother.', 'He is my brother.', 'I am my brother.']),
     ],
   ),
   GrammarLesson(
@@ -84,6 +87,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ӯ духтар аст.', expected: 'She is a girl.', options: ['He is a girl.', 'She is a girl.', 'You are a girl.']),
+      GrammarQuiz(prompt: 'Ӯ хоҳари ман аст.', expected: 'She is my sister.', options: ['He is my sister.', 'She is my sister.', 'You are my sister.']),
     ],
   ),
   GrammarLesson(
@@ -98,6 +102,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ин гурба аст.', expected: 'It is a cat.', options: ['He is a cat.', 'It is a cat.', 'She is a cat.']),
+      GrammarQuiz(prompt: 'Ҳаво гарм аст.', expected: 'It is hot.', options: ['He is hot.', 'It is hot.', 'I am hot.']),
     ],
   ),
   GrammarLesson(
@@ -112,6 +117,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ин себ аст.', expected: 'This is an apple.', options: ['These are apples.', 'This is an apple.', 'That is a bag.']),
+      GrammarQuiz(prompt: 'Ин сумкаи ман аст.', expected: 'This is my bag.', options: ['These are my bag.', 'This is my bag.', 'It is my bags.']),
     ],
   ),
   GrammarLesson(
@@ -126,6 +132,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Инҳо китобҳоянд.', expected: 'These are books.', options: ['This is a book.', 'These are books.', 'It is a book.']),
+      GrammarQuiz(prompt: 'Инҳо бозичаҳои мананд.', expected: 'These are my toys.', options: ['This is my toys.', 'These are my toys.', 'It is my toys.']),
     ],
   ),
   GrammarLesson(
@@ -140,6 +147,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ман гурба дорам.', expected: 'I have a cat.', options: ['I am a cat.', 'I have a cat.', 'I like a cat.']),
+      GrammarQuiz(prompt: 'Ман ду даст дорам.', expected: 'I have two hands.', options: ['I am two hands.', 'I have two hands.', 'I like two hands.']),
     ],
   ),
   GrammarLesson(
@@ -154,6 +162,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ба ман шир маъқул аст.', expected: 'I like milk.', options: ['I have milk.', 'I like milk.', 'I am milk.']),
+      GrammarQuiz(prompt: 'Ба ман бозӣ кардан маъқул аст.', expected: 'I like to play.', options: ['I have to play.', 'I like to play.', 'I am to play.']),
     ],
   ),
   GrammarLesson(
@@ -168,6 +177,7 @@ const grammarLessons = <GrammarLesson>[
     ],
     quiz: [
       GrammarQuiz(prompt: 'Ман ҳар рӯз бозӣ мекунам.', expected: 'I play every day.', options: ['I am play.', 'I play every day.', 'She play every day.']),
+      GrammarQuiz(prompt: 'Ӯ себ мехӯрад.', expected: 'She eats an apple.', options: ['She eat an apple.', 'She eats an apple.', 'I eats an apple.']),
     ],
   ),
 ];

@@ -708,10 +708,6 @@ class _HomeShellState extends State<HomeShell> {
     }
 
     final progress = words.isEmpty ? 0.0 : learned.length / words.length;
-    final next = words.firstWhere(
-      (w) => !w.isMarked(learned),
-      orElse: () => words.first,
-    );
     final snap = ProgressService.instance.snapshot;
     final wotd = _wordOfDay;
     final active = snap.active;
@@ -724,7 +720,7 @@ class _HomeShellState extends State<HomeShell> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
             child: Column(
               children: [
-                _hero(progress, next, snap.streak),
+                _hero(progress, snap.streak),
                 if (active != null && !active.completed) ...[
                   const SizedBox(height: 12),
                   _continueCard(active),
@@ -786,7 +782,7 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Widget _hero(double progress, Word next, int streak) {
+  Widget _hero(double progress, int streak) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -848,7 +844,7 @@ class _HomeShellState extends State<HomeShell> {
             child: FilledButton.icon(
               onPressed: () => unawaited(_continueLearning()),
               icon: const Icon(Icons.play_arrow_rounded),
-              label: Text('Идома: ${next.displayEnglish}'),
+              label: Text(continueLabel(ProgressService.instance.snapshot.letters, words, learned)),
             ),
           ),
         ],

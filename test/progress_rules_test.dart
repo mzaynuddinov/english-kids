@@ -22,6 +22,8 @@ void main() {
     final week1 = {for (final w in words.where((w) => w.week == 1)) w.id};
     expect(weekUnlocked(2, letters, words, week1), isTrue);
     expect(grammarUnlocked(words, week1, letters), isFalse);
+    expect(continueLabel({}, words, {}), 'Идома: Алифбо');
+    expect(continueLabel(letters, words, {}), 'Идома: Ҳафтаи 1');
   });
 
   test('PIN digest is stable and not the raw pin', () {
