@@ -7,6 +7,7 @@ import '../services/progress_service.dart';
 import '../services/reminder_service.dart';
 import '../theme.dart';
 import 'calendar_page.dart';
+import 'parent_hub_page.dart';
 import 'parent_stats_page.dart';
 import 'pin_gate.dart';
 
@@ -124,6 +125,20 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   FilledButton.tonal(
                     onPressed: () async {
+                      final ok = await unlockParent(context, title: 'Қисми волидон');
+                      if (!ok || !context.mounted) return;
+                      await Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ParentHubPage(words: words, learned: learned, saved: const {}),
+                        ),
+                      );
+                    },
+                    child: const Text('Қисми волидон'),
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton.tonal(
+                    onPressed: () async {
                       final ok = await unlockParent(context, title: 'Омори омӯзиш');
                       if (!ok || !context.mounted) return;
                       await Navigator.push<void>(
@@ -143,7 +158,7 @@ class SettingsPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: () => _reset(context),
-                    child: const Text('Пок кардани пешрафт'),
+                    child: const Text('Сброси пешрафт'),
                   ),
                 ],
               ),
@@ -155,16 +170,16 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<void> _reset(BuildContext context) async {
-    final pinOk = await unlockParent(context, title: 'Пок кардани пешрафт');
+    final pinOk = await unlockParent(context, title: 'Сброси пешрафт');
     if (!pinOk || !context.mounted) return;
     final sure = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Ҳамаи пешрафт пок мешавад?'),
-        content: const Text('Ҳамаи пешрафт, натиҷаҳо ва захираҳо пок мешаванд.'),
+        title: const Text('Сброси пешрафт'),
+        content: const Text('Ҳамаи пешрафт, натиҷаҳо ва захираҳои шумо пок мешаванд.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Бекор кардан')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Пок кардан')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Сброс кардан')),
         ],
       ),
     );
