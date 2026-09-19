@@ -15,6 +15,7 @@ class WordsPage extends StatelessWidget {
   final Future<void> Function(Word word) onLearn;
   final Future<void> Function(Word word) onRemind;
   final void Function(String message) onLocked;
+  final String voiceGender;
 
   const WordsPage({
     super.key,
@@ -26,6 +27,7 @@ class WordsPage extends StatelessWidget {
     required this.onLearn,
     required this.onRemind,
     required this.onLocked,
+    this.voiceGender = 'female',
   });
 
   @override
@@ -63,6 +65,7 @@ class WordsPage extends StatelessWidget {
                           onSave: onSave,
                           onLearn: onLearn,
                           onRemind: onRemind,
+                          voiceGender: voiceGender,
                         ),
                       ),
                     );
@@ -103,7 +106,8 @@ class _WeekTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
+          border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -111,7 +115,10 @@ class _WeekTile extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: locked ? [slate700, slate800] : const [teal600, cyan600]),
+                gradient: LinearGradient(
+                    colors: locked
+                        ? [slate700, slate800]
+                        : const [teal600, cyan600]),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -119,7 +126,10 @@ class _WeekTile extends StatelessWidget {
                     ? const Icon(Icons.lock_rounded, color: Colors.white)
                     : Text(
                         '$week',
-                        style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900),
                       ),
               ),
             ),
@@ -128,21 +138,28 @@ class _WeekTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                  Text(weekTitles[week] ?? '', style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week',
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w700)),
+                  Text(weekTitles[week] ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   if (locked)
-                    Text(lockReason(week), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))
+                    Text(lockReason(week),
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w700))
                   else
                     ClipRRect(
                       borderRadius: BorderRadius.circular(99),
-                      child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
+                      child: LinearProgressIndicator(
+                          value: pct, minHeight: 7, color: emerald500),
                     ),
                 ],
               ),
             ),
             const SizedBox(width: 10),
-            Text('$done/${words.length}', style: const TextStyle(fontWeight: FontWeight.w900)),
+            Text('$done/${words.length}',
+                style: const TextStyle(fontWeight: FontWeight.w900)),
           ],
         ),
       ),

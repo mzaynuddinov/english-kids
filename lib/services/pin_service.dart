@@ -17,7 +17,7 @@ class PinService {
   }
 
   bool validFormat(String pin) {
-    return RegExp(r'^\d{4,6}$').hasMatch(pin);
+    return RegExp(r'^\d{4}$').hasMatch(pin);
   }
 
   String digest(String pin, String salt) {

@@ -1,3 +1,7 @@
+import 'word_lexicon.dart';
+
+export 'word_lexicon.dart' show WordFormation, cleanLexemeList;
+
 class Word {
   final String english;
   final String pronunciation;
@@ -17,6 +21,7 @@ class Word {
   final String phonetic;
   final String stress;
   final String origin;
+  final WordFormation formation;
 
   const Word({
     required this.english,
@@ -37,6 +42,7 @@ class Word {
     this.phonetic = '',
     this.stress = '',
     this.origin = '',
+    this.formation = const WordFormation(),
   });
 
   bool get isValid =>
@@ -56,37 +62,30 @@ class Word {
   /// Homonyms such as color/fruit "orange" must stay distinct.
   String get id => '${english.toLowerCase()}|$week|${tajik.toLowerCase()}';
 
-  bool isMarked(Set<String> keys) => keys.contains(id) || keys.contains(english);
+  bool isMarked(Set<String> keys) =>
+      keys.contains(id) || keys.contains(english);
 
-  String get posLabel => formatPos(partOfSpeech, topic: topic, english: english);
+  String get posLabel =>
+      formatPos(partOfSpeech, topic: topic, english: english);
 
   String get ipaLabel => ipa.isEmpty ? '' : '[$ipa]';
 
   String get phoneticLabel {
-    if (phonetic.isNotEmpty) return phonetic.startsWith('/') ? phonetic : '/$phonetic/';
+    if (phonetic.isNotEmpty) {
+      return phonetic.startsWith('/') ? phonetic : '/$phonetic/';
+    }
     if (ipa.isNotEmpty) return '/$ipa/';
     return '';
   }
 
-  static List<String> _list(dynamic raw) {
-    if (raw is List) {
-      return [
-        for (final item in raw)
-          if ('$item'.trim().isNotEmpty) '$item'.trim(),
-      ];
-    }
-    final text = '$raw'.trim();
-    if (text.isEmpty) return const [];
-    return [
-      for (final part in text.split(','))
-        if (part.trim().isNotEmpty) part.trim(),
-    ];
-  }
+  static List<String> _list(dynamic raw) => cleanLexemeList(raw);
 
   static Word? tryParse(dynamic raw) {
     try {
       if (raw is List && raw.length >= 5) {
-        final week = raw[3] is num ? (raw[3] as num).toInt() : int.tryParse('${raw[3]}') ?? 0;
+        final week = raw[3] is num
+            ? (raw[3] as num).toInt()
+            : int.tryParse('${raw[3]}') ?? 0;
         final english = '${raw[0]}'.trim();
         final topic = '${raw[4]}'.trim();
         final pos = inferPartOfSpeech(topic, english);
@@ -106,40 +105,51 @@ class Word {
           phonetic: inferPhonetic(ipa),
           stress: inferStress(english),
           origin: inferOrigin(pos, topic),
+          formation: inferFormation(english),
         );
         return word.isValid ? word : null;
       }
       if (raw is Map) {
         final weekRaw = raw['week'];
-        final week = weekRaw is num ? weekRaw.toInt() : int.tryParse('$weekRaw') ?? 0;
+        final week =
+            weekRaw is num ? weekRaw.toInt() : int.tryParse('$weekRaw') ?? 0;
         final dayRaw = raw['day'];
-        final day = dayRaw is num ? dayRaw.toInt() : int.tryParse('$dayRaw') ?? 1;
+        final day =
+            dayRaw is num ? dayRaw.toInt() : int.tryParse('$dayRaw') ?? 1;
         final diffRaw = raw['difficulty'];
-        final difficulty = diffRaw is num ? diffRaw.toInt() : int.tryParse('$diffRaw') ?? 1;
+        final difficulty =
+            diffRaw is num ? diffRaw.toInt() : int.tryParse('$diffRaw') ?? 1;
         final english = '${raw['english'] ?? raw['en'] ?? ''}'.trim();
         final topic = '${raw['topic'] ?? raw['category'] ?? ''}'.trim();
         final posRaw = '${raw['partOfSpeech'] ?? raw['pos'] ?? ''}'.trim();
         final pos = posRaw.isEmpty ? inferPartOfSpeech(topic, english) : posRaw;
         final cefrRaw = '${raw['cefr'] ?? raw['level'] ?? ''}'.trim();
-        final noteRaw = '${raw['grammarNote'] ?? raw['grammar_note'] ?? ''}'.trim();
+        final noteRaw =
+            '${raw['grammarNote'] ?? raw['grammar_note'] ?? ''}'.trim();
         final ipaRaw = '${raw['ipa'] ?? raw['ipaTranscription'] ?? ''}'.trim();
         final phoneticRaw = '${raw['phonetic'] ?? ''}'.trim();
         final stressRaw = '${raw['stress'] ?? ''}'.trim();
         final originRaw = '${raw['origin'] ?? raw['etymology'] ?? ''}'.trim();
-        final ipa = ipaRaw.isEmpty ? inferIpa(english) : ipaRaw.replaceAll(RegExp(r'[\[\]/]'), '');
+        final ipa = ipaRaw.isEmpty
+            ? inferIpa(english)
+            : ipaRaw.replaceAll(RegExp(r'[\[\]/]'), '');
         final grammar = noteRaw.isEmpty ? inferGrammarNote(pos) : noteRaw;
         final synonyms = _list(raw['synonyms']);
         final antonyms = _list(raw['antonyms']);
+        final formation =
+            WordFormation.tryParse(raw['formation']) ?? inferFormation(english);
         final word = Word(
           english: english,
-          pronunciation: '${raw['pronunciation'] ?? raw['transliteration'] ?? ''}'.trim(),
+          pronunciation:
+              '${raw['pronunciation'] ?? raw['transliteration'] ?? ''}'.trim(),
           tajik: '${raw['tajik'] ?? raw['tj'] ?? raw['meaning'] ?? ''}'.trim(),
           week: week,
           topic: topic,
           day: day < 1 ? 1 : day,
           difficulty: difficulty < 1 ? 1 : difficulty,
           example: '${raw['example'] ?? ''}'.trim(),
-          exampleTajik: '${raw['example_tajik'] ?? raw['exampleTajik'] ?? ''}'.trim(),
+          exampleTajik:
+              '${raw['example_tajik'] ?? raw['exampleTajik'] ?? ''}'.trim(),
           partOfSpeech: pos,
           cefr: cefrRaw.isEmpty ? inferCefr(week) : cefrRaw,
           synonyms: synonyms.isEmpty ? inferSynonyms(english) : synonyms,
@@ -148,7 +158,8 @@ class Word {
           ipa: ipa,
           phonetic: phoneticRaw.isEmpty ? inferPhonetic(ipa) : phoneticRaw,
           stress: stressRaw.isEmpty ? inferStress(english) : stressRaw,
-          origin: originRaw.isEmpty ? inferOrigin(pos, topic) : originRaw,
+          origin: originRaw,
+          formation: formation,
         );
         return word.isValid ? word : null;
       }
@@ -202,7 +213,8 @@ String formatPos(String pos, {String topic = '', String english = ''}) {
       if (part.trim().isNotEmpty)
         '${part.trim()[0].toUpperCase()}${part.trim().substring(1)}',
   ];
-  if (topic == 'Greetings' && !parts.any((p) => p.toLowerCase().contains('interjection'))) {
+  if (topic == 'Greetings' &&
+      !parts.any((p) => p.toLowerCase().contains('interjection'))) {
     parts.add('Interjection');
   }
   return parts.join(' / ');
@@ -279,36 +291,15 @@ String inferStress(String english) {
 String inferOrigin(String pos, String topic) {
   final grammar = inferGrammarNote(pos);
   if (grammar.isNotEmpty) return grammar;
-  if (topic.isEmpty) return 'Решаи калима дар луғати кӯдакона.';
-  return 'Мавзӯъ: $topic.';
+  if (topic.isEmpty) return '';
+  return '';
 }
 
-List<String> inferSynonyms(String english) {
-  switch (english.trim().toLowerCase()) {
-    case 'hello':
-      return const ['Hi', 'Hey'];
-    case 'hi':
-      return const ['Hello', 'Hey'];
-    case 'goodbye':
-    case 'bye':
-      return const ['Bye', 'See you'];
-    default:
-      return const [];
-  }
-}
+List<String> inferSynonyms(String english) => lexiconSynonyms(english);
 
-List<String> inferAntonyms(String english) {
-  switch (english.trim().toLowerCase()) {
-    case 'hello':
-    case 'hi':
-      return const ['Goodbye'];
-    case 'goodbye':
-    case 'bye':
-      return const ['Hello'];
-    default:
-      return const [];
-  }
-}
+List<String> inferAntonyms(String english) => lexiconAntonyms(english);
+
+WordFormation inferFormation(String english) => lexiconFormation(english);
 
 const weekCount = 10;
 

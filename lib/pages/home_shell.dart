@@ -18,6 +18,8 @@ import '../services/vocabulary_service.dart';
 import '../theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/search_sheet.dart';
+import '../widgets/word_card.dart';
 import 'about_page.dart';
 import 'alphabet_page.dart';
 import 'calendar_page.dart';
@@ -117,7 +119,8 @@ class _HomeShellState extends State<HomeShell> {
 
     try {
       await ProgressService.instance.load();
-      ReminderService.instance.rearmActive(widget.settings.voiceGender, widget.settings.speechRate);
+      ReminderService.instance
+          .rearmActive(widget.settings.voiceGender, widget.settings.speechRate);
       if (mounted) setState(() {});
     } catch (error, stack) {
       debugPrint('Learning state load failed: $error\n$stack');
@@ -138,10 +141,12 @@ class _HomeShellState extends State<HomeShell> {
       final needle = text.trim().toLowerCase();
       final match = words.where((w) => w.english.toLowerCase() == needle);
       if (match.isNotEmpty) {
-        snap = ProgressService.instance.bumpWord(snap, match.first.id, listened: 1);
+        snap = ProgressService.instance
+            .bumpWord(snap, match.first.id, listened: 1);
       }
       snap = snap.copyWith(
-        achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
+        achievements: ProgressService.instance
+            .computeAchievements(snap, learned: learned.length),
       );
       await ProgressService.instance.save(snap);
     } catch (_) {}
@@ -185,7 +190,9 @@ class _HomeShellState extends State<HomeShell> {
     await PreferencesService.instance.saveSet('saved', next);
     if (!mounted) return;
     setState(() => saved = next);
-    _feedback(added ? '🔖 «${word.displayEnglish}» барои баъд захира шуд' : '«${word.displayEnglish}» аз захираҳо хориҷ шуд');
+    _feedback(added
+        ? '🔖 «${word.displayEnglish}» барои баъд захира шуд'
+        : '«${word.displayEnglish}» аз захираҳо хориҷ шуд');
   }
 
   Future<void> _learn(Word word) async {
@@ -194,10 +201,13 @@ class _HomeShellState extends State<HomeShell> {
     if (!mounted) return;
     setState(() => learned = next);
     try {
-      var snap = ProgressService.instance.withActivity(ProgressService.instance.snapshot);
+      var snap = ProgressService.instance
+          .withActivity(ProgressService.instance.snapshot);
       snap = ProgressService.instance.bumpDay(snap, learned: 1, opened: 1);
       snap = ProgressService.instance.bumpWord(snap, word.id, opened: 1);
-      snap = snap.copyWith(achievements: ProgressService.instance.computeAchievements(snap, learned: next.length));
+      snap = snap.copyWith(
+          achievements: ProgressService.instance
+              .computeAchievements(snap, learned: next.length));
       await ProgressService.instance.save(snap);
     } catch (_) {}
     if (mounted) setState(() {});
@@ -214,7 +224,8 @@ class _HomeShellState extends State<HomeShell> {
         learned: learned.length,
       ),
     );
-    await ProgressService.instance.save(ProgressService.instance.withActivity(next));
+    await ProgressService.instance
+        .save(ProgressService.instance.withActivity(next));
     if (mounted) setState(() {});
     _feedback('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
   }
@@ -222,7 +233,8 @@ class _HomeShellState extends State<HomeShell> {
   Future<void> _saveAlphabetIndex(int index) async {
     try {
       await ProgressService.instance.save(
-        ProgressService.instance.snapshot.copyWith(alphabetIndex: index.clamp(0, 25)),
+        ProgressService.instance.snapshot
+            .copyWith(alphabetIndex: index.clamp(0, 25)),
       );
     } catch (_) {}
   }
@@ -268,17 +280,24 @@ class _HomeShellState extends State<HomeShell> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                reminder.english[0].toUpperCase() + reminder.english.substring(1),
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                reminder.english[0].toUpperCase() +
+                    reminder.english.substring(1),
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
               ),
-              Text(reminder.pronunciation, style: const TextStyle(fontWeight: FontWeight.w700)),
-              Text(reminder.tajik, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              Text(reminder.pronunciation,
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(reminder.tajik,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
               Text('Такрор ${reminder.completed} аз ${reminder.repeatTotal}'),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Пӯшидан')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Пӯшидан')),
             FilledButton(
               onPressed: () {
                 unawaited(_speak(reminder.english));
@@ -316,7 +335,8 @@ class _HomeShellState extends State<HomeShell> {
       return;
     }
     try {
-      await ProgressService.instance.save(ProgressService.instance.bumpDay(snap, opened: 1));
+      await ProgressService.instance
+          .save(ProgressService.instance.bumpDay(snap, opened: 1));
     } catch (_) {}
     if (!mounted) return;
     await Navigator.push<void>(
@@ -332,6 +352,7 @@ class _HomeShellState extends State<HomeShell> {
           onSave: _toggleSave,
           onLearn: _learn,
           onRemind: _scheduleWord,
+          voiceGender: widget.settings.voiceGender,
         ),
       ),
     );
@@ -340,6 +361,22 @@ class _HomeShellState extends State<HomeShell> {
 
   void _openSettings() {
     unawaited(_openSettingsAsync());
+  }
+
+  void _openSearch() {
+    unawaited(
+      openWordSearch(
+        context,
+        words: words,
+        learned: learned,
+        saved: saved,
+        onSpeak: _speak,
+        onSave: _toggleSave,
+        onLearn: _learn,
+        onRemind: _scheduleWord,
+        voiceGender: widget.settings.voiceGender,
+      ),
+    );
   }
 
   Future<void> _openSettingsAsync() async {
@@ -372,7 +409,8 @@ class _HomeShellState extends State<HomeShell> {
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => TestHistoryPage(results: ProgressService.instance.snapshot.history),
+        builder: (_) =>
+            TestHistoryPage(results: ProgressService.instance.snapshot.history),
       ),
     );
   }
@@ -388,7 +426,8 @@ class _HomeShellState extends State<HomeShell> {
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => GrammarPage(words: words, learned: learned, onSpeak: _speak),
+        builder: (_) =>
+            GrammarPage(words: words, learned: learned, onSpeak: _speak),
       ),
     );
     if (mounted) setState(() {});
@@ -410,11 +449,18 @@ class _HomeShellState extends State<HomeShell> {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Санҷишро идома медиҳед?'),
-          content: Text('${active.kindLabel}: саволи ${active.index + 1} / ${active.total}'),
+          content: Text(
+              '${active.kindLabel}: саволи ${active.index + 1} / ${active.total}'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, 'cancel'), child: const Text('Бекор')),
-            TextButton(onPressed: () => Navigator.pop(ctx, 'restart'), child: const Text('Аз нав')),
-            FilledButton(onPressed: () => Navigator.pop(ctx, 'continue'), child: const Text('Идома')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, 'cancel'),
+                child: const Text('Бекор')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, 'restart'),
+                child: const Text('Аз нав')),
+            FilledButton(
+                onPressed: () => Navigator.pop(ctx, 'continue'),
+                child: const Text('Идома')),
           ],
         ),
       );
@@ -436,7 +482,8 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _startFresh(TestKind kind) async {
     final session = _buildSession(kind);
-    await ProgressService.instance.save(ProgressService.instance.snapshot.copyWith(active: session));
+    await ProgressService.instance
+        .save(ProgressService.instance.snapshot.copyWith(active: session));
     if (!mounted) return;
     await _openRunner(session);
   }
@@ -543,7 +590,8 @@ class _HomeShellState extends State<HomeShell> {
     snap = ProgressService.instance.bumpDay(snap, tests: 1);
     snap = ProgressService.instance.withActivity(snap);
     snap = snap.copyWith(
-      achievements: ProgressService.instance.computeAchievements(snap, learned: learned.length),
+      achievements: ProgressService.instance
+          .computeAchievements(snap, learned: learned.length),
     );
     await ProgressService.instance.save(snap);
     if (mounted) setState(() {});
@@ -551,7 +599,12 @@ class _HomeShellState extends State<HomeShell> {
 
   Word get _wordOfDay {
     if (words.isEmpty) {
-      return const Word(english: 'hello', pronunciation: '/həˈləʊ/', tajik: 'Салом', week: 1, topic: 'Greetings');
+      return const Word(
+          english: 'hello',
+          pronunciation: '/həˈləʊ/',
+          tajik: 'Салом',
+          week: 1,
+          topic: 'Greetings');
     }
     final now = DateTime.now();
     final day = now.difference(DateTime(now.year)).inDays;
@@ -565,7 +618,8 @@ class _HomeShellState extends State<HomeShell> {
       return;
     }
     for (var week = 1; week <= weekCount; week++) {
-      if (!weekComplete(week, words, learned) && weekUnlocked(week, snap.letters, words, learned)) {
+      if (!weekComplete(week, words, learned) &&
+          weekUnlocked(week, snap.letters, words, learned)) {
         await _openWeek(week);
         return;
       }
@@ -590,6 +644,7 @@ class _HomeShellState extends State<HomeShell> {
         onSave: _toggleSave,
         onLearn: _learn,
         onRemind: _scheduleWord,
+        voiceGender: widget.settings.voiceGender,
       ),
       ProgressPage(
         words: words,
@@ -619,6 +674,11 @@ class _HomeShellState extends State<HomeShell> {
           ],
         ),
         actions: [
+          IconButton(
+            onPressed: _openSearch,
+            tooltip: 'Ҷустуҷӯ',
+            icon: const Icon(Icons.search_rounded),
+          ),
           IconButton(
             onPressed: _openSettings,
             tooltip: 'Танзимот',
@@ -686,7 +746,8 @@ class _HomeShellState extends State<HomeShell> {
           children: [
             AppLogo(size: 96),
             SizedBox(height: 18),
-            Text(appName, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22)),
+            Text(appName,
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22)),
             SizedBox(height: 16),
             CircularProgressIndicator(color: cyan600),
           ],
@@ -700,7 +761,8 @@ class _HomeShellState extends State<HomeShell> {
         child: EmptyState(
           icon: Icons.cloud_off_rounded,
           title: 'Калимаҳо бор нашуданд.',
-          text: 'Луғатро аз нав бор кунед. Барнома бе луғат ҳам кушода мемонад.',
+          text:
+              'Луғатро аз нав бор кунед. Барнома бе луғат ҳам кушода мемонад.',
           actionLabel: 'Дубора кӯшиш кунед',
           onAction: _loadData,
         ),
@@ -736,11 +798,17 @@ class _HomeShellState extends State<HomeShell> {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Expanded(child: _stat(Icons.menu_book_rounded, '${words.length}', 'Калима')),
+                    Expanded(
+                        child: _stat(Icons.menu_book_rounded, '${words.length}',
+                            'Калима')),
                     const SizedBox(width: 9),
-                    Expanded(child: _stat(Icons.check_circle_rounded, '${learned.length}', 'Омӯхта')),
+                    Expanded(
+                        child: _stat(Icons.check_circle_rounded,
+                            '${learned.length}', 'Омӯхта')),
                     const SizedBox(width: 9),
-                    Expanded(child: _stat(Icons.local_fire_department_rounded, '${snap.streak}', 'Рӯз')),
+                    Expanded(
+                        child: _stat(Icons.local_fire_department_rounded,
+                            '${snap.streak}', 'Рӯз')),
                   ],
                 ),
                 const SizedBox(height: 22),
@@ -749,11 +817,15 @@ class _HomeShellState extends State<HomeShell> {
                   children: [
                     Text(
                       'Нақшаи омӯзиш',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w900),
                     ),
                     Text(
                       '${(progress * 100).round()}%',
-                      style: const TextStyle(color: cyan600, fontWeight: FontWeight.w900),
+                      style: const TextStyle(
+                          color: cyan600, fontWeight: FontWeight.w900),
                     ),
                   ],
                 ),
@@ -773,7 +845,8 @@ class _HomeShellState extends State<HomeShell> {
               final locked = !weekUnlocked(week, snap.letters, words, learned);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 11),
-                child: _weekCard(week, weekTitles[week] ?? '', list.length, done, locked),
+                child: _weekCard(
+                    week, weekTitles[week] ?? '', list.length, done, locked),
               );
             },
           ),
@@ -786,7 +859,8 @@ class _HomeShellState extends State<HomeShell> {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [slate950, slate800, Color(0xFF064E3B)]),
+        gradient: const LinearGradient(
+            colors: [slate950, slate800, Color(0xFF064E3B)]),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: cyan600.withValues(alpha: 0.55)),
       ),
@@ -802,12 +876,17 @@ class _HomeShellState extends State<HomeShell> {
                   children: [
                     Text(
                       'Хуш омадед!',
-                      style: TextStyle(color: Color(0xFF99F6E4), fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          color: Color(0xFF99F6E4),
+                          fontWeight: FontWeight.w800),
                     ),
                     SizedBox(height: 5),
                     Text(
                       'Имрӯз як қадами нав ба сӯи English!',
-                      style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900),
                     ),
                   ],
                 ),
@@ -833,8 +912,11 @@ class _HomeShellState extends State<HomeShell> {
                 style: const TextStyle(color: Color(0xFFCBD5E1)),
               ),
               Text(
-                streak > 0 ? '🔥 $streak рӯз пай дар пай' : '${(progress * 100).round()}%',
-                style: const TextStyle(color: Color(0xFF6EE7B7), fontWeight: FontWeight.w900),
+                streak > 0
+                    ? '🔥 $streak рӯз пай дар пай'
+                    : '${(progress * 100).round()}%',
+                style: const TextStyle(
+                    color: Color(0xFF6EE7B7), fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -844,7 +926,8 @@ class _HomeShellState extends State<HomeShell> {
             child: FilledButton.icon(
               onPressed: () => unawaited(_continueLearning()),
               icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(continueLabel(ProgressService.instance.snapshot.letters, words, learned)),
+              label: Text(continueLabel(
+                  ProgressService.instance.snapshot.letters, words, learned)),
             ),
           ),
         ],
@@ -856,8 +939,10 @@ class _HomeShellState extends State<HomeShell> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.play_circle_rounded, color: teal600),
-        title: const Text('Идомаи санҷиш', style: TextStyle(fontWeight: FontWeight.w900)),
-        subtitle: Text('${active.kindLabel} • ${active.index + 1} / ${active.total}'),
+        title: const Text('Идомаи санҷиш',
+            style: TextStyle(fontWeight: FontWeight.w900)),
+        subtitle:
+            Text('${active.kindLabel} • ${active.index + 1} / ${active.total}'),
         trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () => _startTest(active.kind),
       ),
@@ -865,39 +950,23 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Widget _wordOfDayCard(Word word) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('🌟 Калимаи имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
-            const SizedBox(height: 6),
-            Text(word.displayEnglish, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, height: 1.1)),
-            Text(word.tajik, style: const TextStyle(fontWeight: FontWeight.w800)),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.tonalIcon(
-                    onPressed: () => _speak(word.english),
-                    icon: const Icon(Icons.volume_up_rounded),
-                    label: const Text('Гӯш кардан'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: word.isMarked(learned) ? null : () => _learn(word),
-                    icon: const Icon(Icons.check_rounded),
-                    label: Text(word.isMarked(learned) ? 'Омӯхта шуд' : 'Омӯзидан'),
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('🌟 Калимаи имрӯз',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+        const SizedBox(height: 8),
+        WordCard(
+          word: word,
+          learned: word.isMarked(learned),
+          saved: word.isMarked(saved),
+          onSpeak: _speak,
+          onSave: _toggleSave,
+          onLearn: _learn,
+          onRemind: _scheduleWord,
+          voiceGender: widget.settings.voiceGender,
         ),
-      ),
+      ],
     );
   }
 
@@ -930,10 +999,14 @@ class _HomeShellState extends State<HomeShell> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('🎯 Мушкилоти имрӯз', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    const Text('🎯 Мушкилоти имрӯз',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 16)),
                     const SizedBox(height: 3),
                     Text(
-                      snap.dailyDone ? 'Имрӯз анҷом ёфт!' : 'Тақрибан 30 савол — якто-якто',
+                      snap.dailyDone
+                          ? 'Имрӯз анҷом ёфт!'
+                          : 'Тақрибан 30 савол — якто-якто',
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -970,17 +1043,21 @@ class _HomeShellState extends State<HomeShell> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Алифбо', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    const Text('Алифбо',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 16)),
                     const SizedBox(height: 6),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(99),
-                      child: LinearProgressIndicator(value: done / 26, minHeight: 7, color: emerald500),
+                      child: LinearProgressIndicator(
+                          value: done / 26, minHeight: 7, color: emerald500),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 10),
-              Text('$done / 26', style: const TextStyle(fontWeight: FontWeight.w900)),
+              Text('$done / 26',
+                  style: const TextStyle(fontWeight: FontWeight.w900)),
             ],
           ),
         ),
@@ -995,7 +1072,8 @@ class _HomeShellState extends State<HomeShell> {
       child: InkWell(
         onTap: () {
           if (!unlocked) {
-            _feedback('🔒 Қадами оянда ҳоло қулф аст. Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.');
+            _feedback(
+                '🔒 Қадами оянда ҳоло қулф аст. Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.');
             return;
           }
           unawaited(_openGrammar());
@@ -1008,20 +1086,31 @@ class _HomeShellState extends State<HomeShell> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: unlocked ? const [indigo600, blue600] : [slate700, slate800]),
+                  gradient: LinearGradient(
+                      colors: unlocked
+                          ? const [indigo600, blue600]
+                          : [slate700, slate800]),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(unlocked ? Icons.menu_book_rounded : Icons.lock_rounded, color: Colors.white),
+                child: Icon(
+                    unlocked ? Icons.menu_book_rounded : Icons.lock_rounded,
+                    color: Colors.white),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(unlocked ? 'Грамматикаи асосӣ' : '🔒 Грамматикаи асосӣ', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                     Text(
-                      unlocked ? '${snap.grammar.length} / 10 дарс' : 'Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                        unlocked ? 'Грамматикаи асосӣ' : '🔒 Грамматикаи асосӣ',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w900, fontSize: 16)),
+                    Text(
+                      unlocked
+                          ? '${snap.grammar.length} / 10 дарс'
+                          : 'Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                   ],
                 ),
@@ -1040,13 +1129,16 @@ class _HomeShellState extends State<HomeShell> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.35)),
+        border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.35)),
       ),
       child: Column(
         children: [
           Icon(icon, color: cyan600),
           const SizedBox(height: 5),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
           Text(label, style: const TextStyle(fontSize: 11)),
         ],
       ),
@@ -1075,7 +1167,10 @@ class _HomeShellState extends State<HomeShell> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: locked ? [slate700, slate800] : const [teal600, cyan600]),
+                gradient: LinearGradient(
+                    colors: locked
+                        ? [slate700, slate800]
+                        : const [teal600, cyan600]),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -1083,7 +1178,10 @@ class _HomeShellState extends State<HomeShell> {
                     ? const Icon(Icons.lock_rounded, color: Colors.white)
                     : Text(
                         '$week',
-                        style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900),
                       ),
               ),
             ),
@@ -1092,15 +1190,21 @@ class _HomeShellState extends State<HomeShell> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week',
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w700)),
+                  Text(title,
+                      style: const TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   if (locked)
-                    Text(lockReason(week), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))
+                    Text(lockReason(week),
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w700))
                   else
                     ClipRRect(
                       borderRadius: BorderRadius.circular(99),
-                      child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
+                      child: LinearProgressIndicator(
+                          value: pct, minHeight: 7, color: emerald500),
                     ),
                 ],
               ),
@@ -1108,7 +1212,8 @@ class _HomeShellState extends State<HomeShell> {
             const SizedBox(width: 10),
             Column(
               children: [
-                Text('$done/$total', style: const TextStyle(fontWeight: FontWeight.w900)),
+                Text('$done/$total',
+                    style: const TextStyle(fontWeight: FontWeight.w900)),
                 const Icon(Icons.chevron_right_rounded, color: cyan600),
               ],
             ),
@@ -1143,7 +1248,8 @@ class _HomeShellState extends State<HomeShell> {
               margin: const EdgeInsets.all(14),
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [slate950, Color(0xFF064E3B), Color(0xFF083344)]),
+                gradient: const LinearGradient(
+                    colors: [slate950, Color(0xFF064E3B), Color(0xFF083344)]),
                 borderRadius: BorderRadius.circular(26),
                 border: Border.all(color: cyan600.withValues(alpha: 0.65)),
               ),
@@ -1154,7 +1260,10 @@ class _HomeShellState extends State<HomeShell> {
                   Expanded(
                     child: Text(
                       'Омӯз, бозӣ кун ва пеш рав!',
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900),
                     ),
                   ),
                 ],
@@ -1181,7 +1290,9 @@ class _HomeShellState extends State<HomeShell> {
                     onSave: _toggleSave,
                     onLearn: _learn,
                     onRemind: _scheduleWord,
-                    onLocked: (message) => _feedback('🔒 Қадами оянда ҳоло қулф аст. $message'),
+                    onLocked: (message) =>
+                        _feedback('🔒 Қадами оянда ҳоло қулф аст. $message'),
+                    voiceGender: widget.settings.voiceGender,
                   ),
                 ),
               );

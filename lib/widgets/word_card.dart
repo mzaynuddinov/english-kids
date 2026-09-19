@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/word.dart';
 import '../theme.dart';
 
-/// Compact dark word card: badges, IPA glass box, 3 accordions, learned toggle.
+/// Universal word card: theme-aware, hides empty sections, never shows "null".
 class WordCardWidget extends StatefulWidget {
   final Word word;
   final bool learned;
@@ -32,43 +32,45 @@ class WordCardWidget extends StatefulWidget {
 
 typedef WordCard = WordCardWidget;
 
-class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProviderStateMixin {
+class _WordCardWidgetState extends State<WordCardWidget> {
   bool exampleOpen = false;
   bool synOpen = false;
-  bool originOpen = false;
-  late final AnimationController play;
+  bool formOpen = false;
 
   Word get word => widget.word;
 
   @override
-  void initState() {
-    super.initState();
-    play = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
-  }
-
-  @override
-  void dispose() {
-    play.dispose();
-    super.dispose();
-  }
-
-  Future<void> _speakExample() async {
-    play
-      ..reset()
-      ..forward();
-    await widget.onSpeak(word.example.isEmpty ? word.english : word.example);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final voiceBadge = widget.voiceGender == 'male' ? 'Male Voice' : 'Female Voice';
+    final scheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final onCard = scheme.onSurface;
+    final muted = scheme.onSurface.withValues(alpha: 0.68);
+    final voiceBadge =
+        widget.voiceGender == 'male' ? 'Male Voice' : 'Female Voice';
+    final synonyms = [
+      for (final item in word.synonyms)
+        if (item.trim().isNotEmpty && item.trim().toLowerCase() != 'null')
+          item.trim()
+    ];
+    final antonyms = [
+      for (final item in word.antonyms)
+        if (item.trim().isNotEmpty && item.trim().toLowerCase() != 'null')
+          item.trim()
+    ];
+    final showPhonetic = word.ipaLabel.isNotEmpty ||
+        word.phoneticLabel.isNotEmpty ||
+        word.stress.isNotEmpty;
+    final showPairs = synonyms.isNotEmpty || antonyms.isNotEmpty;
+    final showFormation = !word.formation.isEmpty;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: slate950,
+          color: dark ? slate950 : scheme.surface,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: cyan600.withValues(alpha: 0.35)),
+          border: Border.all(
+              color: scheme.primary.withValues(alpha: dark ? 0.35 : 0.22)),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 12, 14),
@@ -85,22 +87,25 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                       children: [
                         _badge(
                           word.topic.isEmpty ? 'Greetings' : word.topic,
-                          background: Colors.blue.shade900.withValues(alpha: 0.4),
-                          foreground: const Color(0xFFBFDBFE),
+                          background: scheme.primary.withValues(alpha: 0.16),
+                          foreground: scheme.primary,
                         ),
                         if (word.posLabel.isNotEmpty)
                           _badge(
                             word.posLabel,
-                            background: slate800,
-                            foreground: const Color(0xFFE2E8F0),
+                            background: scheme.surfaceContainerHighest,
+                            foreground: onCard,
                           ),
                         if (word.cefr.isNotEmpty)
-                          _badge(word.cefr, background: cyan700, foreground: Colors.white),
+                          _badge(word.cefr,
+                              background: cyan700, foreground: Colors.white),
                         if (widget.learned)
                           _badge(
                             'Омӯхта шуд',
-                            background: const Color(0xFF10B981).withValues(alpha: 0.2),
-                            foreground: const Color(0xFF6EE7B7),
+                            background:
+                                const Color(0xFF10B981).withValues(alpha: 0.2),
+                            foreground:
+                                dark ? const Color(0xFF6EE7B7) : emerald700,
                             icon: Icons.check_rounded,
                           ),
                       ],
@@ -111,8 +116,10 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                     visualDensity: VisualDensity.compact,
                     onPressed: () => widget.onSave(word),
                     icon: Icon(
-                      widget.saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-                      color: widget.saved ? emerald500 : cyan500,
+                      widget.saved
+                          ? Icons.bookmark_rounded
+                          : Icons.bookmark_outline_rounded,
+                      color: widget.saved ? emerald500 : scheme.primary,
                     ),
                   ),
                 ],
@@ -122,23 +129,21 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                 word.displayEnglish,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: onCard,
                   height: 1.05,
                 ),
               ),
-              Text(
-                word.pronunciation,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.grey.shade400,
-                  height: 1.2,
+              if (word.pronunciation.trim().isNotEmpty)
+                Text(
+                  word.pronunciation,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, color: muted, height: 1.2),
                 ),
-              ),
               Text(
                 word.tajik,
                 maxLines: 2,
@@ -146,13 +151,13 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: Colors.grey.shade200,
+                  color: onCard,
                   height: 1.2,
                 ),
               ),
-              if (word.ipaLabel.isNotEmpty || word.phoneticLabel.isNotEmpty || word.stress.isNotEmpty) ...[
+              if (showPhonetic) ...[
                 const SizedBox(height: 10),
-                _phoneticBox(),
+                _phoneticBox(scheme, onCard, muted),
               ],
               const SizedBox(height: 10),
               SizedBox(
@@ -166,33 +171,20 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
               ),
               const SizedBox(height: 4),
               _accordion(
-                title: 'Ҷумлаи мисол',
+                title: 'Мисол дар ҷумла',
                 open: exampleOpen,
+                color: onCard,
                 onTap: () => setState(() => exampleOpen = !exampleOpen),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       word.example.isEmpty ? word.displayEnglish : word.example,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                      style:
+                          TextStyle(color: onCard, fontWeight: FontWeight.w800),
                     ),
                     if (word.exampleTajik.isNotEmpty)
-                      Text(word.exampleTajik, style: TextStyle(color: Colors.grey.shade300)),
-                    const SizedBox(height: 8),
-                    AnimatedBuilder(
-                      animation: play,
-                      builder: (context, _) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(99),
-                          child: LinearProgressIndicator(
-                            minHeight: 7,
-                            value: play.isAnimating || play.value > 0 && play.value < 1 ? play.value : 0,
-                            color: emerald500,
-                            backgroundColor: slate800,
-                          ),
-                        );
-                      },
-                    ),
+                      Text(word.exampleTajik, style: TextStyle(color: muted)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -202,58 +194,116 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                         SizedBox(
                           height: 44,
                           child: OutlinedButton.icon(
-                            onPressed: _speakExample,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              side: const BorderSide(color: cyan600),
-                            ),
+                            onPressed: () => widget.onSpeak(word.example.isEmpty
+                                ? word.english
+                                : word.example),
                             icon: const Icon(Icons.volume_up_rounded, size: 18),
                             label: const Text('Гӯш кардани ҷумла'),
                           ),
                         ),
-                        _badge(voiceBadge, background: indigo600.withValues(alpha: 0.35), foreground: Colors.white),
+                        _badge(
+                          voiceBadge,
+                          background: indigo600.withValues(alpha: 0.28),
+                          foreground: dark ? Colors.white : indigo700,
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-              _accordion(
-                title: 'Синонимҳо ва Антонимҳо',
-                open: synOpen,
-                onTap: () => setState(() => synOpen = !synOpen),
-                child: word.synonyms.isEmpty && word.antonyms.isEmpty
-                    ? Text('Ҳоло синоним ё антоним нест.', style: TextStyle(color: Colors.grey.shade300))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (word.synonyms.isNotEmpty)
-                            Text(
-                              'Синонимҳо: ${word.synonyms.join(', ')}',
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                            ),
-                          if (word.antonyms.isNotEmpty)
-                            Text('Антонимҳо: ${word.antonyms.join(', ')}', style: TextStyle(color: Colors.grey.shade200)),
-                        ],
-                      ),
-              ),
-              _accordion(
-                title: 'Решаи калима',
-                open: originOpen,
-                onTap: () => setState(() => originOpen = !originOpen),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (word.posLabel.isNotEmpty)
-                      Text(word.posLabel, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                    Text(
-                      word.origin.isNotEmpty
-                          ? word.origin
-                          : (word.grammarNote.isNotEmpty ? word.grammarNote : 'Решаи калима дар луғати кӯдакона.'),
-                      style: TextStyle(color: Colors.grey.shade200),
-                    ),
-                  ],
+              if (showPairs)
+                _accordion(
+                  title: 'Синонимҳо ва Антонимҳо',
+                  open: synOpen,
+                  color: onCard,
+                  onTap: () => setState(() => synOpen = !synOpen),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (synonyms.isNotEmpty) ...[
+                        Text('Синонимҳо',
+                            style: TextStyle(
+                                color: muted,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final item in synonyms)
+                              _badge(
+                                item,
+                                background:
+                                    scheme.primary.withValues(alpha: 0.14),
+                                foreground: scheme.primary,
+                              ),
+                          ],
+                        ),
+                      ],
+                      if (synonyms.isNotEmpty && antonyms.isNotEmpty)
+                        const SizedBox(height: 10),
+                      if (antonyms.isNotEmpty) ...[
+                        Text('Антонимҳо',
+                            style: TextStyle(
+                                color: muted,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12)),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final item in antonyms)
+                              _badge(
+                                item,
+                                background:
+                                    scheme.error.withValues(alpha: 0.12),
+                                foreground: scheme.error,
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
+              if (showFormation)
+                _accordion(
+                  title: 'Сохти калима',
+                  open: formOpen,
+                  color: onCard,
+                  onTap: () => setState(() => formOpen = !formOpen),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (word.formation.hasParts)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            if (word.formation.prefix.isNotEmpty)
+                              _badge(word.formation.prefix,
+                                  background: scheme.secondaryContainer,
+                                  foreground: scheme.onSecondaryContainer),
+                            if (word.formation.root.isNotEmpty)
+                              _badge(word.formation.root,
+                                  background: scheme.primaryContainer,
+                                  foreground: scheme.onPrimaryContainer),
+                            if (word.formation.suffix.isNotEmpty)
+                              _badge(word.formation.suffix,
+                                  background: scheme.tertiaryContainer,
+                                  foreground: scheme.onTertiaryContainer),
+                          ],
+                        ),
+                      if (word.formation.note.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(word.formation.note,
+                            style: TextStyle(
+                                color: onCard, fontWeight: FontWeight.w700)),
+                      ],
+                    ],
+                  ),
+                ),
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -261,13 +311,17 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                     child: SizedBox(
                       height: 48,
                       child: ElevatedButton.icon(
-                        onPressed: widget.learned ? () {} : () => widget.onLearn(word),
-                        icon: Icon(widget.learned ? Icons.check_circle_rounded : Icons.check_rounded),
+                        onPressed:
+                            widget.learned ? () {} : () => widget.onLearn(word),
+                        icon: Icon(widget.learned
+                            ? Icons.check_circle_rounded
+                            : Icons.check_rounded),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: emerald600,
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
                         ),
                         label: const Text('Омӯхта шуд'),
                       ),
@@ -279,8 +333,8 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
                     child: OutlinedButton.icon(
                       onPressed: () => widget.onRemind(word),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: slate700),
+                        foregroundColor: onCard,
+                        side: BorderSide(color: scheme.outline),
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                       ),
                       icon: const Icon(Icons.alarm_rounded),
@@ -296,10 +350,12 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
     );
   }
 
-  Widget _badge(String text, {required Color background, required Color foreground, IconData? icon}) {
+  Widget _badge(String text,
+      {required Color background, required Color foreground, IconData? icon}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+          color: background, borderRadius: BorderRadius.circular(10)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -309,40 +365,47 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
           ],
           Text(
             text,
-            style: TextStyle(color: foreground, fontSize: 11, fontWeight: FontWeight.w900),
+            style: TextStyle(
+                color: foreground, fontSize: 11, fontWeight: FontWeight.w900),
           ),
         ],
       ),
     );
   }
 
-  Widget _phoneticBox() {
+  Widget _phoneticBox(ColorScheme scheme, Color onCard, Color muted) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: scheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.16)),
       ),
       child: Wrap(
         spacing: 12,
         runSpacing: 6,
         children: [
-          if (word.ipaLabel.isNotEmpty) _phoneticItem('IPA', word.ipaLabel),
-          if (word.phoneticLabel.isNotEmpty) _phoneticItem('Phonetic', word.phoneticLabel),
-          if (word.stress.isNotEmpty) _phoneticItem('Stress', word.stress),
+          if (word.ipaLabel.isNotEmpty)
+            _phoneticItem('IPA', word.ipaLabel, onCard, muted),
+          if (word.phoneticLabel.isNotEmpty)
+            _phoneticItem('Phonetic', word.phoneticLabel, onCard, muted),
+          if (word.stress.isNotEmpty)
+            _phoneticItem('Stress', word.stress, onCard, muted),
         ],
       ),
     );
   }
 
-  Widget _phoneticItem(String label, String value) {
+  Widget _phoneticItem(String label, String value, Color onCard, Color muted) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.grey.shade500, fontSize: 10, fontWeight: FontWeight.w800)),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        Text(label,
+            style: TextStyle(
+                color: muted, fontSize: 10, fontWeight: FontWeight.w800)),
+        Text(value,
+            style: TextStyle(color: onCard, fontWeight: FontWeight.w800)),
       ],
     );
   }
@@ -350,6 +413,7 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
   Widget _accordion({
     required String title,
     required bool open,
+    required Color color,
     required VoidCallback onTap,
     required Widget child,
   }) {
@@ -363,12 +427,17 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
             child: Row(
               children: [
                 Expanded(
-                  child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+                  child: Text(title,
+                      style: TextStyle(
+                          color: color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800)),
                 ),
                 AnimatedRotation(
                   turns: open ? 0.5 : 0,
                   duration: const Duration(milliseconds: 180),
-                  child: const Icon(Icons.expand_more_rounded, color: cyan500),
+                  child: Icon(Icons.expand_more_rounded,
+                      color: Theme.of(context).colorScheme.primary),
                 ),
               ],
             ),
@@ -376,8 +445,10 @@ class _WordCardWidgetState extends State<WordCardWidget> with SingleTickerProvid
         ),
         AnimatedCrossFade(
           firstChild: const SizedBox(width: double.infinity, height: 0),
-          secondChild: Padding(padding: const EdgeInsets.only(bottom: 8), child: child),
-          crossFadeState: open ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          secondChild:
+              Padding(padding: const EdgeInsets.only(bottom: 8), child: child),
+          crossFadeState:
+              open ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 180),
         ),
       ],

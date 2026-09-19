@@ -52,7 +52,7 @@ class _PinGateState extends State<PinGate> {
     try {
       if (setup) {
         if (!PinService.instance.validFormat(pin.text)) {
-          setState(() => error = 'PIN бояд 4–6 рақам бошад.');
+          setState(() => error = 'PIN бояд 4 рақам бошад.');
           return;
         }
         if (pin.text != confirm.text) {
@@ -81,7 +81,8 @@ class _PinGateState extends State<PinGate> {
   @override
   Widget build(BuildContext context) {
     if (!ready) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator(color: cyan600)));
+      return const Scaffold(
+          body: Center(child: CircularProgressIndicator(color: cyan600)));
     }
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
@@ -103,7 +104,7 @@ class _PinGateState extends State<PinGate> {
               controller: pin,
               keyboardType: TextInputType.number,
               obscureText: true,
-              maxLength: 6,
+              maxLength: 4,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               onChanged: (_) => setState(() {}),
               decoration: const InputDecoration(
@@ -118,7 +119,7 @@ class _PinGateState extends State<PinGate> {
                 controller: confirm,
                 keyboardType: TextInputType.number,
                 obscureText: true,
-                maxLength: 6,
+                maxLength: 4,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
                   labelText: 'Такрори PIN',
@@ -128,7 +129,9 @@ class _PinGateState extends State<PinGate> {
             ],
             if (error != null) ...[
               const SizedBox(height: 8),
-              Text(error!, style: const TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.w800)),
+              Text(error!,
+                  style: const TextStyle(
+                      color: Color(0xFFDC2626), fontWeight: FontWeight.w800)),
             ],
             const SizedBox(height: 12),
             FilledButton(
@@ -142,7 +145,8 @@ class _PinGateState extends State<PinGate> {
   }
 }
 
-Future<bool> unlockParent(BuildContext context, {String title = 'Қисмати волидон'}) async {
+Future<bool> unlockParent(BuildContext context,
+    {String title = 'Қисмати волидон'}) async {
   var ok = false;
   await Navigator.push<void>(
     context,
@@ -159,7 +163,6 @@ Future<bool> unlockParent(BuildContext context, {String title = 'Қисмати 
   return ok;
 }
 
-
 class _PinDots extends StatelessWidget {
   final String value;
   const _PinDots({required this.value});
@@ -169,7 +172,7 @@ class _PinDots extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        for (var i = 0; i < 6; i++)
+        for (var i = 0; i < 4; i++)
           Container(
             width: 14,
             height: 14,

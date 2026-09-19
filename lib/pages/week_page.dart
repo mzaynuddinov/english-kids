@@ -15,6 +15,7 @@ class WeekPage extends StatefulWidget {
   final Future<void> Function(Word word) onSave;
   final Future<void> Function(Word word) onLearn;
   final Future<void> Function(Word word) onRemind;
+  final String voiceGender;
 
   const WeekPage({
     super.key,
@@ -27,6 +28,7 @@ class WeekPage extends StatefulWidget {
     required this.onSave,
     required this.onLearn,
     required this.onRemind,
+    this.voiceGender = 'female',
   });
 
   @override
@@ -74,7 +76,8 @@ class _WeekPageState extends State<WeekPage> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [slate900, Color(0xFF134E4A)]),
+                gradient:
+                    const LinearGradient(colors: [slate900, Color(0xFF134E4A)]),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: teal600.withValues(alpha: 0.55)),
               ),
@@ -92,7 +95,8 @@ class _WeekPageState extends State<WeekPage> {
                   const SizedBox(height: 6),
                   Text(
                     '${widget.words.length} калима • гӯш кунед, омӯзед ва барои баъд захира кунед',
-                    style: const TextStyle(color: Color(0xFF99F6E4), fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: Color(0xFF99F6E4), fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -110,7 +114,8 @@ class _WeekPageState extends State<WeekPage> {
                   padding: const EdgeInsets.only(bottom: 8, top: 6),
                   child: Text(
                     'Рӯзи $day • ${widget.words.where((w) => w.day == day).length} калима',
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: cyan700),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w900, color: cyan700),
                   ),
                 ),
                 ...widget.words.where((w) => w.day == day).map(
@@ -123,6 +128,7 @@ class _WeekPageState extends State<WeekPage> {
                         onSave: _save,
                         onLearn: _learn,
                         onRemind: widget.onRemind,
+                        voiceGender: widget.voiceGender,
                       ),
                     ),
               ],
@@ -137,6 +143,7 @@ class _WeekPageState extends State<WeekPage> {
                     onSave: _save,
                     onLearn: _learn,
                     onRemind: widget.onRemind,
+                    voiceGender: widget.voiceGender,
                   ),
                 ),
           ],

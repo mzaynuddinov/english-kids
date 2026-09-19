@@ -12,6 +12,7 @@ class SavedPage extends StatelessWidget {
   final Future<void> Function(Word word) onSave;
   final Future<void> Function(Word word) onLearn;
   final Future<void> Function(Word word) onRemind;
+  final String voiceGender;
 
   const SavedPage({
     super.key,
@@ -22,6 +23,7 @@ class SavedPage extends StatelessWidget {
     required this.onSave,
     required this.onLearn,
     required this.onRemind,
+    this.voiceGender = 'female',
   });
 
   @override
@@ -32,7 +34,10 @@ class SavedPage extends StatelessWidget {
       children: [
         Text(
           'Барои баъд',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall
+              ?.copyWith(fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 4),
         Text('${list.length} калима захира шудааст'),
@@ -41,7 +46,8 @@ class SavedPage extends StatelessWidget {
           const EmptyState(
             icon: Icons.bookmark_border_rounded,
             title: 'Ҳоло чизе нест',
-            text: 'Калимаҳоеро, ки дертар такрор кардан мехоҳед, бо «Барои баъд» захира кунед.',
+            text:
+                'Калимаҳоеро, ки дертар такрор кардан мехоҳед, бо «Барои баъд» захира кунед.',
           ),
         ...list.map(
           (word) => WordCard(
@@ -53,6 +59,7 @@ class SavedPage extends StatelessWidget {
             onSave: onSave,
             onLearn: onLearn,
             onRemind: onRemind,
+            voiceGender: voiceGender,
           ),
         ),
       ],

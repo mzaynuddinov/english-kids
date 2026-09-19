@@ -6,7 +6,9 @@ import '../services/preferences_service.dart';
 import '../services/progress_service.dart';
 import '../services/reminder_service.dart';
 import '../theme.dart';
+import 'about_page.dart';
 import 'calendar_page.dart';
+import 'guide_page.dart';
 import 'parent_hub_page.dart';
 import 'parent_stats_page.dart';
 import 'pin_gate.dart';
@@ -44,12 +46,22 @@ class SettingsPage extends StatelessWidget {
               title: 'Намуди барнома',
               child: SegmentedButton<ThemeMode>(
                 segments: const [
-                  ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_rounded), label: Text('Light')),
-                  ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_rounded), label: Text('Dark')),
-                  ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.brightness_auto_rounded), label: Text('Auto')),
+                  ButtonSegment(
+                      value: ThemeMode.light,
+                      icon: Icon(Icons.light_mode_rounded),
+                      label: Text('Light')),
+                  ButtonSegment(
+                      value: ThemeMode.dark,
+                      icon: Icon(Icons.dark_mode_rounded),
+                      label: Text('Dark')),
+                  ButtonSegment(
+                      value: ThemeMode.system,
+                      icon: Icon(Icons.brightness_auto_rounded),
+                      label: Text('Auto')),
                 ],
                 selected: {settings.themeMode},
-                onSelectionChanged: (value) => onChanged(settings.copyWith(themeMode: value.first)),
+                onSelectionChanged: (value) =>
+                    onChanged(settings.copyWith(themeMode: value.first)),
               ),
             ),
             _section(
@@ -59,7 +71,9 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text('A', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                      const Text('A',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w700)),
                       Expanded(
                         child: Slider(
                           min: 0.85,
@@ -67,13 +81,17 @@ class SettingsPage extends StatelessWidget {
                           divisions: 8,
                           value: settings.textScale,
                           label: '${(settings.textScale * 100).round()}%',
-                          onChanged: (value) => onChanged(settings.copyWith(textScale: value)),
+                          onChanged: (value) =>
+                              onChanged(settings.copyWith(textScale: value)),
                         ),
                       ),
-                      const Text('A', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900)),
+                      const Text('A',
+                          style: TextStyle(
+                              fontSize: 23, fontWeight: FontWeight.w900)),
                     ],
                   ),
-                  Text('${(settings.textScale * 100).round()}% — пешнамоиши андоза'),
+                  Text(
+                      '${(settings.textScale * 100).round()}% — пешнамоиши андоза'),
                 ],
               ),
             ),
@@ -85,14 +103,22 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   SegmentedButton<String>(
                     segments: const [
-                      ButtonSegment(value: 'female', icon: Icon(Icons.female), label: Text('Зан')),
-                      ButtonSegment(value: 'male', icon: Icon(Icons.male), label: Text('Мард')),
+                      ButtonSegment(
+                          value: 'female',
+                          icon: Icon(Icons.female),
+                          label: Text('Зан')),
+                      ButtonSegment(
+                          value: 'male',
+                          icon: Icon(Icons.male),
+                          label: Text('Мард')),
                     ],
                     selected: {settings.voiceGender},
-                    onSelectionChanged: (value) => onChanged(settings.copyWith(voiceGender: value.first)),
+                    onSelectionChanged: (value) =>
+                        onChanged(settings.copyWith(voiceGender: value.first)),
                   ),
                   const SizedBox(height: 12),
-                  const Text('Суръати овоз', style: TextStyle(fontWeight: FontWeight.w800)),
+                  const Text('Суръати овоз',
+                      style: TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   SegmentedButton<bool>(
                     segments: const [
@@ -100,7 +126,8 @@ class SettingsPage extends StatelessWidget {
                       ButtonSegment(value: true, label: Text('Суст 0.75x')),
                     ],
                     selected: {slow},
-                    onSelectionChanged: (value) => onChanged(settings.copyWith(speechRate: value.first ? 0.32 : 0.45)),
+                    onSelectionChanged: (value) => onChanged(settings.copyWith(
+                        speechRate: value.first ? 0.32 : 0.45)),
                   ),
                   const SizedBox(height: 12),
                   FilledButton.tonalIcon(
@@ -118,19 +145,28 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             _section(
+              icon: Icons.notifications_outlined,
+              title: 'Огоҳиҳо',
+              child: const Text(
+                'Ёдрасҳо огоҳии Android ва TTS-ро истифода мебаранд. Агар телефони шумо огоҳӣ ё овози пасзаминаро маҳдуд кунад, барнома кушода мемонад ва экрани сиёҳ намедиҳад.',
+              ),
+            ),
+            _section(
               icon: Icons.lock_rounded,
-              title: 'Қулфи волидон',
+              title: 'Амният',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   FilledButton.tonal(
                     onPressed: () async {
-                      final ok = await unlockParent(context, title: 'Қисми волидон');
+                      final ok =
+                          await unlockParent(context, title: 'Қисми волидон');
                       if (!ok || !context.mounted) return;
                       await Navigator.push<void>(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ParentHubPage(words: words, learned: learned, saved: const {}),
+                          builder: (_) => ParentHubPage(
+                              words: words, learned: learned, saved: const {}),
                         ),
                       );
                     },
@@ -139,11 +175,14 @@ class SettingsPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   FilledButton.tonal(
                     onPressed: () async {
-                      final ok = await unlockParent(context, title: 'Омори омӯзиш');
+                      final ok =
+                          await unlockParent(context, title: 'Омори омӯзиш');
                       if (!ok || !context.mounted) return;
                       await Navigator.push<void>(
                         context,
-                        MaterialPageRoute(builder: (_) => ParentStatsPage(words: words, learned: learned)),
+                        MaterialPageRoute(
+                            builder: (_) => ParentStatsPage(
+                                words: words, learned: learned)),
                       );
                     },
                     child: const Text('Омори омӯзиш'),
@@ -151,7 +190,10 @@ class SettingsPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: () {
-                      Navigator.push<void>(context, MaterialPageRoute(builder: (_) => const CalendarPage()));
+                      Navigator.push<void>(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const CalendarPage()));
                     },
                     child: const Text('Тақвими омӯзиш'),
                   ),
@@ -159,6 +201,36 @@ class SettingsPage extends StatelessWidget {
                   OutlinedButton(
                     onPressed: () => _reset(context),
                     child: const Text('Сброси пешрафт'),
+                  ),
+                ],
+              ),
+            ),
+            _section(
+              icon: Icons.help_outline_rounded,
+              title: 'Кӯмак',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.tonalIcon(
+                    onPressed: () {
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(builder: (_) => const GuidePage()),
+                      );
+                    },
+                    icon: const Icon(Icons.menu_book_outlined),
+                    label: const Text('Дастурамал'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AboutPage()),
+                      );
+                    },
+                    icon: const Icon(Icons.info_outline_rounded),
+                    label: const Text('Дар бораи барнома'),
                   ),
                 ],
               ),
@@ -176,10 +248,15 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Сброси пешрафт'),
-        content: const Text('Ҳамаи пешрафт, натиҷаҳо ва захираҳои шумо пок мешаванд.'),
+        content: const Text(
+            'Ҳамаи пешрафт, натиҷаҳо ва захираҳои шумо пок мешаванд.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Бекор кардан')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Сброс кардан')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Бекор кардан')),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Сброс кардан')),
         ],
       ),
     );
@@ -190,10 +267,15 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Танзимотро ҳам пок кунем?'),
-        content: const Text('Мавзӯъ, андозаи матн ва овоз ба ҳолати аввала бармегардад. PIN нигоҳ дошта мешавад.'),
+        content: const Text(
+            'Мавзӯъ, андозаи матн ва овоз ба ҳолати аввала бармегардад. PIN нигоҳ дошта мешавад.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Не')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Ҳа')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Не')),
+          FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Ҳа')),
         ],
       ),
     );
@@ -210,10 +292,12 @@ class SettingsPage extends StatelessWidget {
       debugPrint('Reset failed: $error');
     }
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пешрафт пок шуд.')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Пешрафт пок шуд.')));
   }
 
-  Widget _section({required IconData icon, required String title, required Widget child}) {
+  Widget _section(
+      {required IconData icon, required String title, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Card(
@@ -226,7 +310,9 @@ class SettingsPage extends StatelessWidget {
                 children: [
                   Icon(icon, color: cyan600),
                   const SizedBox(width: 9),
-                  Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.w900)),
                 ],
               ),
               const SizedBox(height: 14),

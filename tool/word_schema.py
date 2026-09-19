@@ -15,6 +15,19 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 CefrLevel = Literal["A1", "A2", "B1", "B2"]
 
 
+class WordFormation(BaseModel):
+    """Transparent word-building only — never invented etymology."""
+
+    prefix: str = ""
+    root: str = ""
+    suffix: str = ""
+    note: str = ""
+
+    @property
+    def is_empty(self) -> bool:
+        return not (self.prefix or self.root or self.suffix or self.note)
+
+
 class WordSchema(BaseModel):
     """JSON payload for one vocabulary card."""
 
@@ -38,6 +51,7 @@ class WordSchema(BaseModel):
     phonetic: str = Field(default="", examples=["/həˈləʊ/"])
     stress: str = Field(default="", examples=["Hel-lo"])
     origin: str = Field(default="", examples=["Ин нидо аст — салом ё ҳиссиёт."])
+    formation: WordFormation | None = None
 
     @field_validator("english", "tajik", "pronunciation", "topic")
     @classmethod
@@ -86,6 +100,7 @@ HELLO_SAMPLE = WordSchema(
     phonetic="/həˈləʊ/",
     stress="Hel-lo",
     origin="Ин нидо аст — салом ё ҳиссиёт.",
+    formation=None,
 )
 
 

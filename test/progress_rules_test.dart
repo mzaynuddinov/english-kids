@@ -6,9 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   final words = [
     for (var i = 0; i < 3; i++)
-      Word(english: 'w$i', pronunciation: 'p', tajik: 't$i', week: 1, topic: 'A'),
+      Word(
+          english: 'w$i',
+          pronunciation: 'p',
+          tajik: 't$i',
+          week: 1,
+          topic: 'A'),
     for (var i = 0; i < 3; i++)
-      Word(english: 'x$i', pronunciation: 'p', tajik: 'u$i', week: 2, topic: 'B'),
+      Word(
+          english: 'x$i',
+          pronunciation: 'p',
+          tajik: 'u$i',
+          week: 2,
+          topic: 'B'),
   ];
 
   test('weeks stay locked until alphabet and previous week are learned', () {
@@ -30,6 +40,7 @@ void main() {
     final service = PinService.instance;
     expect(service.validFormat('1234'), isTrue);
     expect(service.validFormat('12'), isFalse);
+    expect(service.validFormat('123456'), isFalse);
     expect(service.validFormat('abcdef'), isFalse);
     final hash = service.digest('1234', 'salt');
     expect(hash, isNot('1234'));
