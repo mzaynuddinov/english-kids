@@ -12,20 +12,20 @@ class ParentHubPage extends StatelessWidget {
   final List<Word> words;
   final Set<String> learned;
   final Set<String> saved;
-  final Future<void> Function(String text) onSpeak;
-  final Future<void> Function(Word word) onSave;
-  final Future<void> Function(Word word) onLearn;
-  final Future<void> Function(Word word) onRemind;
+  final Future<void> Function(String text)? onSpeak;
+  final Future<void> Function(Word word)? onSave;
+  final Future<void> Function(Word word)? onLearn;
+  final Future<void> Function(Word word)? onRemind;
 
   const ParentHubPage({
     super.key,
     required this.words,
     required this.learned,
     required this.saved,
-    required this.onSpeak,
-    required this.onSave,
-    required this.onLearn,
-    required this.onRemind,
+    this.onSpeak,
+    this.onSave,
+    this.onLearn,
+    this.onRemind,
   });
 
   @override
@@ -59,24 +59,25 @@ class ParentHubPage extends StatelessWidget {
             _tile(context, Icons.calendar_month_rounded, 'Тақвими омӯзиш', () {
               Navigator.push<void>(context, MaterialPageRoute(builder: (_) => const CalendarPage()));
             }),
-            _tile(context, Icons.replay_rounded, 'Калимаҳои хато', () {
-              Navigator.push<void>(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PracticePage(
-                    words: words,
-                    learned: learned,
-                    saved: saved,
-                    misses: snap.misses,
-                    hits: snap.hits,
-                    onSpeak: onSpeak,
-                    onSave: onSave,
-                    onLearn: onLearn,
-                    onRemind: onRemind,
+            if (onSpeak != null && onSave != null && onLearn != null && onRemind != null)
+              _tile(context, Icons.replay_rounded, 'Калимаҳои хато', () {
+                Navigator.push<void>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PracticePage(
+                      words: words,
+                      learned: learned,
+                      saved: saved,
+                      misses: snap.misses,
+                      hits: snap.hits,
+                      onSpeak: onSpeak!,
+                      onSave: onSave!,
+                      onLearn: onLearn!,
+                      onRemind: onRemind!,
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
           ],
         ),
       ),
