@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/grammar.dart';
 import '../models/word.dart';
 import '../services/progress_service.dart';
 import '../theme.dart';
@@ -7,8 +8,14 @@ import '../theme.dart';
 class ParentStatsPage extends StatelessWidget {
   final List<Word> words;
   final Set<String> learned;
+  final Set<String> saved;
 
-  const ParentStatsPage({super.key, required this.words, required this.learned});
+  const ParentStatsPage({
+    super.key,
+    required this.words,
+    required this.learned,
+    this.saved = const {},
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +49,9 @@ class ParentStatsPage extends StatelessWidget {
                 _card('Пайдарпай', '${snap.streak} рӯз'),
                 _card('Такрор лозим', '${snap.misses.values.where((v) => v > 0).length} калима'),
                 _card('Алифбо', '${snap.letters.length} / 26'),
-                _card('Грамматика', '${snap.grammar.length} / 10'),
+                _card('Грамматика', '${snap.grammar.length} / ${grammarLessons.length}'),
                 _card('Омӯхта', '${learned.length} / ${words.length}'),
+                _card('Захира', '${saved.length}'),
                 _card('Гӯш', '${snap.listens}'),
                 _card('Хатоҳо', '$mistakes'),
                 _card('Рӯзҳои омӯзиш', '$studyDays'),
