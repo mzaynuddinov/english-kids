@@ -6,7 +6,6 @@ import 'package:english_kids/services/reminder_service.dart';
 import 'package:english_kids/services/vocabulary_service.dart';
 import 'package:english_kids/theme.dart';
 import 'package:english_kids/widgets/error_fallback.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
