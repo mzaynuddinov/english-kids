@@ -28,7 +28,7 @@ Future<void> pumpApp(WidgetTester tester) async {
   await tester.pumpWidget(const EnglishKidsApp());
   await tester.pump();
   await tester.pump();
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < 6; i++) {
     await tester.pump(const Duration(milliseconds: 16));
     if (find.textContaining('Нақшаи омӯзиш').evaluate().isNotEmpty) return;
     if (find.text('Калимаҳо бор нашуданд.').evaluate().isNotEmpty) return;
@@ -63,7 +63,7 @@ void main() {
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
     await disposeApp(tester);
-  });
+  }, timeout: const Timeout(Duration(seconds: 20)));
 
   testWidgets('home shell renders after vocabulary load', (tester) async {
     await pumpApp(tester);
@@ -75,14 +75,14 @@ void main() {
     expect(find.textContaining('Калимаи имрӯз'), findsOneWidget);
     expect(find.textContaining('Грамматикаи асосӣ'), findsWidgets);
     await disposeApp(tester);
-  });
+  }, timeout: const Timeout(Duration(seconds: 20)));
 
   testWidgets('drawer contains required destinations', (tester) async {
     await pumpApp(tester);
 
     await tester.tap(find.byIcon(Icons.menu));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Асосӣ'), findsWidgets);
     expect(find.text('Алифбо'), findsWidgets);
@@ -98,7 +98,7 @@ void main() {
     expect(find.text('Таҳиягар'), findsOneWidget);
     expect(find.text('Дар бораи барнома'), findsOneWidget);
     await disposeApp(tester);
-  });
+  }, timeout: const Timeout(Duration(seconds: 20)));
 
   testWidgets('fallback screen is child-friendly', (tester) async {
     await tester.pumpWidget(const ErrorFallback());
@@ -106,5 +106,5 @@ void main() {
     expect(find.text('Мушкилоти мувақатӣ ба вуҷуд омад.'), findsOneWidget);
     expect(find.text('Дубора кӯшиш кунед'), findsOneWidget);
     await disposeApp(tester);
-  });
+  }, timeout: const Timeout(Duration(seconds: 10)));
 }

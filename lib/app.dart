@@ -35,10 +35,7 @@ class _EnglishKidsAppState extends State<EnglishKidsApp> {
       debugPrint('Settings bootstrap failed: $error\n$stack');
     }
     try {
-      final bindingName = WidgetsBinding.instance.runtimeType.toString();
-      if (bindingName.contains('TestWidgetsFlutterBinding')) {
-        return;
-      }
+      if (ReminderService.suppressTimersForTests) return;
       await ReminderService.instance.initialize();
     } catch (error, stack) {
       debugPrint('Reminder bootstrap failed: $error\n$stack');
