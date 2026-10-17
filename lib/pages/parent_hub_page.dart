@@ -5,6 +5,7 @@ import '../theme.dart';
 import 'calendar_page.dart';
 import 'parent_stats_page.dart';
 import 'practice_page.dart';
+import 'students_page.dart';
 import 'test_history_page.dart';
 import '../services/progress_service.dart';
 
@@ -42,6 +43,12 @@ class ParentHubPage extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
+            _tile(context, Icons.people_rounded, 'Талабагон / Фарзандон', () {
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(builder: (_) => const StudentsPage()),
+              );
+            }),
             _tile(context, Icons.insights_rounded, 'Омори омӯзиш', () {
               Navigator.push<void>(
                 context,
