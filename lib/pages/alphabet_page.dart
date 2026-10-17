@@ -199,9 +199,7 @@ class _AlphabetPageState extends State<AlphabetPage>
                         height: 44,
                         width: double.infinity,
                         child: FilledButton.icon(
-                          onPressed: learned
-                              ? () {}
-                              : () => widget.onLearnLetter(item),
+                          onPressed: () => widget.onLearnLetter(item),
                           style: FilledButton.styleFrom(
                             backgroundColor: learned ? emerald600 : teal600,
                             foregroundColor: Colors.white,
@@ -286,6 +284,13 @@ class _LetterCard extends StatelessWidget {
                   fontSize: 68,
                   fontWeight: FontWeight.w900,
                   height: 1),
+            ),
+            Text(
+              letter.letter.toLowerCase(),
+              style: const TextStyle(
+                  color: Color(0xFFCCFBF1),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800),
             ),
             Text(letter.ipa,
                 style: const TextStyle(

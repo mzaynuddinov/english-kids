@@ -41,53 +41,61 @@ void main() {
     expect(ReminderService.suppressTimersForTests, isTrue);
   });
 
-  test('adding a student persists and keeps progress separate', () async {
+  test('students are added only by name and stay separate', () async {
     await StudentService.instance.init();
-    final created = await StudentService.instance.addStudent('Али');
-    expect(StudentService.instance.students.map((s) => s.name), contains('Али'));
+    expect(StudentService.instance.students, isEmpty);
+    expect(StudentService.instance.currentStudentId, isNull);
+
+    final nasim = await StudentService.instance.addStudent('Насим');
+    final usmon = await StudentService.instance.addStudent('Усмон');
+    expect(nasim.id, isNot(usmon.id));
+    expect(StudentService.instance.students.map((s) => s.name), ['Насим', 'Усмон']);
+    expect(StudentService.instance.currentStudentId, nasim.id);
     expect(
-      StudentService.instance.learnedKey(created.id),
-      isNot(StudentService.instance.learnedKey('default')),
+      StudentService.instance.learnedKey(nasim.id),
+      isNot(StudentService.instance.learnedKey(usmon.id)),
     );
 
     await PreferencesService.instance.saveSet(
-      StudentService.instance.learnedKey('default'),
+      StudentService.instance.learnedKey(nasim.id),
       {'word-1'},
     );
     await PreferencesService.instance.saveSet(
-      StudentService.instance.learnedKey(created.id),
+      StudentService.instance.learnedKey(usmon.id),
       {'word-2'},
     );
 
     StudentService.instance.debugReset();
     PreferencesService.instance.debugReset();
     await StudentService.instance.init();
+    expect(StudentService.instance.students.map((s) => s.name), ['Насим', 'Усмон']);
     expect(
-      StudentService.instance.students.map((s) => s.name),
-      containsAll(['Талабаи асосӣ', 'Али']),
+      StudentService.instance.students.any((s) => s.name == 'Талабаи асосӣ'),
+      isFalse,
     );
 
-    final ali = StudentService.instance.students.firstWhere((s) => s.name == 'Али');
-    final def = await PreferencesService.instance.loadSet(
-      StudentService.instance.learnedKey('default'),
+    final restored = StudentService.instance.students.firstWhere((s) => s.name == 'Насим');
+    expect(restored.id, nasim.id);
+    expect(
+      await PreferencesService.instance.loadSet(StudentService.instance.learnedKey(nasim.id)),
+      {'word-1'},
     );
-    final aliLearned = await PreferencesService.instance.loadSet(
-      StudentService.instance.learnedKey(ali.id),
+    expect(
+      await PreferencesService.instance.loadSet(StudentService.instance.learnedKey(usmon.id)),
+      {'word-2'},
     );
-    expect(def, {'word-1'});
-    expect(aliLearned, {'word-2'});
 
-    await StudentService.instance.renameStudent(ali.id, 'Алишер');
-    expect(StudentService.instance.students.any((s) => s.name == 'Алишер'), isTrue);
+    await StudentService.instance.renameStudent(nasim.id, 'Насими нав');
+    expect(StudentService.instance.studentById(nasim.id)?.name, 'Насими нав');
+    expect(
+      await PreferencesService.instance.loadSet(StudentService.instance.learnedKey(nasim.id)),
+      {'word-1'},
+    );
 
-    await StudentService.instance.setCurrentStudent(ali.id);
-    expect(StudentService.instance.currentStudentId, ali.id);
-
-    final beforeDelete = StudentService.instance.students.length;
-    await StudentService.instance.deleteStudent(ali.id);
-    expect(StudentService.instance.students.length, beforeDelete - 1);
-    expect(StudentService.instance.students.any((s) => s.id == ali.id), isFalse);
-    expect(StudentService.instance.students, isNotEmpty);
+    await StudentService.instance.deleteStudent(nasim.id);
+    await StudentService.instance.deleteStudent(usmon.id);
+    expect(StudentService.instance.students, isEmpty);
+    expect(StudentService.instance.currentStudentId, isNull);
   });
 
   testWidgets('first frame shows the app name on a light screen', (tester) async {

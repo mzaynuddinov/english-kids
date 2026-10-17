@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/alphabet.dart';
 import '../models/activity.dart';
+import '../models/days.dart';
 import '../models/progress_rules.dart';
 import '../models/reminder.dart';
 import '../models/settings.dart';
@@ -35,6 +36,8 @@ import 'oral_quiz_page.dart';
 import 'reminders_page.dart';
 import 'saved_page.dart';
 import 'settings_page.dart';
+import 'students_page.dart';
+import 'study_start_page.dart';
 import 'test_history_page.dart';
 import 'test_hub_page.dart';
 import 'test_result_page.dart';
@@ -232,23 +235,10 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _toggleSave(Word word) async {
+    if (!_needStudent()) return;
     final service = WordLearningService.instance;
-    final wasSaved = service.studentId == null
-        ? word.isMarked(saved)
-        : service.of(word.id).saved;
-    if (service.studentId != null) {
-      await service.setFlag(word.id, saved: !wasSaved);
-    } else {
-      final next = {...saved};
-      if (wasSaved) {
-        next.remove(word.id);
-        next.remove(word.english);
-      } else {
-        next.add(word.id);
-      }
-      await PreferencesService.instance.saveSet(StudentService.instance.savedKey(), next);
-      if (mounted) setState(() => saved = next);
-    }
+    final wasSaved = service.of(word.id).saved;
+    await service.setFlag(word.id, saved: !wasSaved);
     if (!mounted) return;
     _feedback(wasSaved
         ? '«${word.displayEnglish}» аз захираҳо хориҷ шуд'
@@ -256,6 +246,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _learn(Word word) async {
+    if (!_needStudent()) return;
     final service = WordLearningService.instance;
     final wasLearned = service.studentId == null
         ? word.isMarked(learned)
@@ -274,7 +265,7 @@ class _HomeShellState extends State<HomeShell> {
       if (mounted) setState(() => learned = next);
     }
     if (!mounted) return;
-    final learnedCount = service.studentId == null ? learned.length : service.learnedIds().length;
+    final learnedCount = words.where((item) => service.of(item.id).learned).length;
     try {
       var snap = ProgressService.instance
           .withActivity(ProgressService.instance.snapshot);
@@ -291,20 +282,43 @@ class _HomeShellState extends State<HomeShell> {
         : '🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.');
   }
 
+  bool _studentReady() {
+    final id = StudentService.instance.currentStudentId;
+    return id != null &&
+        StudentService.instance.students.any((student) => student.id == id) &&
+        WordLearningService.instance.studentId == id;
+  }
+
+  bool _needStudent() {
+    if (_studentReady()) return true;
+    _feedback('Аввал талабаро илова ва интихоб кунед. Ном ба таври автоматӣ илова намешавад.');
+    return false;
+  }
+
   Future<void> _learnLetter(AlphabetLetter letter) async {
+    if (!_needStudent()) return;
     final snap = ProgressService.instance.snapshot;
-    final letters = {...snap.letters, letter.letter};
+    final already = snap.letters.contains(letter.letter) ||
+        WordLearningService.instance.of(letterLearningId(letter.letter)).learned;
+    final letters = {...snap.letters};
+    if (already) {
+      letters.remove(letter.letter);
+    } else {
+      letters.add(letter.letter);
+    }
     final next = snap.copyWith(
       letters: letters,
       achievements: ProgressService.instance.computeAchievements(
         snap.copyWith(letters: letters),
-        learned: learned.length,
+        learned: words.where((word) => word.isMarked(learned)).length,
       ),
     );
-    await ProgressService.instance
-        .save(ProgressService.instance.withActivity(next));
+    await ProgressService.instance.save(ProgressService.instance.withActivity(next));
+    await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
     if (mounted) setState(() {});
-    _feedback('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
+    _feedback(already
+        ? 'Ҳарфи ${letter.letter} ба ҳолати қаблӣ баргардонида шуд.'
+        : '🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
   }
 
   Future<void> _saveAlphabetIndex(int index) async {
@@ -406,11 +420,8 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _openWeek(int week) async {
+    if (!_needStudent()) return;
     final snap = ProgressService.instance.snapshot;
-    if (!weekUnlocked(week, snap.letters, words, learned)) {
-      _feedback('🔒 Қадами оянда ҳоло қулф аст. ${lockReason(week)}');
-      return;
-    }
     try {
       await ProgressService.instance
           .save(ProgressService.instance.bumpDay(snap, opened: 1));
@@ -504,7 +515,7 @@ class _HomeShellState extends State<HomeShell> {
       context,
       MaterialPageRoute(
         builder: (_) =>
-            GrammarPage(words: words, learned: learned, onSpeak: _speak),
+            GrammarPage(onSpeak: _speak),
       ),
     );
     if (mounted) setState(() {});
@@ -862,7 +873,8 @@ class _HomeShellState extends State<HomeShell> {
       );
     }
 
-    final progress = words.isEmpty ? 0.0 : learned.length / words.length;
+    final vocabLearned = words.where((word) => word.isMarked(learned)).length;
+    final progress = words.isEmpty ? 0.0 : vocabLearned / words.length;
     final snap = ProgressService.instance.snapshot;
     final wotd = _wordOfDay;
     final active = snap.active;
@@ -875,7 +887,11 @@ class _HomeShellState extends State<HomeShell> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
             child: Column(
               children: [
-                _hero(progress, snap.streak),
+                _hero(progress, snap.streak, vocabLearned),
+                const SizedBox(height: 12),
+                _studentBar(),
+                const SizedBox(height: 12),
+                _studyCard(),
                 const SizedBox(height: 12),
                 _oralQuizCard(),
                 if (active != null && !active.completed) ...[
@@ -899,7 +915,7 @@ class _HomeShellState extends State<HomeShell> {
                     const SizedBox(width: 9),
                     Expanded(
                         child: _stat(Icons.check_circle_rounded,
-                            '${learned.length}', 'Омӯхта')),
+                            '$vocabLearned', 'Омӯхта')),
                     const SizedBox(width: 9),
                     Expanded(
                         child: _stat(Icons.local_fire_department_rounded,
@@ -937,11 +953,10 @@ class _HomeShellState extends State<HomeShell> {
               final week = i + 1;
               final list = words.where((w) => w.week == week).toList();
               final done = list.where((w) => w.isMarked(learned)).length;
-              final locked = !weekUnlocked(week, snap.letters, words, learned);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 11),
                 child: _weekCard(
-                    week, weekTitles[week] ?? '', list.length, done, locked),
+                    week, weekTitles[week] ?? '', list.length, done, false),
               );
             },
           ),
@@ -950,7 +965,41 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
+  Future<void> _openStudents() async {
+    final ok = await unlockParent(context, title: 'Талабагон');
+    if (!ok || !mounted) return;
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (_) => const StudentsPage()),
+    );
+    if (mounted) await _loadData(silent: true);
+  }
+
+  Future<void> _openStudy() async {
+    if (!_needStudent()) {
+      await _openStudents();
+      return;
+    }
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StudyStartPage(
+          words: words,
+          learned: learned,
+          saved: saved,
+          onSpeak: _speak,
+          onSave: _toggleSave,
+          onLearn: _learn,
+          onRemind: _scheduleWord,
+          onLearnLetter: _learnLetter,
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   Future<void> _openOralQuiz() async {
+    if (!_needStudent()) return;
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
@@ -958,6 +1007,81 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     if (mounted) setState(() {});
+  }
+
+  Widget _studentBar() {
+    final students = StudentService.instance.students;
+    final current = StudentService.instance.currentStudentId;
+    if (students.isEmpty) {
+      return Card(
+        child: ListTile(
+          leading: const Icon(Icons.person_add_alt_1_rounded, color: teal600),
+          title: const Text('Талаба нест', style: TextStyle(fontWeight: FontWeight.w900)),
+          subtitle: const Text('Номро худатон ворид кунед. Ягон ном ба таври автоматӣ илова намешавад.'),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => unawaited(_openStudents()),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: Text('Талабаи ҷорӣ', style: TextStyle(fontWeight: FontWeight.w900)),
+            ),
+            TextButton(
+              onPressed: () => unawaited(_openStudents()),
+              child: const Text('+ Илова кардани талаба'),
+            ),
+          ],
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final student in students)
+              ChoiceChip(
+                label: Text(student.name),
+                selected: student.id == current,
+                onSelected: (_) => unawaited(StudentService.instance.setCurrentStudent(student.id)),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _studyCard() {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => unawaited(_openStudy()),
+        child: const Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(Icons.school_rounded, color: teal600),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Оғози омӯзиш', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                    Text(
+                      'Алифбо, рақамҳо, рӯзҳо, рангҳо ё ҳар ҳафта — бе қулфи мавзӯъҳои пешин',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: cyan600),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _oralQuizCard() {
@@ -1009,7 +1133,7 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Widget _hero(double progress, int streak) {
+  Widget _hero(double progress, int streak, int vocabLearned) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -1062,7 +1186,7 @@ class _HomeShellState extends State<HomeShell> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${learned.length} аз ${words.length} калима',
+                '${vocabLearned} аз ${words.length} калима',
                 style: const TextStyle(color: Color(0xFFCBD5E1)),
               ),
               Text(
@@ -1220,18 +1344,10 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Widget _grammarCard(ProgressSnapshot snap) {
-    final unlocked = grammarUnlocked(words, learned, snap.letters);
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          if (!unlocked) {
-            _feedback(
-                '🔒 Қадами оянда ҳоло қулф аст. Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.');
-            return;
-          }
-          unawaited(_openGrammar());
-        },
+        onTap: () => unawaited(_openGrammar()),
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Row(
@@ -1240,31 +1356,21 @@ class _HomeShellState extends State<HomeShell> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: unlocked
-                          ? const [indigo600, blue600]
-                          : [slate700, slate800]),
+                  gradient: const LinearGradient(colors: [indigo600, blue600]),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
-                    unlocked ? Icons.menu_book_rounded : Icons.lock_rounded,
-                    color: Colors.white),
+                child: const Icon(Icons.menu_book_rounded, color: Colors.white),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('Грамматикаи асосӣ',
+                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                     Text(
-                        unlocked ? 'Грамматикаи асосӣ' : '🔒 Грамматикаи асосӣ',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 16)),
-                    Text(
-                      unlocked
-                          ? '${snap.grammar.length} / 10 дарс'
-                          : 'Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 12),
+                      '${snap.grammar.length} / 10 дарс',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                   ],
                 ),
@@ -1427,6 +1533,14 @@ class _HomeShellState extends State<HomeShell> {
               Navigator.pop(context);
               setState(() => tab = 0);
             }),
+            _item(Icons.school_rounded, 'Оғози омӯзиш', () {
+              Navigator.pop(context);
+              unawaited(_openStudy());
+            }),
+            _item(Icons.people_rounded, 'Талабагон / Фарзандон', () {
+              Navigator.pop(context);
+              unawaited(_openStudents());
+            }),
             _item(Icons.abc_rounded, 'Алифбо', () {
               Navigator.pop(context);
               unawaited(_openAlphabet());
@@ -1448,8 +1562,6 @@ class _HomeShellState extends State<HomeShell> {
                     onSave: _toggleSave,
                     onLearn: _learn,
                     onRemind: _scheduleWord,
-                    onLocked: (message) =>
-                        _feedback('🔒 Қадами оянда ҳоло қулф аст. $message'),
                     voiceGender: widget.settings.voiceGender,
                   ),
                 ),

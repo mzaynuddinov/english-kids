@@ -134,6 +134,14 @@ class WordLearningService extends ChangeNotifier {
     }
   }
 
+  /// Drops the in-memory map when that student is removed. Stored data is cleared by the caller.
+  void release(String id) {
+    if (studentId != id) return;
+    studentId = null;
+    byId = {};
+    notifyListeners();
+  }
+
   @visibleForTesting
   void debugReset() {
     studentId = null;

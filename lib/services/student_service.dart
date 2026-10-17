@@ -6,6 +6,7 @@ import '../models/student.dart';
 import '../models/word_learning.dart';
 import 'preferences_service.dart';
 import 'progress_service.dart';
+import 'word_learning_service.dart';
 
 class StudentService extends ChangeNotifier {
   StudentService._();
@@ -81,24 +82,30 @@ class StudentService extends ChangeNotifier {
   Future<void> _ensureDefaultAndMigrate() async {
     if (students.isNotEmpty) return;
 
-    const defaultId = 'default';
-    final defaultStudent = Student(id: defaultId, name: 'Талабаи асосӣ');
-    students = [defaultStudent];
-    await _saveStudents();
-
     final oldLearned = await PreferencesService.instance.loadSet('learned');
+    final oldSaved = await PreferencesService.instance.loadSet('saved');
+    final oldProgress = await PreferencesService.instance.loadRaw('learning_state_v2');
+    final hasOld = oldLearned.isNotEmpty ||
+        oldSaved.isNotEmpty ||
+        (oldProgress != null && oldProgress.isNotEmpty);
+    if (!hasOld) {
+      students = [];
+      currentStudentId = null;
+      return;
+    }
+
+    const defaultId = 'default';
+    students = [Student(id: defaultId, name: 'Маълумоти пештара')];
+    await _saveStudents();
     if (oldLearned.isNotEmpty) {
       await PreferencesService.instance.saveSet(learnedKey(defaultId), oldLearned);
     }
-    final oldSaved = await PreferencesService.instance.loadSet('saved');
     if (oldSaved.isNotEmpty) {
       await PreferencesService.instance.saveSet(savedKey(defaultId), oldSaved);
     }
-    final oldProgress = await PreferencesService.instance.loadRaw('learning_state_v2');
     if (oldProgress != null && oldProgress.isNotEmpty) {
       await PreferencesService.instance.saveRaw(progressKey(defaultId), oldProgress);
     }
-
     currentStudentId = defaultId;
     await PreferencesService.instance.saveRaw(_currentKey, defaultId);
   }
@@ -125,7 +132,7 @@ class StudentService extends ChangeNotifier {
     if (trimmed.isEmpty) {
       throw ArgumentError('Ном холӣ аст');
     }
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    final id = '${DateTime.now().microsecondsSinceEpoch}_${students.length}';
     final student = Student(id: id, name: trimmed);
     students.add(student);
     await _saveStudents();
@@ -148,18 +155,22 @@ class StudentService extends ChangeNotifier {
   }
 
   Future<void> deleteStudent(String id) async {
-    if (students.length <= 1) return;
+    if (!students.any((s) => s.id == id)) return;
     students.removeWhere((s) => s.id == id);
     await _saveStudents();
     await PreferencesService.instance.saveSet(learnedKey(id), {});
     await PreferencesService.instance.saveSet(savedKey(id), {});
     await PreferencesService.instance.saveRaw(progressKey(id), '');
     await PreferencesService.instance.saveRaw(wordLearningKey(id), '{"words":{}}');
+    WordLearningService.instance.release(id);
     if (currentStudentId == id) {
       currentStudentId = students.isNotEmpty ? students.first.id : null;
       if (currentStudentId != null) {
         await PreferencesService.instance.saveRaw(_currentKey, currentStudentId!);
         await ProgressService.instance.load(key: progressKey());
+      } else {
+        await PreferencesService.instance.saveRaw(_currentKey, '');
+        await ProgressService.instance.load(key: progressKey('none'));
       }
     }
     notifyListeners();

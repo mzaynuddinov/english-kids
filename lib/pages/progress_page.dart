@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../models/achievements.dart';
+import '../models/progress_rules.dart';
 import '../models/student.dart';
+import '../models/study_stats.dart';
 import '../models/word.dart';
 import '../models/word_learning.dart';
 import '../services/progress_service.dart';
 import '../services/student_service.dart';
 import '../services/word_learning_service.dart';
 import '../theme.dart';
+import '../widgets/word_history_sheet.dart';
 import 'certificate_page.dart';
 
 class ProgressPage extends StatelessWidget {
@@ -35,12 +38,17 @@ class ProgressPage extends StatelessWidget {
     final service = WordLearningService.instance;
     final sameStudent = service.studentId != null &&
         service.studentId == StudentService.instance.currentStudentId;
-    final summary = sameStudent ? Lexicon.summary(words, service.byId) : null;
-    final learnedCount = summary?.learned ?? learned.length;
-    final savedCount = summary?.saved ?? saved.length;
-    final earned = sameStudent
-        ? Lexicon.certificateEarned(words, service.byId)
-        : words.isNotEmpty && learned.length >= words.length && words.length >= 500;
+    final state = sameStudent ? service.byId : const <String, WordLearning>{};
+    final summary = Lexicon.summary(words, state);
+    final stats = ManualStudyStats.compute(
+      words: words,
+      state: state,
+      now: DateTime.now(),
+      snapshotLetters: snapshot.letters,
+    );
+    final learnedCount = summary.learned;
+    final savedWords = words.where((word) => word.isMarked(saved) || (sameStudent && service.of(word.id).saved)).length;
+    final earned = sameStudent && Lexicon.certificateEarned(words, service.byId);
     String? studentName;
     final currentId = StudentService.instance.currentStudentId;
     for (final student in StudentService.instance.students) {
@@ -48,6 +56,15 @@ class ProgressPage extends StatelessWidget {
     }
     final pct = words.isEmpty ? 0.0 : learnedCount / words.length;
     final practice = snapshot.misses.values.where((v) => v > 0).length;
+    var weeksDone = 0;
+    final learnedKeys = {
+      ...learned,
+      for (final word in words)
+        if (Lexicon.of(state, word.id).learned) word.id,
+    };
+    for (var week = 1; week <= weekCount; week++) {
+      if (weekComplete(week, words, learnedKeys)) weeksDone += 1;
+    }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       children: [
@@ -90,10 +107,19 @@ class ProgressPage extends StatelessWidget {
                 const SizedBox(height: 18),
                 Text(
                   studentName == null
-                      ? '$learnedCount аз ${words.length} калима омӯхта шуд'
+                      ? 'Талаба интихоб нашудааст'
                       : '$studentName: $learnedCount аз ${words.length} калима омӯхта шуд',
                   style: const TextStyle(fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Алифбо ${stats.lettersLearned}/${ManualStudyStats.letterTotal} · '
+                  'Рақамҳо ${stats.numbersLearned}/${stats.numbersTotal} · '
+                  'Рӯзҳо ${stats.daysLearned}/${ManualStudyStats.dayTotal} · '
+                  'Ҳафтаҳо $weeksDone/$weekCount',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 if (earned) ...[
                   const SizedBox(height: 16),
@@ -133,10 +159,16 @@ class ProgressPage extends StatelessWidget {
           runSpacing: 8,
           children: [
             _chip('Омӯхта', '$learnedCount'),
-            _chip('Наомӯхта', '${summary?.unlearned ?? (words.length - learnedCount)}'),
-            _chip('Барои баъд', '$savedCount'),
-            _chip('Насанҷида', '${summary?.untested ?? words.length}'),
-            _chip('Алифбо', '${snapshot.letters.length} / 26'),
+            _chip('Наомӯхта', '${summary.unlearned}'),
+            _chip('Барои баъд', '$savedWords'),
+            _chip('Насанҷида', '${summary.untested}'),
+            _chip('Алифбо', '${stats.lettersLearned} / ${ManualStudyStats.letterTotal}'),
+            _chip('Рақамҳо', '${stats.numbersLearned} / ${stats.numbersTotal}'),
+            _chip('Рӯзҳо', '${stats.daysLearned} / ${ManualStudyStats.dayTotal}'),
+            _chip('Дуруст', '${stats.correct}'),
+            _chip('Нодуруст', '${stats.incorrect + stats.unknown}'),
+            _chip('Имрӯз', '${stats.todayCorrect} дуруст / ${stats.todayIncorrect + stats.todayUnknown} нодуруст'),
+            _chip('Охирин пурсиш', formatLearningStamp(stats.lastQuizAt)),
             _chip('Гӯш', '${snapshot.listens}'),
             _chip('Санҷиш', '${snapshot.history.length}'),
           ],

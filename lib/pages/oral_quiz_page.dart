@@ -5,15 +5,18 @@ import '../models/word_learning.dart';
 import '../services/student_service.dart';
 import '../services/word_learning_service.dart';
 import '../theme.dart';
+import '../widgets/word_history_sheet.dart';
 
 class OralQuizPage extends StatefulWidget {
   final List<Word> words;
   final Future<void> Function(String text) onSpeak;
+  final String title;
 
   const OralQuizPage({
     super.key,
     required this.words,
     required this.onSpeak,
+    this.title = 'Пурсиши луғат',
   });
 
   @override
@@ -58,14 +61,25 @@ class _OralQuizPageState extends State<OralQuizPage> {
 
   Future<void> _mark(OralMark mark) async {
     if (saving || index >= queue.length) return;
+    if (WordLearningService.instance.studentId == null) {
+      _failed('Аввал талабаро интихоб кунед.');
+      return;
+    }
     final word = queue[index];
     setState(() => saving = true);
+    var ok = false;
     try {
       await WordLearningService.instance.record(word.id, mark);
+      ok = true;
     } catch (error, stack) {
       debugPrint('Oral quiz save failed: $error\n$stack');
     }
     if (!mounted) return;
+    if (!ok) {
+      setState(() => saving = false);
+      _failed('Натиҷа захира нашуд. Боз кӯшиш кунед.');
+      return;
+    }
     setState(() {
       saving = false;
       reveal = false;
@@ -80,11 +94,44 @@ class _OralQuizPageState extends State<OralQuizPage> {
     });
   }
 
+  Future<void> _toggleLearned() async {
+    if (saving || index >= queue.length) return;
+    final word = queue[index];
+    final next = !WordLearningService.instance.of(word.id).learned;
+    try {
+      await WordLearningService.instance.setFlag(word.id, learned: next);
+    } catch (error, stack) {
+      debugPrint('Oral learned flag failed: $error\n$stack');
+      _failed('Ҳолат захира нашуд.');
+      return;
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _toggleSaved() async {
+    if (saving || index >= queue.length) return;
+    final word = queue[index];
+    final next = !WordLearningService.instance.of(word.id).saved;
+    try {
+      await WordLearningService.instance.setFlag(word.id, saved: next);
+    } catch (error, stack) {
+      debugPrint('Oral saved flag failed: $error\n$stack');
+      _failed('Рӯйхати барои баъд захира нашуд.');
+      return;
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _failed(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Пурсиши луғат'),
+        title: Text(widget.title),
       ),
       body: SafeArea(
         child: running ? _session() : (finished ? _report(emptyQueue: queue.isEmpty) : _setup()),
@@ -154,89 +201,103 @@ class _OralQuizPageState extends State<OralQuizPage> {
   Widget _session() {
     final word = queue[index];
     final record = WordLearningService.instance.of(word.id);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    final last = record.quizzed
+        ? 'Пурсиши охирин: ${oralMarkLabel(record.history.last.mark)} · ${formatLearningStamp(record.lastQuizAt)}'
+        : 'Ҳанӯз санҷида нашудааст';
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        Text(
+          '$_studentName · ${index + 1} / ${queue.length}',
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        LinearProgressIndicator(
+          value: queue.isEmpty ? 0 : index / queue.length,
+          color: cyan600,
+          minHeight: 8,
+          borderRadius: BorderRadius.circular(99),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          word.displayEnglish,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900),
+        ),
+        if (word.pronunciation.trim().isNotEmpty)
           Text(
-            '$_studentName · ${index + 1} / ${queue.length}',
-            style: const TextStyle(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: queue.isEmpty ? 0 : index / queue.length,
-            color: cyan600,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(99),
-          ),
-          const SizedBox(height: 18),
-          Text(
-            word.displayEnglish,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900),
-          ),
-          if (word.pronunciation.trim().isNotEmpty)
-            Text(
-              word.pronunciation,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          const SizedBox(height: 8),
-          TextButton.icon(
-            onPressed: () => widget.onSpeak(word.english),
-            icon: const Icon(Icons.volume_up_rounded),
-            label: const Text('Гӯш кардан'),
-          ),
-          const SizedBox(height: 8),
-          if (!reveal)
-            OutlinedButton(
-              onPressed: () => setState(() => reveal = true),
-              child: const Text('Ҷавобро нишон диҳ'),
-            )
-          else
-            Text(
-              word.tajik,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: teal700),
-            ),
-          const SizedBox(height: 8),
-          Text(
-            record.quizzed
-                ? 'Қаблан: ${record.correct} дуруст, ${record.incorrect + record.unknown} нодуруст'
-                : 'Ин калима ҳанӯз барои ин талаба санҷида нашудааст',
+            word.pronunciation,
             textAlign: TextAlign.center,
             style: const TextStyle(fontWeight: FontWeight.w700),
           ),
-          const Spacer(),
-          FilledButton(
-            onPressed: saving ? null : () => _mark(OralMark.correct),
-            style: FilledButton.styleFrom(backgroundColor: emerald600, minimumSize: const Size.fromHeight(48)),
-            child: const Text('Дуруст'),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: () => widget.onSpeak(word.english),
+          icon: const Icon(Icons.volume_up_rounded),
+          label: const Text('Гӯш кардан'),
+        ),
+        if (!reveal)
+          OutlinedButton(
+            onPressed: () => setState(() => reveal = true),
+            child: const Text('Ҷавобро нишон диҳ'),
+          )
+        else
+          Text(
+            word.tajik,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: teal700),
           ),
-          const SizedBox(height: 8),
-          FilledButton(
-            onPressed: saving ? null : () => _mark(OralMark.incorrect),
-            style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade800, minimumSize: const Size.fromHeight(48)),
-            child: const Text('Нодуруст'),
-          ),
-          const SizedBox(height: 8),
-          FilledButton(
-            onPressed: saving ? null : () => _mark(OralMark.unknown),
-            style: FilledButton.styleFrom(backgroundColor: slate700, minimumSize: const Size.fromHeight(48)),
-            child: const Text('Надонист · барои баъд'),
-          ),
-          TextButton(
-            onPressed: saving
-                ? null
-                : () => setState(() {
-                      running = false;
-                      finished = true;
-                    }),
-            child: const Text('Хотима ва ҳисобот'),
-          ),
-        ],
-      ),
+        const SizedBox(height: 8),
+        Text(
+          'Омӯзиш: ${record.learned ? 'омӯхта шудааст' : 'ҳанӯз омӯхта нашудааст'}',
+          textAlign: TextAlign.center,
+        ),
+        Text(last, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700)),
+        Text(
+          record.saved ? 'Барои баъд: ҳа' : 'Барои баъд: не',
+          textAlign: TextAlign.center,
+        ),
+        TextButton(
+          onPressed: () => showWordHistory(context, word),
+          child: const Text('Таърихи ин талаба'),
+        ),
+        const SizedBox(height: 8),
+        FilledButton(
+          onPressed: saving ? null : () => _mark(OralMark.correct),
+          style: FilledButton.styleFrom(backgroundColor: emerald600, minimumSize: const Size.fromHeight(46)),
+          child: const Text('Дуруст ҷавоб дод'),
+        ),
+        const SizedBox(height: 8),
+        FilledButton(
+          onPressed: saving ? null : () => _mark(OralMark.incorrect),
+          style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade800, minimumSize: const Size.fromHeight(46)),
+          child: const Text('Нодуруст ҷавоб дод'),
+        ),
+        const SizedBox(height: 8),
+        FilledButton(
+          onPressed: saving ? null : () => _mark(OralMark.unknown),
+          style: FilledButton.styleFrom(backgroundColor: slate700, minimumSize: const Size.fromHeight(46)),
+          child: const Text('Надонист'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: saving ? null : _toggleSaved,
+          child: Text(record.saved ? 'Аз «барои баъд» гирифтан' : 'Барои баъд'),
+        ),
+        OutlinedButton(
+          onPressed: saving ? null : _toggleLearned,
+          child: Text(record.learned ? 'Омӯхта шуд — бозгашт' : 'Омӯхта шуд'),
+        ),
+        TextButton(
+          onPressed: saving
+              ? null
+              : () => setState(() {
+                    running = false;
+                    finished = true;
+                  }),
+          child: const Text('Хотима ва ҳисобот'),
+        ),
+      ],
     );
   }
 

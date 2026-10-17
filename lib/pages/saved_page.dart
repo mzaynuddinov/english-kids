@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/days.dart';
 import '../models/word.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/word_card.dart';
@@ -29,6 +30,12 @@ class SavedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final list = words.where((w) => w.isMarked(saved)).toList();
+    final extras = <String>[
+      for (final key in saved)
+        if (key.startsWith('letter:')) 'Ҳарф ${key.substring('letter:'.length)}',
+      for (final day in weekDays)
+        if (saved.contains(day.id)) 'Рӯз: ${day.english} · ${day.tajik}',
+    ];
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       children: [
@@ -40,9 +47,21 @@ class SavedPage extends StatelessWidget {
               ?.copyWith(fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 4),
-        Text('${list.length} калима захира шудааст'),
+        Text('${list.length} калима · ${extras.length} ҳарф ё рӯз'),
         const SizedBox(height: 16),
-        if (list.isEmpty)
+        if (extras.isNotEmpty) ...[
+          const Text('Ҳарфҳо ва рӯзҳои барои баъд', style: TextStyle(fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          for (final item in extras)
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.bookmark_rounded),
+                title: Text(item, style: const TextStyle(fontWeight: FontWeight.w800)),
+              ),
+            ),
+          const SizedBox(height: 12),
+        ],
+        if (list.isEmpty && extras.isEmpty)
           const EmptyState(
             icon: Icons.bookmark_border_rounded,
             title: 'Ҳоло чизе нест',

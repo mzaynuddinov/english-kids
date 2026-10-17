@@ -60,13 +60,14 @@ class _StudentsPageState extends State<StudentsPage> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Бекор')),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Илова'),
+            child: const Text('Захира кардан'),
           ),
         ],
       ),
     );
 
-    if (name == null || name.isEmpty) {
+    if (name == null) return;
+    if (name.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Ном холӣ буда наметавонад')),
@@ -126,7 +127,7 @@ class _StudentsPageState extends State<StudentsPage> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Бекор')),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Заҳира'),
+            child: const Text('Захира кардан'),
           ),
         ],
       ),
@@ -145,14 +146,6 @@ class _StudentsPageState extends State<StudentsPage> {
   }
 
   Future<void> _delete(Student student) async {
-    if (students.length <= 1) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Охирин талаба нест карда намешавад')),
-        );
-      }
-      return;
-    }
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -190,7 +183,7 @@ class _StudentsPageState extends State<StudentsPage> {
           IconButton(
             icon: const Icon(Icons.person_add_rounded),
             onPressed: _addStudent,
-            tooltip: 'Талабаи нав',
+            tooltip: '+ Илова кардани талаба',
           ),
         ],
       ),
@@ -208,13 +201,13 @@ class _StudentsPageState extends State<StudentsPage> {
                       FilledButton.icon(
                         onPressed: _addStudent,
                         icon: const Icon(Icons.person_add),
-                        label: const Text('Илова кардани талаба'),
+                        label: const Text('+ Илова кардани талаба'),
                       ),
                     ],
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                   itemCount: students.length,
                   itemBuilder: (ctx, i) {
                     final s = students[i];
@@ -259,6 +252,13 @@ class _StudentsPageState extends State<StudentsPage> {
                     );
                   },
                 ),
+      floatingActionButton: loading
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _addStudent,
+              icon: const Icon(Icons.person_add_rounded),
+              label: const Text('+ Илова кардани талаба'),
+            ),
     );
   }
 }

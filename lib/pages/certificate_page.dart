@@ -135,7 +135,7 @@ class CertificatePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
-                        '✓ 500 калима',
+                        '✓ 500 калима / 500 Words',
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           color: Color(0xFFB45309),

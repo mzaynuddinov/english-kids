@@ -27,13 +27,28 @@ String oralMarkLabel(OralMark mark) {
 
 Future<void> showWordHistory(BuildContext context, Word word) {
   final service = WordLearningService.instance;
+  final current = StudentService.instance.currentStudentId;
+  final record = service.studentId == current ? service.of(word.id) : const WordLearning();
+  return showLearningHistory(
+    context,
+    title: word.displayEnglish,
+    subtitle: word.tajik,
+    record: record,
+  );
+}
+
+Future<void> showLearningHistory(
+  BuildContext context, {
+  required String title,
+  required String subtitle,
+  required WordLearning record,
+}) {
   final students = StudentService.instance;
   Student? student;
   final current = students.currentStudentId;
   for (final item in students.students) {
     if (item.id == current) student = item;
   }
-  final record = service.studentId == current ? service.of(word.id) : const WordLearning();
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -50,10 +65,10 @@ Future<void> showWordHistory(BuildContext context, Word word) {
             ),
             const SizedBox(height: 4),
             Text(
-              word.displayEnglish,
+              title,
               style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
             ),
-            Text(word.tajik, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            Text(subtitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 14),
             _line('Омӯхта шуд', record.learned ? 'ҳа' : 'не'),
             _line('Барои баъд', record.saved ? 'ҳа' : 'не'),
