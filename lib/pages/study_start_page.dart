@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/alphabet.dart';
 import '../models/days.dart';
+import '../models/progress_rules.dart';
 import '../models/word.dart';
 import '../services/student_service.dart';
 import 'alphabet_page.dart';
@@ -13,6 +14,7 @@ class StudyStartPage extends StatelessWidget {
   final List<Word> words;
   final Set<String> learned;
   final Set<String> saved;
+  final Set<String> letters;
   final Future<void> Function(String text) onSpeak;
   final Future<void> Function(Word word) onSave;
   final Future<void> Function(Word word) onLearn;
@@ -24,6 +26,7 @@ class StudyStartPage extends StatelessWidget {
     required this.words,
     required this.learned,
     required this.saved,
+    required this.letters,
     required this.onSpeak,
     required this.onSave,
     required this.onLearn,
@@ -41,6 +44,24 @@ class StudyStartPage extends StatelessWidget {
 
   List<Word> _topic(String topic) => words.where((word) => word.topic == topic).toList();
 
+  bool _open(int week) => weekUnlocked(week, letters, words, learned);
+
+  List<Word> _openTopic(String topic) => _topic(topic).where((word) => _open(word.week)).toList();
+
+  String _topicLock(String topic) {
+    if (!alphabetComplete(letters)) return lockReason(1);
+    final list = _topic(topic);
+    if (list.isEmpty) return lockReason(1);
+    for (final word in list) {
+      if (!_open(word.week)) return lockReason(word.week);
+    }
+    return lockReason(1);
+  }
+
+  void _blocked(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +72,7 @@ class StudyStartPage extends StatelessWidget {
           Text(_studentName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
           const SizedBox(height: 6),
           const Text(
-            'Мавзӯъро худатон интихоб кунед. Гузаштани мавзӯъҳои пешин шарт нест. Натиҷа танҳо барои талабаи ҷорӣ сабт мешавад.',
+            'Аввал алифбо. Ҳафтаи навбатӣ танҳо пас аз анҷоми ҳафтаи пеш кушода мешавад. Натиҷа барои талабаи ҷорӣ сабт мешавад.',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 12),
@@ -82,34 +103,56 @@ class StudyStartPage extends StatelessWidget {
             context,
             'Рақамҳо',
             'Numbers · ${_topic('Numbers').length}',
-            () => _openWords(context, 'Рақамҳо', _topic('Numbers')),
-            onQuiz: () => _openQuiz(context, 'Пурсиши рақамҳо', _topic('Numbers')),
+            () => _openWords(context, 'Рақамҳо', _openTopic('Numbers')),
+            onQuiz: () => _openQuiz(context, 'Пурсиши рақамҳо', _openTopic('Numbers')),
+            locked: _openTopic('Numbers').isEmpty,
+            lockText: _topicLock('Numbers'),
           ),
-          _tile(context, 'Рӯзҳои ҳафта', 'Days of the Week · 7', () {
-            Navigator.push<void>(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CatalogQuizPage(title: 'Рӯзҳои ҳафта', prompts: dayPrompts(), onSpeak: onSpeak),
-              ),
-            );
-          }),
+          _tile(
+            context,
+            'Рӯзҳои ҳафта',
+            'Days of the Week · 7',
+            () {
+              if (!alphabetComplete(letters)) {
+                _blocked(context, lockReason(1));
+                return;
+              }
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CatalogQuizPage(title: 'Рӯзҳои ҳафта', prompts: dayPrompts(), onSpeak: onSpeak),
+                ),
+              );
+            },
+            locked: !alphabetComplete(letters),
+            lockText: lockReason(1),
+          ),
           _tile(
             context,
             'Рангҳо',
             'Colors · ${_topic('Colors').length}',
-            () => _openWords(context, 'Рангҳо', _topic('Colors')),
-            onQuiz: () => _openQuiz(context, 'Пурсиши рангҳо', _topic('Colors')),
+            () => _openWords(context, 'Рангҳо', _openTopic('Colors')),
+            onQuiz: () => _openQuiz(context, 'Пурсиши рангҳо', _openTopic('Colors')),
+            locked: _openTopic('Colors').isEmpty,
+            lockText: _topicLock('Colors'),
           ),
           _tile(
             context,
             'Калимаҳои ибтидоӣ',
             'Basics · ${_topic('Basics').length}',
-            () => _openWords(context, 'Калимаҳои ибтидоӣ', _topic('Basics')),
-            onQuiz: () => _openQuiz(context, 'Пурсиши калимаҳои ибтидоӣ', _topic('Basics')),
+            () => _openWords(context, 'Калимаҳои ибтидоӣ', _openTopic('Basics')),
+            onQuiz: () => _openQuiz(context, 'Пурсиши калимаҳои ибтидоӣ', _openTopic('Basics')),
+            locked: _openTopic('Basics').isEmpty,
+            lockText: _topicLock('Basics'),
           ),
-          _tile(context, 'Тамоми луғат', '500 калима', () {
-            Navigator.push<void>(context, MaterialPageRoute(builder: (_) => OralQuizPage(words: words, onSpeak: onSpeak)));
-          }),
+          _tile(
+            context,
+            'Тамоми луғати кушода',
+            'Танҳо ҳафтаҳои кушода',
+            () => _openQuiz(context, 'Пурсиши луғат', words.where((word) => _open(word.week)).toList()),
+            locked: !words.any((word) => _open(word.week)),
+            lockText: lockReason(1),
+          ),
           const SizedBox(height: 8),
           const Text('Ҳафтаҳои мавҷуда', style: TextStyle(fontWeight: FontWeight.w900)),
           for (var week = 1; week <= weekCount; week++)
@@ -123,6 +166,8 @@ class StudyStartPage extends StatelessWidget {
                 'Пурсиши ҳафтаи $week',
                 words.where((word) => word.week == week).toList(),
               ),
+              locked: !_open(week),
+              lockText: lockReason(week),
             ),
           const SizedBox(height: 12),
           const Text(
@@ -135,6 +180,10 @@ class StudyStartPage extends StatelessWidget {
   }
 
   void _openQuiz(BuildContext context, String title, List<Word> list) {
+    if (list.isEmpty || list.any((word) => !_open(word.week))) {
+      _blocked(context, list.isEmpty ? lockReason(1) : lockReason(list.first.week));
+      return;
+    }
     Navigator.push<void>(
       context,
       MaterialPageRoute(builder: (_) => OralQuizPage(words: list, onSpeak: onSpeak, title: title)),
@@ -142,11 +191,15 @@ class StudyStartPage extends StatelessWidget {
   }
 
   void _openWords(BuildContext context, String title, List<Word> list) {
+    if (list.isEmpty || list.any((word) => !_open(word.week))) {
+      _blocked(context, lockReason(1));
+      return;
+    }
     Navigator.push<void>(
       context,
       MaterialPageRoute(
         builder: (_) => WeekPage(
-          week: list.isEmpty ? 1 : list.first.week,
+          week: list.first.week,
           title: title,
           words: list,
           learned: learned,
@@ -161,6 +214,10 @@ class StudyStartPage extends StatelessWidget {
   }
 
   void _openWeek(BuildContext context, int week) {
+    if (!_open(week)) {
+      _blocked(context, lockReason(week));
+      return;
+    }
     Navigator.push<void>(
       context,
       MaterialPageRoute(
@@ -179,24 +236,34 @@ class StudyStartPage extends StatelessWidget {
     );
   }
 
-  Widget _tile(BuildContext context, String title, String subtitle, VoidCallback onTap, {VoidCallback? onQuiz}) {
+  Widget _tile(
+    BuildContext context,
+    String title,
+    String subtitle,
+    VoidCallback onTap, {
+    VoidCallback? onQuiz,
+    bool locked = false,
+    String? lockText,
+  }) {
     return Card(
       child: ListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-        subtitle: Text(subtitle),
+        title: Text(locked ? '🔒 $title' : title, style: const TextStyle(fontWeight: FontWeight.w800)),
+        subtitle: Text(locked ? (lockText ?? subtitle) : subtitle),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (onQuiz != null)
               IconButton(
                 tooltip: 'Пурсиш',
-                onPressed: onQuiz,
+                onPressed: locked
+                    ? () => _blocked(context, lockText ?? lockReason(1))
+                    : onQuiz,
                 icon: const Icon(Icons.record_voice_over_rounded),
               ),
-            const Icon(Icons.chevron_right_rounded),
+            Icon(locked ? Icons.lock_rounded : Icons.chevron_right_rounded),
           ],
         ),
-        onTap: onTap,
+        onTap: locked ? () => _blocked(context, lockText ?? lockReason(1)) : onTap,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/progress_rules.dart';
 import '../models/word.dart';
 import '../theme.dart';
 import 'week_page.dart';
@@ -13,6 +14,7 @@ class WordsPage extends StatelessWidget {
   final Future<void> Function(Word word) onLearn;
   final Future<void> Function(Word word) onRemind;
   final String voiceGender;
+  final bool Function(int week) weekOpen;
 
   const WordsPage({
     super.key,
@@ -23,6 +25,7 @@ class WordsPage extends StatelessWidget {
     required this.onSave,
     required this.onLearn,
     required this.onRemind,
+    required this.weekOpen,
     this.voiceGender = 'female',
   });
 
@@ -35,7 +38,7 @@ class WordsPage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
             const Text(
-              'Ҳар ҳафта кушода аст. Гузаштани мавзӯъҳои пешин шарт нест.',
+              'Аввал алифбо. Ҳар ҳафтаи навбатӣ танҳо пас аз анҷоми ҳафтаи пеш кушода мешавад.',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10),
@@ -46,7 +49,9 @@ class WordsPage extends StatelessWidget {
                   week: week,
                   words: words.where((w) => w.week == week).toList(),
                   learned: learned,
+                  locked: !weekOpen(week),
                   onOpen: () {
+                    if (!weekOpen(week)) return;
                     Navigator.push<void>(
                       context,
                       MaterialPageRoute(
@@ -78,12 +83,14 @@ class _WeekTile extends StatelessWidget {
   final int week;
   final List<Word> words;
   final Set<String> learned;
+  final bool locked;
   final VoidCallback onOpen;
 
   const _WeekTile({
     required this.week,
     required this.words,
     required this.learned,
+    required this.locked,
     required this.onOpen,
   });
 
@@ -111,10 +118,12 @@ class _WeekTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
-                child: Text(
-                  '$week',
-                  style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
-                ),
+                child: locked
+                    ? const Icon(Icons.lock_rounded, color: Colors.white)
+                    : Text(
+                        '$week',
+                        style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900),
+                      ),
               ),
             ),
             const SizedBox(width: 14),
@@ -122,13 +131,16 @@ class _WeekTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  Text(locked ? '🔒 Ҳафтаи $week' : 'Ҳафтаи $week', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   Text(weekTitles[week] ?? '', style: const TextStyle(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(99),
-                    child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
-                  ),
+                  if (locked)
+                    Text(lockReason(week), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))
+                  else
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(value: pct, minHeight: 7, color: emerald500),
+                    ),
                 ],
               ),
             ),

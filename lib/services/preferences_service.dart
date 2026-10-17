@@ -24,6 +24,10 @@ class PreferencesService {
   final Map<String, String> _fileCache = {};
   @visibleForTesting
   bool debugFailWrites = false;
+  @visibleForTesting
+  int prefsReads = 0;
+  bool _fileDirty = false;
+  Future<void>? _fileJob;
 
   static const _revKey = '__rev';
 
@@ -76,6 +80,7 @@ class PreferencesService {
         debugPrint('SharedPreferences reload failed: $error\n$stack');
       }
       _fileLoaded = false;
+      _memory.clear();
       await _loadFile();
       await _reconcile();
     });
@@ -138,6 +143,9 @@ class PreferencesService {
 
   Set<String> _loadSet(String key) {
     try {
+      final mem = _memory[key];
+      if (mem is List<String>) return {...mem};
+      prefsReads++;
       final prefs = _prefs;
       if (prefs != null && prefs.containsKey(key)) {
         final list = prefs.getStringList(key) ?? <String>[];
@@ -154,8 +162,6 @@ class PreferencesService {
           return {...list};
         }
       }
-      final mem = _memory[key];
-      if (mem is List<String>) return {...mem};
       return <String>{};
     } catch (error, stack) {
       debugPrint('Corrupt set $key: $error\n$stack');
@@ -168,10 +174,10 @@ class PreferencesService {
   Future<bool> _saveSet(String key, Set<String> values) async {
     if (debugFailWrites) return false;
     final list = values.toList();
+    final previous = _memory[key];
     _bumpRev();
     _memory[key] = list;
     _fileCache['set:$key'] = jsonEncode(list);
-    final fileOk = await _writeFile();
     var prefsOk = false;
     try {
       final prefs = _prefs;
@@ -182,11 +188,20 @@ class PreferencesService {
     } catch (error, stack) {
       debugPrint('Failed to persist $key: $error\n$stack');
     }
-    return prefsOk || fileOk;
+    if (prefsOk) {
+      _scheduleFileWrite();
+      return true;
+    }
+    final fileOk = await _writeFileNow();
+    if (!fileOk) _restoreMemory(key, previous);
+    return fileOk;
   }
 
   String? _loadRaw(String key) {
     try {
+      final mem = _memory[key];
+      if (mem is String) return mem;
+      prefsReads++;
       final prefs = _prefs;
       if (prefs != null && prefs.containsKey(key)) {
         final disk = prefs.getString(key);
@@ -203,8 +218,7 @@ class PreferencesService {
         }
         return stored;
       }
-      final mem = _memory[key];
-      return mem is String ? mem : null;
+      return null;
     } catch (error, stack) {
       debugPrint('Corrupt raw $key: $error\n$stack');
       final mem = _memory[key];
@@ -214,10 +228,10 @@ class PreferencesService {
 
   Future<bool> _saveRaw(String key, String value) async {
     if (debugFailWrites) return false;
+    final previous = _memory[key];
     _bumpRev();
     _memory[key] = value;
     _fileCache[key] = value;
-    final fileOk = await _writeFile();
     var prefsOk = false;
     try {
       final prefs = _prefs;
@@ -228,7 +242,21 @@ class PreferencesService {
     } catch (error) {
       debugPrint('writeRaw $key failed: $error');
     }
-    return prefsOk || fileOk;
+    if (prefsOk) {
+      _scheduleFileWrite();
+      return true;
+    }
+    final fileOk = await _writeFileNow();
+    if (!fileOk) _restoreMemory(key, previous);
+    return fileOk;
+  }
+
+  void _restoreMemory(String key, Object? previous) {
+    if (previous == null) {
+      _memory.remove(key);
+    } else {
+      _memory[key] = previous;
+    }
   }
 
   int? _readInt(String key) {
@@ -281,7 +309,7 @@ class PreferencesService {
     } catch (error) {
       debugPrint('writeString $key failed: $error');
     }
-    await _writeFile();
+    _scheduleFileWrite();
   }
 
   Future<void> _loadFile() async {
@@ -383,7 +411,31 @@ class PreferencesService {
     await prefs.setString(_revKey, rev);
   }
 
-  Future<bool> _writeFile() async {
+  void _scheduleFileWrite() {
+    _fileDirty = true;
+    _fileJob ??= _drainFileWrites();
+  }
+
+  Future<void> _drainFileWrites() async {
+    try {
+      while (_fileDirty) {
+        _fileDirty = false;
+        final snapshot = Map<String, String>.from(_fileCache);
+        try {
+          final file = await _storeFile();
+          await file.writeAsString(jsonEncode(snapshot), flush: true);
+        } catch (error) {
+          debugPrint('Durable store write skipped: $error');
+        }
+      }
+    } finally {
+      _fileJob = null;
+      if (_fileDirty) _fileJob = _drainFileWrites();
+    }
+  }
+
+  Future<bool> _writeFileNow() async {
+    _fileDirty = false;
     try {
       final file = await _storeFile();
       await file.writeAsString(jsonEncode(_fileCache), flush: true);
@@ -416,5 +468,8 @@ class PreferencesService {
     _memory.clear();
     _fileCache.clear();
     debugFailWrites = false;
+    prefsReads = 0;
+    _fileDirty = false;
+    _fileJob = null;
   }
 }

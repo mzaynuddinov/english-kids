@@ -166,20 +166,45 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                   IconButton(
                     tooltip: 'Гӯш кардан',
                     constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    padding: EdgeInsets.zero,
                     onPressed: () => widget.onSpeak(word.english),
                     icon: const Icon(Icons.volume_up_rounded),
                   ),
                   IconButton(
                     tooltip: 'Таърихи ин талаба',
                     constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    padding: EdgeInsets.zero,
                     onPressed: () => showWordHistory(context, word),
                     icon: const Icon(Icons.history_rounded),
                   ),
                   IconButton(
                     tooltip: 'Ёдрас',
                     constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    padding: EdgeInsets.zero,
                     onPressed: () => widget.onRemind(word),
                     icon: const Icon(Icons.alarm_rounded),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () => widget.onLearn(word),
+                        icon: Icon(widget.learned ? Icons.undo_rounded : Icons.check_rounded, size: 18),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: widget.learned ? Colors.orange.shade700 : emerald600,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        label: Text(
+                          widget.learned ? 'Бозгашт' : 'Омӯхта шуд',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -318,22 +343,6 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                     ],
                   ),
                 ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () => widget.onLearn(word),
-                  icon: Icon(widget.learned ? Icons.undo_rounded : Icons.check_rounded),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: widget.learned ? Colors.orange.shade700 : emerald600,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  label: Text(widget.learned ? 'Бозгашт' : 'Омӯхта шуд'),
-                ),
-              ),
             ],
           ),
         ),

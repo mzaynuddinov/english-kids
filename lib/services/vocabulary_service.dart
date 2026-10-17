@@ -19,10 +19,17 @@ class VocabularyService {
   @visibleForTesting
   static Future<VocabularyLoadResult> Function()? debugLoader;
 
+  static VocabularyLoadResult? _cached;
+
   static Future<VocabularyLoadResult> load() {
     final override = debugLoader;
     if (override != null) return override();
-    return loadFromBundle();
+    final cached = _cached;
+    if (cached != null) return Future<VocabularyLoadResult>.value(cached);
+    return loadFromBundle().then((result) {
+      if (result.ok) _cached = result;
+      return result;
+    });
   }
 
   static Future<VocabularyLoadResult> loadFromBundle() async {
@@ -77,5 +84,6 @@ class VocabularyService {
   @visibleForTesting
   static void debugReset() {
     debugLoader = null;
+    _cached = null;
   }
 }

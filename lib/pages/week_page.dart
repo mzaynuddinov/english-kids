@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/word.dart';
+import '../services/word_learning_service.dart';
 import '../theme.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/word_card.dart';
@@ -47,22 +48,34 @@ class _WeekPageState extends State<WeekPage> {
   }
 
   Future<void> _save(Word word) async {
+    final was = word.isMarked(saved);
+    setState(() => _apply(saved, word, !was));
     await widget.onSave(word);
     if (!mounted) return;
-    setState(() {
-      if (word.isMarked(saved)) {
-        saved.remove(word.id);
-        saved.remove(word.english);
-      } else {
-        saved.add(word.id);
-      }
-    });
+    final service = WordLearningService.instance;
+    if (service.studentId != null) {
+      setState(() => _apply(saved, word, service.of(word.id).saved));
+    }
   }
 
   Future<void> _learn(Word word) async {
+    final was = word.isMarked(learned);
+    setState(() => _apply(learned, word, !was));
     await widget.onLearn(word);
     if (!mounted) return;
-    setState(() => learned.add(word.id));
+    final service = WordLearningService.instance;
+    if (service.studentId != null) {
+      setState(() => _apply(learned, word, service.of(word.id).learned));
+    }
+  }
+
+  void _apply(Set<String> keys, Word word, bool on) {
+    if (on) {
+      keys.add(word.id);
+      return;
+    }
+    keys.remove(word.id);
+    keys.remove(word.english);
   }
 
   @override

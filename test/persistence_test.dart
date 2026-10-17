@@ -20,12 +20,14 @@ void main() {
     PreferencesService.instance.debugReset();
     StudentService.instance.debugReset();
     WordLearningService.instance.debugReset();
+    PinService.instance.debugReset();
   });
 
   tearDown(() {
     PreferencesService.instance.debugReset();
     StudentService.instance.debugReset();
     WordLearningService.instance.debugReset();
+    PinService.instance.debugReset();
   });
 
   test('PIN stays valid after the process restarts', () async {
@@ -34,11 +36,24 @@ void main() {
     final salt = await PreferencesService.instance.loadRaw('parent_pin_salt');
 
     PreferencesService.instance.debugReset();
+    PinService.instance.debugReset();
 
     expect(await PinService.instance.hasPin(), isTrue);
     expect(await PinService.instance.verify('2468'), isTrue);
     expect(await PinService.instance.verify('0000'), isFalse);
     expect(await PreferencesService.instance.loadRaw('parent_pin_salt'), salt);
+    expect(await PinService.instance.hasPin(), isTrue);
+  });
+
+  test('a cached PIN answers without another storage read', () async {
+    expect(await PinService.instance.setPin('1357'), isTrue);
+    final reads = PreferencesService.instance.prefsReads;
+    final watch = Stopwatch()..start();
+    expect(await PinService.instance.verify('1357'), isTrue);
+    expect(await PinService.instance.verify('0000'), isFalse);
+    watch.stop();
+    expect(PreferencesService.instance.prefsReads, reads);
+    expect(watch.elapsedMilliseconds, lessThan(200));
     expect(await PinService.instance.hasPin(), isTrue);
   });
 
@@ -186,6 +201,39 @@ void main() {
     expect(find.text('Таърихи ин талаба'), findsNothing);
     expect(find.text('Ёдрас'), findsNothing);
     expect(find.text('Омӯхта шуд'), findsOneWidget);
+    final actionRow = find.ancestor(
+      of: find.byTooltip('Гӯш кардан'),
+      matching: find.byType(Row),
+    ).first;
+    expect(find.descendant(of: actionRow, matching: find.byTooltip('Таърихи ин талаба')), findsOneWidget);
+    expect(find.descendant(of: actionRow, matching: find.byTooltip('Ёдрас')), findsOneWidget);
+    expect(find.descendant(of: actionRow, matching: find.text('Омӯхта шуд')), findsOneWidget);
+
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListView(
+            children: [
+              WordCard(
+                word: word,
+                learned: false,
+                saved: false,
+                onSpeak: (_) async {},
+                onSave: (_) async {},
+                onLearn: (_) async {},
+                onRemind: (_) async {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
 
     await tester.tap(find.byTooltip('Гӯш кардан'));
     await tester.pump();

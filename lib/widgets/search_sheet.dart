@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/word.dart';
 import '../models/word_search.dart';
 import '../services/preferences_service.dart';
+import '../services/word_learning_service.dart';
 import '../theme.dart';
 import 'word_card.dart';
 
@@ -98,20 +99,15 @@ class _SearchSheetState extends State<_SearchSheet> {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (ctx) {
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-          children: [
-            WordCardWidget(
-              word: word,
-              learned: true,
-              saved: word.isMarked(widget.saved),
-              onSpeak: widget.onSpeak,
-              onSave: widget.onSave,
-              onLearn: widget.onLearn,
-              onRemind: widget.onRemind,
-              voiceGender: widget.voiceGender,
-            ),
-          ],
+        return _LearnedPreview(
+          word: word,
+          learned: word.isMarked(widget.learned),
+          saved: word.isMarked(widget.saved),
+          onSpeak: widget.onSpeak,
+          onSave: widget.onSave,
+          onLearn: widget.onLearn,
+          onRemind: widget.onRemind,
+          voiceGender: widget.voiceGender,
         );
       },
     );
@@ -207,6 +203,84 @@ class _SearchSheetState extends State<_SearchSheet> {
           ),
         );
       },
+    );
+  }
+}
+
+class _LearnedPreview extends StatefulWidget {
+  final Word word;
+  final bool learned;
+  final bool saved;
+  final Future<void> Function(String text) onSpeak;
+  final Future<void> Function(Word word) onSave;
+  final Future<void> Function(Word word) onLearn;
+  final Future<void> Function(Word word) onRemind;
+  final String voiceGender;
+
+  const _LearnedPreview({
+    required this.word,
+    required this.learned,
+    required this.saved,
+    required this.onSpeak,
+    required this.onSave,
+    required this.onLearn,
+    required this.onRemind,
+    required this.voiceGender,
+  });
+
+  @override
+  State<_LearnedPreview> createState() => _LearnedPreviewState();
+}
+
+class _LearnedPreviewState extends State<_LearnedPreview> {
+  late bool learned;
+  late bool saved;
+
+  @override
+  void initState() {
+    super.initState();
+    learned = widget.learned;
+    saved = widget.saved;
+  }
+
+  Future<void> _learn(Word word) async {
+    final next = !learned;
+    setState(() => learned = next);
+    await widget.onLearn(word);
+    if (!mounted) return;
+    final service = WordLearningService.instance;
+    if (service.studentId != null) {
+      setState(() => learned = service.of(word.id).learned);
+    }
+  }
+
+  Future<void> _save(Word word) async {
+    final next = !saved;
+    setState(() => saved = next);
+    await widget.onSave(word);
+    if (!mounted) return;
+    final service = WordLearningService.instance;
+    if (service.studentId != null) {
+      setState(() => saved = service.of(word.id).saved);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+      children: [
+        WordCardWidget(
+          word: widget.word,
+          learned: learned,
+          saved: saved,
+          onSpeak: widget.onSpeak,
+          onSave: _save,
+          onLearn: _learn,
+          onRemind: widget.onRemind,
+          voiceGender: widget.voiceGender,
+        ),
+      ],
     );
   }
 }

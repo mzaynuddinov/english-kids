@@ -23,7 +23,7 @@ class GrammarPage extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
             const Text(
-              'Дарсҳо кушодаанд. Анҷом додани алифбо ё ҳафтаҳои пешин шарт нест.',
+              'Грамматика пас аз алифбо ва Ҳафтаи 5 кушода мешавад.',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10),

@@ -11,8 +11,12 @@ class PinService {
   static const _hashKey = 'parent_pin_hash';
   static const _saltKey = 'parent_pin_salt';
 
+  String? _hash;
+  String? _salt;
+
   Future<bool> hasPin() async {
-    final hash = await PreferencesService.instance.loadRaw(_hashKey);
+    final hash = _hash ?? await PreferencesService.instance.loadRaw(_hashKey);
+    _hash = hash;
     return hash != null && hash.isNotEmpty;
   }
 
@@ -48,9 +52,9 @@ class PinService {
       final saltOk = await PreferencesService.instance.saveRaw(_saltKey, salt);
       final hashOk = await PreferencesService.instance.saveRaw(_hashKey, hash);
       if (!saltOk || !hashOk) return false;
-      final storedHash = await PreferencesService.instance.loadRaw(_hashKey);
-      final storedSalt = await PreferencesService.instance.loadRaw(_saltKey);
-      return storedHash == hash && storedSalt == salt;
+      _salt = salt;
+      _hash = hash;
+      return true;
     } catch (error, stack) {
       debugPrint('PIN save failed: $error\n$stack');
       return false;
@@ -59,8 +63,15 @@ class PinService {
 
   Future<bool> verify(String pin) async {
     try {
-      final stored = await PreferencesService.instance.loadRaw(_hashKey);
-      final salt = await _readSalt();
+      if (!validFormat(pin)) return false;
+      var stored = _hash;
+      var salt = _salt;
+      if (stored == null || salt == null) {
+        stored = await PreferencesService.instance.loadRaw(_hashKey);
+        salt = await _readSalt();
+        _hash = stored;
+        _salt = salt;
+      }
       if (stored == null || stored.isEmpty || salt == null) return false;
       return stored == digest(pin, salt);
     } catch (error, stack) {
@@ -70,6 +81,13 @@ class PinService {
   }
 
   Future<void> clear() async {
+    _hash = '';
     await PreferencesService.instance.saveRaw(_hashKey, '');
+  }
+
+  @visibleForTesting
+  void debugReset() {
+    _hash = null;
+    _salt = null;
   }
 }

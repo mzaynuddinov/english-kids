@@ -251,6 +251,10 @@ class _HomeShellState extends State<HomeShell> {
     final wasLearned = service.studentId == null
         ? word.isMarked(learned)
         : service.of(word.id).learned;
+    if (!wasLearned && !_weekOpen(word.week)) {
+      _feedback(lockReason(word.week));
+      return;
+    }
     if (service.studentId != null) {
       final savedNow = await service.setFlag(word.id, learned: !wasLearned);
       if (!savedNow) {
@@ -285,6 +289,16 @@ class _HomeShellState extends State<HomeShell> {
         ? '«${word.displayEnglish}» ба ҳолати қаблӣ баргардонида шуд.'
         : '🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.');
   }
+
+  Set<String> _stageLetters() {
+    return {
+      ...ProgressService.instance.snapshot.letters,
+      for (final id in learned)
+        if (id.startsWith('letter:') && id.length > 7) id.substring(7),
+    };
+  }
+
+  bool _weekOpen(int week) => weekUnlocked(week, _stageLetters(), words, learned);
 
   bool _studentReady() {
     final id = StudentService.instance.currentStudentId;
@@ -433,11 +447,16 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _openWeek(int week) async {
     if (!_needStudent()) return;
+    if (!_weekOpen(week)) {
+      _feedback(lockReason(week));
+      return;
+    }
     final snap = ProgressService.instance.snapshot;
-    try {
-      await ProgressService.instance
-          .save(ProgressService.instance.bumpDay(snap, opened: 1));
-    } catch (_) {}
+    unawaited(() async {
+      try {
+        await ProgressService.instance.save(ProgressService.instance.bumpDay(snap, opened: 1));
+      } catch (_) {}
+    }());
     if (!mounted) return;
     await Navigator.push<void>(
       context,
@@ -456,7 +475,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
       ),
     );
-    if (mounted) await _loadData(silent: true);
+    if (mounted) setState(() {});
   }
 
   void _openSettings() {
@@ -523,6 +542,10 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _openGrammar() async {
+    if (!grammarUnlocked(words, learned, _stageLetters())) {
+      _feedback('Аввал алифбо ва Ҳафтаи 5-ро ба анҷом расонед.');
+      return;
+    }
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
@@ -697,18 +720,12 @@ class _HomeShellState extends State<HomeShell> {
     if (mounted) setState(() {});
   }
 
-  Word get _wordOfDay {
-    if (words.isEmpty) {
-      return const Word(
-          english: 'hello',
-          pronunciation: '/həˈləʊ/',
-          tajik: 'Салом',
-          week: 1,
-          topic: 'Greetings');
-    }
+  Word? get _wordOfDay {
+    final open = words.where((word) => _weekOpen(word.week)).toList();
+    if (open.isEmpty) return null;
     final now = DateTime.now();
     final day = now.difference(DateTime(now.year)).inDays;
-    return words[day % words.length];
+    return open[day % open.length];
   }
 
   Future<void> _continueLearning() async {
@@ -911,11 +928,13 @@ class _HomeShellState extends State<HomeShell> {
                   _continueCard(active),
                 ],
                 const SizedBox(height: 12),
-                _wordOfDayCard(wotd),
-                const SizedBox(height: 12),
+                if (wotd != null) ...[
+                  _wordOfDayCard(wotd),
+                  const SizedBox(height: 12),
+                ],
                 _dailyChallenge(snap),
                 const SizedBox(height: 12),
-                _alphabetCard(snap.letters.length),
+                _alphabetCard(_stageLetters().length),
                 const SizedBox(height: 12),
                 _grammarCard(snap),
                 const SizedBox(height: 14),
@@ -968,7 +987,12 @@ class _HomeShellState extends State<HomeShell> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 11),
                 child: _weekCard(
-                    week, weekTitles[week] ?? '', list.length, done, false),
+                  week,
+                  weekTitles[week] ?? '',
+                  list.length,
+                  done,
+                  !_weekOpen(week),
+                ),
               );
             },
           ),
@@ -999,6 +1023,7 @@ class _HomeShellState extends State<HomeShell> {
           words: words,
           learned: learned,
           saved: saved,
+          letters: _stageLetters(),
           onSpeak: _speak,
           onSave: _toggleSave,
           onLearn: _learn,
@@ -1012,10 +1037,15 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _openOralQuiz() async {
     if (!_needStudent()) return;
+    final open = words.where((word) => _weekOpen(word.week)).toList();
+    if (open.isEmpty) {
+      _feedback(lockReason(1));
+      return;
+    }
     await Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => OralQuizPage(words: words, onSpeak: _speak),
+        builder: (_) => OralQuizPage(words: open, onSpeak: _speak),
       ),
     );
     if (mounted) setState(() {});
@@ -1082,7 +1112,7 @@ class _HomeShellState extends State<HomeShell> {
                   children: [
                     Text('Оғози омӯзиш', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                     Text(
-                      'Алифбо, рақамҳо, рӯзҳо, рангҳо ё ҳар ҳафта — бе қулфи мавзӯъҳои пешин',
+                      'Аввал алифбо, баъд ҳафтаҳо бо навбат',
                       style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                   ],
@@ -1381,7 +1411,9 @@ class _HomeShellState extends State<HomeShell> {
                     const Text('Грамматикаи асосӣ',
                         style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                     Text(
-                      '${snap.grammar.length} / 10 дарс',
+                      grammarUnlocked(words, learned, _stageLetters())
+                          ? '${snap.grammar.length} / 10 дарс'
+                          : '🔒 Пас аз алифбо ва Ҳафтаи 5',
                       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                   ],
@@ -1421,7 +1453,13 @@ class _HomeShellState extends State<HomeShell> {
     final pct = total == 0 ? 0.0 : done / total;
     return InkWell(
       borderRadius: BorderRadius.circular(22),
-      onTap: () => _openWeek(week),
+      onTap: () {
+        if (locked) {
+          _feedback(lockReason(week));
+          return;
+        }
+        unawaited(_openWeek(week));
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -1570,6 +1608,7 @@ class _HomeShellState extends State<HomeShell> {
                     words: words,
                     learned: learned,
                     saved: saved,
+                    weekOpen: _weekOpen,
                     onSpeak: _speak,
                     onSave: _toggleSave,
                     onLearn: _learn,
