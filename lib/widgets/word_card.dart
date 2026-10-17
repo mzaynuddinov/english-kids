@@ -311,19 +311,18 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                     child: SizedBox(
                       height: 48,
                       child: ElevatedButton.icon(
-                        onPressed:
-                            widget.learned ? () {} : () => widget.onLearn(word),
+                        onPressed: () => widget.onLearn(word),
                         icon: Icon(widget.learned
-                            ? Icons.check_circle_rounded
+                            ? Icons.undo_rounded
                             : Icons.check_rounded),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: emerald600,
+                          backgroundColor: widget.learned ? Colors.orange.shade700 : emerald600,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16)),
                         ),
-                        label: const Text('Омӯхта шуд'),
+                        label: Text(widget.learned ? 'Бозгашт' : 'Омӯхта шуд'),
                       ),
                     ),
                   ),
