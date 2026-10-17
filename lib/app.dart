@@ -58,7 +58,7 @@ class _EnglishKidsAppState extends State<EnglishKidsApp> {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(Brightness.light),
       darkTheme: buildAppTheme(Brightness.dark),
-      themeMode: settings.themeMode,
+      themeMode: settings.themeMode == ThemeMode.system ? ThemeMode.light : settings.themeMode,
       builder: (builderContext, child) {
         MediaQueryData data;
         try {
