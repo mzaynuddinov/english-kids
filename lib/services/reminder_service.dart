@@ -211,8 +211,7 @@ class ReminderService {
   }
 
   void _armForeground(WordReminder reminder, String gender, double rate) {
-    // Never schedule real timers under the test binding — they keep flutter test alive.
-    if (WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
+    if (WidgetsBinding.instance is TestWidgetsFlutterBinding || WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
       return;
     }
     _cancelTimers(reminder.id);
@@ -228,7 +227,7 @@ class ReminderService {
   }
 
   void rearmActive(String gender, double rate) {
-    if (WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
+    if (WidgetsBinding.instance is TestWidgetsFlutterBinding || WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
       return;
     }
     for (final reminder in ProgressService.instance.snapshot.reminders) {
@@ -343,7 +342,6 @@ class ReminderService {
     }
   }
 
-  /// Cancel every foreground timer. Safe to call from tests.
   void cancelAllTimers() {
     for (final list in _timers.values) {
       for (final t in list) {
