@@ -50,7 +50,8 @@ jobs:
         run: flutter analyze
 
       - name: Run tests
-        run: flutter test
+        timeout-minutes: 10
+        run: flutter test --reporter expanded
 
       - name: Build release APK
         run: flutter build apk --release

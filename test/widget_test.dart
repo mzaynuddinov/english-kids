@@ -3,12 +3,18 @@ import 'dart:io';
 import 'package:english_kids/app.dart';
 import 'package:english_kids/services/preferences_service.dart';
 import 'package:english_kids/services/progress_service.dart';
+import 'package:english_kids/services/reminder_service.dart';
 import 'package:english_kids/services/vocabulary_service.dart';
 import 'package:english_kids/theme.dart';
 import 'package:english_kids/widgets/error_fallback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> disposeApp(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump();
+}
 
 Future<void> pumpApp(WidgetTester tester) async {
   tester.view.physicalSize = const Size(1080, 1920);
@@ -41,7 +47,10 @@ void main() {
     };
   });
 
-  tearDown(VocabularyService.debugReset);
+  tearDown(() {
+    VocabularyService.debugReset();
+    ReminderService.instance.cancelAllTimers();
+  });
 
   testWidgets('first frame shows the Tajik app name, not a black screen', (tester) async {
     await tester.pumpWidget(const EnglishKidsApp());
@@ -50,6 +59,7 @@ void main() {
     expect(find.text(appName), findsWidgets);
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
+    await disposeApp(tester);
   });
 
   testWidgets('home shell renders after vocabulary load', (tester) async {
@@ -61,6 +71,7 @@ void main() {
     expect(find.text('Алифбо'), findsOneWidget);
     expect(find.textContaining('Калимаи имрӯз'), findsOneWidget);
     expect(find.textContaining('Грамматикаи асосӣ'), findsWidgets);
+    await disposeApp(tester);
   });
 
   testWidgets('drawer contains required destinations', (tester) async {
@@ -83,12 +94,13 @@ void main() {
     expect(find.text('Танзимот'), findsWidgets);
     expect(find.text('Таҳиягар'), findsOneWidget);
     expect(find.text('Дар бораи барнома'), findsOneWidget);
+    await disposeApp(tester);
   });
 
   testWidgets('fallback screen is child-friendly', (tester) async {
     await tester.pumpWidget(const ErrorFallback());
     expect(find.text(appName), findsOneWidget);
-    expect(find.text('Мушкилоти муваққатӣ ба вуҷуд омад.'), findsOneWidget);
+    expect(find.text('Мушкилоти мувақатӣ ба вуҷуд омад.'), findsOneWidget);
     expect(find.text('Дубора кӯшиш кунед'), findsOneWidget);
   });
 }
