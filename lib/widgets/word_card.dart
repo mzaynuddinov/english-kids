@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/word.dart';
 import '../theme.dart';
+import 'word_history_sheet.dart';
 
 /// Universal word card: theme-aware, hides empty sections, never shows "null".
 class WordCardWidget extends StatefulWidget {
@@ -305,6 +306,14 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                   ),
                 ),
               const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => showWordHistory(context, word),
+                  icon: const Icon(Icons.history_rounded),
+                  label: const Text('Таърихи ин талаба'),
+                ),
+              ),
               Row(
                 children: [
                   Expanded(

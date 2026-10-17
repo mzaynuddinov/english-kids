@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../models/student.dart';
+import '../models/word_learning.dart';
 import 'preferences_service.dart';
 import 'progress_service.dart';
 
@@ -153,6 +154,7 @@ class StudentService extends ChangeNotifier {
     await PreferencesService.instance.saveSet(learnedKey(id), {});
     await PreferencesService.instance.saveSet(savedKey(id), {});
     await PreferencesService.instance.saveRaw(progressKey(id), '');
+    await PreferencesService.instance.saveRaw(wordLearningKey(id), '{"words":{}}');
     if (currentStudentId == id) {
       currentStudentId = students.isNotEmpty ? students.first.id : null;
       if (currentStudentId != null) {

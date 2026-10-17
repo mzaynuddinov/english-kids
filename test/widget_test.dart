@@ -6,6 +6,7 @@ import 'package:english_kids/services/progress_service.dart';
 import 'package:english_kids/services/reminder_service.dart';
 import 'package:english_kids/services/student_service.dart';
 import 'package:english_kids/services/vocabulary_service.dart';
+import 'package:english_kids/services/word_learning_service.dart';
 import 'package:english_kids/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,7 @@ void main() {
     PreferencesService.instance.debugReset();
     ProgressService.instance.debugReset();
     StudentService.instance.debugReset();
+    WordLearningService.instance.debugReset();
     VocabularyService.debugLoader = () async {
       final raw = File('data/vocabulary.json').readAsStringSync();
       return VocabularyService.parseRaw(raw);
@@ -31,6 +33,7 @@ void main() {
     ReminderService.instance.cancelAllTimers();
     ReminderService.suppressTimersForTests = false;
     StudentService.instance.debugReset();
+    WordLearningService.instance.debugReset();
   });
 
   test('reminder service can be cancelled', () {

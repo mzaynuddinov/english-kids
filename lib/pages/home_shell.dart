@@ -16,6 +16,7 @@ import '../services/reminder_service.dart';
 import '../services/test_engine.dart';
 import '../services/tts_service.dart';
 import '../services/vocabulary_service.dart';
+import '../services/word_learning_service.dart';
 import '../theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
@@ -30,6 +31,7 @@ import 'grammar_page.dart';
 import 'pin_gate.dart';
 import 'practice_page.dart';
 import 'progress_page.dart';
+import 'oral_quiz_page.dart';
 import 'reminders_page.dart';
 import 'saved_page.dart';
 import 'settings_page.dart';
@@ -70,6 +72,7 @@ class _HomeShellState extends State<HomeShell> {
     super.initState();
     ReminderService.instance.onForegroundFire = _showInAppReminder;
     StudentService.instance.addListener(_onStudentChanged);
+    WordLearningService.instance.addListener(_onLexiconChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_loadData());
     });
@@ -79,11 +82,23 @@ class _HomeShellState extends State<HomeShell> {
   void dispose() {
     ReminderService.instance.onForegroundFire = null;
     StudentService.instance.removeListener(_onStudentChanged);
+    WordLearningService.instance.removeListener(_onLexiconChanged);
     super.dispose();
   }
 
   void _onStudentChanged() {
     if (mounted) unawaited(_loadData(silent: true));
+  }
+
+  void _onLexiconChanged() {
+    if (!mounted) return;
+    final service = WordLearningService.instance;
+    if (service.studentId == null) return;
+    if (service.studentId != StudentService.instance.currentStudentId) return;
+    setState(() {
+      learned = service.learnedIds();
+      saved = service.savedIds();
+    });
   }
 
   Future<void> _loadData({bool silent = false}) async {
@@ -106,7 +121,6 @@ class _HomeShellState extends State<HomeShell> {
       setState(() {
         words = vocab.words;
         loadError = vocab.ok ? null : (vocab.error ?? 'Калимаҳо бор нашуданд.');
-        loading = false;
       });
     } catch (error, stack) {
       debugPrint('Vocabulary load failed: $error\n$stack');
@@ -124,10 +138,25 @@ class _HomeShellState extends State<HomeShell> {
       final savedSet = await PreferencesService.instance
           .loadSet(StudentService.instance.savedKey())
           .timeout(const Duration(seconds: 4), onTimeout: () => <String>{});
+      final studentId = StudentService.instance.currentStudentId;
+      if (studentId != null && words.isNotEmpty) {
+        await WordLearningService.instance.openStudent(
+          studentId: studentId,
+          vocab: words,
+          legacyLearned: learnedSet,
+          legacySaved: savedSet,
+        );
+      }
       if (!mounted) return;
+      final service = WordLearningService.instance;
       setState(() {
-        learned = learnedSet;
-        saved = savedSet;
+        if (service.studentId == studentId && studentId != null && words.isNotEmpty) {
+          learned = service.learnedIds();
+          saved = service.savedIds();
+        } else {
+          learned = learnedSet;
+          saved = savedSet;
+        }
       });
     } catch (error, stack) {
       debugPrint('Progress load failed: $error\n$stack');
@@ -141,6 +170,9 @@ class _HomeShellState extends State<HomeShell> {
     } catch (error, stack) {
       debugPrint('Learning state load failed: $error\n$stack');
     } finally {
+      if (mounted && loading) {
+        setState(() => loading = false);
+      }
       _loadInFlight = false;
       if (_loadAgain && mounted) {
         _loadAgain = false;
@@ -200,36 +232,49 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _toggleSave(Word word) async {
-    final next = {...saved};
-    final added = !word.isMarked(next);
-    if (added) {
-      next.add(word.id);
-      next.remove(word.english);
+    final service = WordLearningService.instance;
+    final wasSaved = service.studentId == null
+        ? word.isMarked(saved)
+        : service.of(word.id).saved;
+    if (service.studentId != null) {
+      await service.setFlag(word.id, saved: !wasSaved);
     } else {
-      next.remove(word.id);
-      next.remove(word.english);
+      final next = {...saved};
+      if (wasSaved) {
+        next.remove(word.id);
+        next.remove(word.english);
+      } else {
+        next.add(word.id);
+      }
+      await PreferencesService.instance.saveSet(StudentService.instance.savedKey(), next);
+      if (mounted) setState(() => saved = next);
     }
-    await PreferencesService.instance.saveSet(StudentService.instance.savedKey(), next);
     if (!mounted) return;
-    setState(() => saved = next);
-    _feedback(added
-        ? '🔖 «${word.displayEnglish}» барои баъд захира шуд'
-        : '«${word.displayEnglish}» аз захираҳо хориҷ шуд');
+    _feedback(wasSaved
+        ? '«${word.displayEnglish}» аз захираҳо хориҷ шуд'
+        : '🔖 «${word.displayEnglish}» барои баъд захира шуд');
   }
 
   Future<void> _learn(Word word) async {
-    final next = {...learned};
-    final wasLearned = word.isMarked(next);
-    if (wasLearned) {
-      next.remove(word.id);
-      next.remove(word.english);
+    final service = WordLearningService.instance;
+    final wasLearned = service.studentId == null
+        ? word.isMarked(learned)
+        : service.of(word.id).learned;
+    if (service.studentId != null) {
+      await service.setFlag(word.id, learned: !wasLearned);
     } else {
-      next.add(word.id);
-      next.remove(word.english);
+      final next = {...learned};
+      if (wasLearned) {
+        next.remove(word.id);
+        next.remove(word.english);
+      } else {
+        next.add(word.id);
+      }
+      await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), next);
+      if (mounted) setState(() => learned = next);
     }
-    await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), next);
     if (!mounted) return;
-    setState(() => learned = next);
+    final learnedCount = service.studentId == null ? learned.length : service.learnedIds().length;
     try {
       var snap = ProgressService.instance
           .withActivity(ProgressService.instance.snapshot);
@@ -237,7 +282,7 @@ class _HomeShellState extends State<HomeShell> {
       snap = ProgressService.instance.bumpWord(snap, word.id, opened: 1);
       snap = snap.copyWith(
           achievements: ProgressService.instance
-              .computeAchievements(snap, learned: next.length));
+              .computeAchievements(snap, learned: learnedCount));
       await ProgressService.instance.save(snap);
     } catch (_) {}
     if (mounted) setState(() {});
@@ -831,6 +876,8 @@ class _HomeShellState extends State<HomeShell> {
             child: Column(
               children: [
                 _hero(progress, snap.streak),
+                const SizedBox(height: 12),
+                _oralQuizCard(),
                 if (active != null && !active.completed) ...[
                   const SizedBox(height: 12),
                   _continueCard(active),
@@ -900,6 +947,65 @@ class _HomeShellState extends State<HomeShell> {
           ),
         ),
       ],
+    );
+  }
+
+  Future<void> _openOralQuiz() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OralQuizPage(words: words, onSpeak: _speak),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Widget _oralQuizCard() {
+    final name = () {
+      final id = StudentService.instance.currentStudentId;
+      for (final student in StudentService.instance.students) {
+        if (student.id == id) return student.name;
+      }
+      return 'талаба';
+    }();
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => unawaited(_openOralQuiz()),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [teal600, cyan600]),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.record_voice_over_rounded, color: Colors.white),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Пурсиши луғат',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    ),
+                    Text(
+                      'Ҳамаи ${words.length} калимаро аз $name шифоҳӣ пурсед',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: cyan600),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -1324,6 +1430,10 @@ class _HomeShellState extends State<HomeShell> {
             _item(Icons.abc_rounded, 'Алифбо', () {
               Navigator.pop(context);
               unawaited(_openAlphabet());
+            }),
+            _item(Icons.record_voice_over_rounded, 'Пурсиши луғат', () {
+              Navigator.pop(context);
+              unawaited(_openOralQuiz());
             }),
             _item(Icons.menu_book_rounded, 'Калимаҳо', () {
               Navigator.pop(context);

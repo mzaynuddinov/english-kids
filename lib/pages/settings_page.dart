@@ -6,6 +6,7 @@ import '../services/preferences_service.dart';
 import '../services/progress_service.dart';
 import '../services/reminder_service.dart';
 import '../services/student_service.dart';
+import '../services/word_learning_service.dart';
 import '../theme.dart';
 import 'about_page.dart';
 import 'calendar_page.dart';
@@ -281,6 +282,10 @@ class SettingsPage extends StatelessWidget {
       ),
     );
     try {
+      final studentId = StudentService.instance.currentStudentId;
+      if (studentId != null) {
+        await WordLearningService.instance.clear(studentId);
+      }
       await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), {});
       await PreferencesService.instance.saveSet(StudentService.instance.savedKey(), {});
       await ProgressService.instance.resetLearning();
