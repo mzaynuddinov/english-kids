@@ -1186,7 +1186,7 @@ class _HomeShellState extends State<HomeShell> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${vocabLearned} аз ${words.length} калима',
+                '$vocabLearned аз ${words.length} калима',
                 style: const TextStyle(color: Color(0xFFCBD5E1)),
               ),
               Text(
