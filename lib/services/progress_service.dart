@@ -163,11 +163,13 @@ class ProgressSnapshot {
 class ProgressService extends ChangeNotifier {
   ProgressService._();
   static final ProgressService instance = ProgressService._();
-  static const _key = 'learning_state_v2';
+  static const _defaultKey = 'learning_state_v2';
+  String _key = _defaultKey;
 
   ProgressSnapshot snapshot = const ProgressSnapshot();
 
-  Future<ProgressSnapshot> load() async {
+  Future<ProgressSnapshot> load({String? key}) async {
+    if (key != null) _key = key;
     try {
       final raw = await PreferencesService.instance.loadRaw(_key);
       if (raw == null || raw.isEmpty) {
