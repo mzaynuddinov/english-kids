@@ -19,7 +19,23 @@ class _StudentsPageState extends State<StudentsPage> {
   @override
   void initState() {
     super.initState();
+    StudentService.instance.addListener(_onStudents);
     _load();
+  }
+
+  @override
+  void dispose() {
+    StudentService.instance.removeListener(_onStudents);
+    super.dispose();
+  }
+
+  void _onStudents() {
+    if (!mounted) return;
+    setState(() {
+      students = List.from(StudentService.instance.students);
+      currentId = StudentService.instance.currentStudentId;
+      loading = false;
+    });
   }
 
   Future<void> _load() async {

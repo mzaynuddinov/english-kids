@@ -6,6 +6,7 @@ import 'models/settings.dart';
 import 'pages/home_shell.dart';
 import 'services/preferences_service.dart';
 import 'services/reminder_service.dart';
+import 'services/student_service.dart';
 import 'theme.dart';
 import 'widgets/error_fallback.dart';
 
@@ -16,15 +17,29 @@ class EnglishKidsApp extends StatefulWidget {
   State<EnglishKidsApp> createState() => _EnglishKidsAppState();
 }
 
-class _EnglishKidsAppState extends State<EnglishKidsApp> {
+class _EnglishKidsAppState extends State<EnglishKidsApp> with WidgetsBindingObserver {
   AppSettings settings = const AppSettings();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_bootstrap());
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(StudentService.instance.refreshFromDisk());
+    }
   }
 
   Future<void> _bootstrap() async {

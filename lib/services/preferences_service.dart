@@ -1,98 +1,220 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/settings.dart';
 
+/// SharedPreferences plus a JSON file.
+///
+/// A timed-out or wiped preference cache must not be treated as an empty
+/// database. The file copy restores students, the PIN, and learning records.
 class PreferencesService {
   PreferencesService._();
   static final PreferencesService instance = PreferencesService._();
 
   SharedPreferences? _prefs;
   bool _ready = false;
-  Future<void>? _initFuture;
-
+  Future<void> _tail = Future<void>.value();
+  bool _fileLoaded = false;
   final Map<String, Object> _memory = {};
+  final Map<String, String> _fileCache = {};
+
+  Future<T> _sync<T>(Future<T> Function() action) {
+    final result = _tail.then((_) => action());
+    _tail = result.then((_) {}, onError: (_) {});
+    return result;
+  }
 
   Future<void> init() {
-    return _initFuture ??= _doInit();
+    return _sync(_doInit);
   }
 
   Future<void> _doInit() async {
-    if (_ready) return;
-    try {
-      _prefs = await SharedPreferences.getInstance().timeout(
-        const Duration(seconds: 4),
-      );
-    } catch (error, stack) {
-      debugPrint('SharedPreferences unavailable: $error\n$stack');
-      _prefs = null;
+    if (_ready && _prefs != null) return;
+    Object? lastError;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        final prefs = await SharedPreferences.getInstance().timeout(
+          const Duration(seconds: 8),
+        );
+        try {
+          await prefs.reload();
+        } catch (error) {
+          debugPrint('SharedPreferences reload skipped: $error');
+        }
+        _prefs = prefs;
+        _ready = true;
+        await _loadFile();
+        await _restoreMissing();
+        return;
+      } catch (error, stack) {
+        lastError = error;
+        debugPrint('SharedPreferences attempt ${attempt + 1} failed: $error\n$stack');
+        await Future<void>.delayed(Duration(milliseconds: 200 * (attempt + 1)));
+      }
     }
-    _ready = true;
+    _ready = false;
+    _prefs = null;
+    await _loadFile();
+    debugPrint('SharedPreferences unavailable, file copy only: $lastError');
   }
 
-  Future<AppSettings> loadSettings() async {
-    await init();
+  Future<void> reloadFromDisk() {
+    return _sync(() async {
+      await _doInit();
+      try {
+        await _prefs?.reload();
+      } catch (error, stack) {
+        debugPrint('SharedPreferences reload failed: $error\n$stack');
+      }
+      _fileLoaded = false;
+      await _loadFile();
+      await _restoreMissing();
+    });
+  }
+
+  Future<AppSettings> loadSettings() {
+    return _sync(() async {
+      await _doInit();
+      try {
+        return AppSettings(
+          themeMode: AppSettings.themeModeFromIndex(_readInt('themeMode')),
+          textScale: AppSettings.scaleFrom(_readDouble('textScale')),
+          voiceGender: AppSettings.genderFrom(_readString('voiceGender')),
+          speechRate: AppSettings.rateFrom(_readDouble('speechRate')),
+        );
+      } catch (error, stack) {
+        debugPrint('Corrupt settings, using defaults: $error\n$stack');
+        return const AppSettings();
+      }
+    });
+  }
+
+  Future<void> saveSettings(AppSettings settings) {
+    return _sync(() async {
+      await _doInit();
+      await _writeInt('themeMode', settings.themeMode.index);
+      await _writeDouble('textScale', settings.textScale);
+      await _writeString('voiceGender', settings.voiceGender);
+      await _writeDouble('speechRate', settings.speechRate);
+    });
+  }
+
+  Future<Set<String>> loadSet(String key) {
+    return _sync(() async {
+      await _doInit();
+      return _loadSet(key);
+    });
+  }
+
+  Future<bool> saveSet(String key, Set<String> values) {
+    return _sync(() async {
+      await _doInit();
+      return _saveSet(key, values);
+    });
+  }
+
+  Future<String?> loadRaw(String key) {
+    return _sync(() async {
+      await _doInit();
+      return _loadRaw(key);
+    });
+  }
+
+  Future<bool> saveRaw(String key, String value) {
+    return _sync(() async {
+      await _doInit();
+      return _saveRaw(key, value);
+    });
+  }
+
+  Set<String> _loadSet(String key) {
     try {
-      return AppSettings(
-        themeMode: AppSettings.themeModeFromIndex(_readInt('themeMode')),
-        textScale: AppSettings.scaleFrom(_readDouble('textScale')),
-        voiceGender: AppSettings.genderFrom(_readString('voiceGender')),
-        speechRate: AppSettings.rateFrom(_readDouble('speechRate')),
-      );
-    } catch (error, stack) {
-      debugPrint('Corrupt settings, using defaults: $error\n$stack');
-      return const AppSettings();
-    }
-  }
-
-  Future<void> saveSettings(AppSettings settings) async {
-    await init();
-    await _writeInt('themeMode', settings.themeMode.index);
-    await _writeDouble('textScale', settings.textScale);
-    await _writeString('voiceGender', settings.voiceGender);
-    await _writeDouble('speechRate', settings.speechRate);
-  }
-
-  Future<Set<String>> loadSet(String key) async {
-    await init();
-    try {
-      final list = _prefs?.getStringList(key) ?? (_memory[key] as List<String>?);
-      return {...?list};
+      final prefs = _prefs;
+      if (prefs != null && prefs.containsKey(key)) {
+        final list = prefs.getStringList(key) ?? <String>[];
+        _memory[key] = list;
+        _fileCache['set:$key'] = jsonEncode(list);
+        return {...list};
+      }
+      final stored = _fileCache['set:$key'];
+      if (stored != null) {
+        final decoded = jsonDecode(stored);
+        if (decoded is List) {
+          final list = [for (final item in decoded) '$item'];
+          _memory[key] = list;
+          unawaited(prefs?.setStringList(key, list));
+          return {...list};
+        }
+      }
+      final mem = _memory[key];
+      if (mem is List<String>) return {...mem};
+      return <String>{};
     } catch (error, stack) {
       debugPrint('Corrupt set $key: $error\n$stack');
+      final mem = _memory[key];
+      if (mem is List<String>) return {...mem};
       return <String>{};
     }
   }
 
-  Future<void> saveSet(String key, Set<String> values) async {
-    await init();
+  Future<bool> _saveSet(String key, Set<String> values) async {
     final list = values.toList();
     _memory[key] = list;
+    _fileCache['set:$key'] = jsonEncode(list);
+    final fileOk = await _writeFile();
+    var prefsOk = false;
     try {
-      await _prefs?.setStringList(key, list);
+      prefsOk = await _prefs?.setStringList(key, list) ?? false;
     } catch (error, stack) {
       debugPrint('Failed to persist $key: $error\n$stack');
     }
+    return prefsOk || fileOk;
   }
 
-  Future<String?> loadRaw(String key) async {
-    await init();
+  String? _loadRaw(String key) {
     try {
-      return _prefs?.getString(key) ?? _memory[key] as String?;
+      final prefs = _prefs;
+      if (prefs != null && prefs.containsKey(key)) {
+        final disk = prefs.getString(key);
+        if (disk != null) {
+          _memory[key] = disk;
+          _fileCache[key] = disk;
+          return disk;
+        }
+      }
+      final stored = _fileCache[key];
+      if (stored != null) {
+        _memory[key] = stored;
+        if (prefs != null && !prefs.containsKey(key)) {
+          unawaited(prefs.setString(key, stored));
+        }
+        return stored;
+      }
+      final mem = _memory[key];
+      return mem is String ? mem : null;
     } catch (error, stack) {
       debugPrint('Corrupt raw $key: $error\n$stack');
-      return null;
+      final mem = _memory[key];
+      return mem is String ? mem : null;
     }
   }
 
-  Future<void> saveRaw(String key, String value) async {
-    await init();
+  Future<bool> _saveRaw(String key, String value) async {
     _memory[key] = value;
+    _fileCache[key] = value;
+    final fileOk = await _writeFile();
+    var prefsOk = false;
     try {
-      await _prefs?.setString(key, value);
+      prefsOk = await _prefs?.setString(key, value) ?? false;
     } catch (error) {
       debugPrint('writeRaw $key failed: $error');
     }
+    return prefsOk || fileOk;
   }
 
   int? _readInt(String key) {
@@ -139,18 +261,77 @@ class PreferencesService {
 
   Future<void> _writeString(String key, String value) async {
     _memory[key] = value;
+    _fileCache[key] = value;
     try {
       await _prefs?.setString(key, value);
     } catch (error) {
       debugPrint('writeString $key failed: $error');
     }
+    await _writeFile();
+  }
+
+  Future<void> _loadFile() async {
+    if (_fileLoaded) return;
+    _fileLoaded = true;
+    try {
+      final file = await _storeFile();
+      if (!await file.exists()) return;
+      final decoded = jsonDecode(await file.readAsString());
+      if (decoded is! Map) return;
+      _fileCache
+        ..clear()
+        ..addAll({
+          for (final entry in decoded.entries) '${entry.key}': '${entry.value}',
+        });
+    } catch (error) {
+      debugPrint('Durable store read skipped: $error');
+    }
+  }
+
+  Future<void> _restoreMissing() async {
+    final prefs = _prefs;
+    if (prefs == null || _fileCache.isEmpty) return;
+    try {
+      for (final entry in _fileCache.entries.toList()) {
+        if (entry.key.startsWith('set:')) {
+          final key = entry.key.substring(4);
+          if (prefs.containsKey(key)) continue;
+          final decoded = jsonDecode(entry.value);
+          if (decoded is List) {
+            await prefs.setStringList(key, [for (final item in decoded) '$item']);
+          }
+        } else if (!prefs.containsKey(entry.key)) {
+          await prefs.setString(entry.key, entry.value);
+        }
+      }
+    } catch (error, stack) {
+      debugPrint('Durable restore skipped: $error\n$stack');
+    }
+  }
+
+  Future<bool> _writeFile() async {
+    try {
+      final file = await _storeFile();
+      await file.writeAsString(jsonEncode(_fileCache), flush: true);
+      return true;
+    } catch (error) {
+      debugPrint('Durable store write skipped: $error');
+      return false;
+    }
+  }
+
+  Future<File> _storeFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/anglisiro_store.json');
   }
 
   @visibleForTesting
   void debugReset() {
     _prefs = null;
     _ready = false;
-    _initFuture = null;
+    _fileLoaded = false;
+    _tail = Future<void>.value();
     _memory.clear();
+    _fileCache.clear();
   }
 }

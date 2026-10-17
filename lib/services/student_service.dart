@@ -18,23 +18,80 @@ class StudentService extends ChangeNotifier {
   List<Student> students = [];
   String? currentStudentId;
   bool _initialized = false;
+  Future<void>? _initFuture;
+  bool _allowEmptyWrite = false;
 
   String learnedKey([String? id]) => 'learned_${id ?? currentStudentId ?? "default"}';
   String savedKey([String? id]) => 'saved_${id ?? currentStudentId ?? "default"}';
   String progressKey([String? id]) => 'learning_state_v2_${id ?? currentStudentId ?? "default"}';
 
-  Future<void> init() async {
+  Future<void> init() {
+    return _initFuture ??= _doInit();
+  }
+
+  Future<void> _doInit() async {
     if (_initialized) return;
-    _initialized = true;
     try {
       await _loadStudents();
       await _ensureDefaultAndMigrate();
       await _loadCurrent();
+      _initialized = true;
       notifyListeners();
     } catch (error) {
-      _initialized = false;
+      _initFuture = null;
       rethrow;
     }
+  }
+
+  /// Re-reads storage after the app returns to the foreground.
+  /// A failed or empty read never erases students that are still in memory,
+  /// and an in-memory list is written back if the disk copy is missing.
+  Future<void> refreshFromDisk() async {
+    await PreferencesService.instance.reloadFromDisk();
+    if (!_initialized) {
+      await init();
+      return;
+    }
+    final raw = await PreferencesService.instance.loadRaw(_studentsKey);
+    if (raw == null) {
+      if (students.isNotEmpty) await _saveStudents();
+      return;
+    }
+    List<Student>? disk;
+    try {
+      if (raw.isEmpty || raw == '[]') {
+        disk = [];
+      } else {
+        final list = jsonDecode(raw) as List;
+        disk = list
+            .whereType<Map>()
+            .map((e) => Student.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+    } catch (error, stack) {
+      debugPrint('Student refresh kept the in-memory list: $error\n$stack');
+      return;
+    }
+    final loaded = disk;
+    if (loaded == null) return;
+    if (loaded.isEmpty && students.isNotEmpty) {
+      await _saveStudents();
+      return;
+    }
+    final byId = <String, Student>{for (final student in loaded) student.id: student};
+    var memoryChangedDisk = loaded.length != students.length;
+    for (final student in students) {
+      final previous = byId[student.id];
+      if (previous == null || previous.name != student.name) memoryChangedDisk = true;
+      byId[student.id] = student;
+    }
+    final merged = byId.values.toList();
+    final before = students.map((student) => '${student.id}:${student.name}').join('|');
+    students = merged;
+    await _loadCurrent();
+    final after = students.map((student) => '${student.id}:${student.name}').join('|');
+    if (memoryChangedDisk && students.isNotEmpty) await _saveStudents();
+    if (before != after) notifyListeners();
   }
 
   @visibleForTesting
@@ -42,6 +99,8 @@ class StudentService extends ChangeNotifier {
     students = [];
     currentStudentId = null;
     _initialized = false;
+    _initFuture = null;
+    _allowEmptyWrite = false;
   }
 
   Future<void> _loadStudents() async {
@@ -58,15 +117,26 @@ class StudentService extends ChangeNotifier {
           .toList();
     } catch (e) {
       debugPrint('Failed to parse students: $e');
-      students = [];
     }
   }
 
-  Future<void> _saveStudents() async {
-    await PreferencesService.instance.saveRaw(
+  Future<bool> _saveStudents() async {
+    if (students.isEmpty && !_allowEmptyWrite) {
+      final existing = await PreferencesService.instance.loadRaw(_studentsKey);
+      if (existing != null && existing.isNotEmpty && existing != '[]') {
+        debugPrint('Blocked an empty student list from erasing saved students');
+        await _loadStudents();
+        notifyListeners();
+        return false;
+      }
+    }
+    final ok = await PreferencesService.instance.saveRaw(
       _studentsKey,
       jsonEncode(students.map((s) => s.toJson()).toList()),
     );
+    _allowEmptyWrite = false;
+    if (!ok) debugPrint('Student list was not written to storage');
+    return ok;
   }
 
   Future<void> _loadCurrent() async {
@@ -111,7 +181,7 @@ class StudentService extends ChangeNotifier {
   }
 
   Future<Student?> getCurrentStudent() async {
-    if (currentStudentId == null) await init();
+    if (!_initialized) await init();
     try {
       return students.firstWhere((s) => s.id == currentStudentId);
     } catch (_) {
@@ -135,7 +205,12 @@ class StudentService extends ChangeNotifier {
     final id = '${DateTime.now().microsecondsSinceEpoch}_${students.length}';
     final student = Student(id: id, name: trimmed);
     students.add(student);
-    await _saveStudents();
+    final saved = await _saveStudents();
+    if (!saved) {
+      students.removeWhere((item) => item.id == id);
+      notifyListeners();
+      throw StateError('Талаба захира нашуд. Боз кӯшиш кунед.');
+    }
     if (currentStudentId == null) {
       await setCurrentStudent(id);
     } else {
@@ -150,14 +225,24 @@ class StudentService extends ChangeNotifier {
     final trimmed = newName.trim();
     if (trimmed.isEmpty) return;
     students[idx] = students[idx].copyWith(name: trimmed);
-    await _saveStudents();
+    final saved = await _saveStudents();
+    if (!saved) {
+      await _loadStudents();
+      return;
+    }
     notifyListeners();
   }
 
   Future<void> deleteStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
     students.removeWhere((s) => s.id == id);
-    await _saveStudents();
+    if (students.isEmpty) _allowEmptyWrite = true;
+    final saved = await _saveStudents();
+    if (!saved) {
+      await _loadStudents();
+      notifyListeners();
+      return;
+    }
     await PreferencesService.instance.saveSet(learnedKey(id), {});
     await PreferencesService.instance.saveSet(savedKey(id), {});
     await PreferencesService.instance.saveRaw(progressKey(id), '');

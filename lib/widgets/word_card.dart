@@ -161,14 +161,27 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                 _phoneticBox(scheme, onCard, muted),
               ],
               const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: FilledButton.tonalIcon(
-                  onPressed: () => widget.onSpeak(word.english),
-                  icon: const Icon(Icons.volume_up_rounded),
-                  label: const Text('Гӯш кардан'),
-                ),
+              Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Гӯш кардан',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: () => widget.onSpeak(word.english),
+                    icon: const Icon(Icons.volume_up_rounded),
+                  ),
+                  IconButton(
+                    tooltip: 'Таърихи ин талаба',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: () => showWordHistory(context, word),
+                    icon: const Icon(Icons.history_rounded),
+                  ),
+                  IconButton(
+                    tooltip: 'Ёдрас',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: () => widget.onRemind(word),
+                    icon: const Icon(Icons.alarm_rounded),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               _accordion(
@@ -306,50 +319,20 @@ class _WordCardWidgetState extends State<WordCardWidget> {
                   ),
                 ),
               const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: () => showWordHistory(context, word),
-                  icon: const Icon(Icons.history_rounded),
-                  label: const Text('Таърихи ин талаба'),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () => widget.onLearn(word),
+                  icon: Icon(widget.learned ? Icons.undo_rounded : Icons.check_rounded),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: widget.learned ? Colors.orange.shade700 : emerald600,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  label: Text(widget.learned ? 'Бозгашт' : 'Омӯхта шуд'),
                 ),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 48,
-                      child: ElevatedButton.icon(
-                        onPressed: () => widget.onLearn(word),
-                        icon: Icon(widget.learned
-                            ? Icons.undo_rounded
-                            : Icons.check_rounded),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.learned ? Colors.orange.shade700 : emerald600,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                        ),
-                        label: Text(widget.learned ? 'Бозгашт' : 'Омӯхта шуд'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      onPressed: () => widget.onRemind(word),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: onCard,
-                        side: BorderSide(color: scheme.outline),
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                      icon: const Icon(Icons.alarm_rounded),
-                      label: const Text('Ёдрас'),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

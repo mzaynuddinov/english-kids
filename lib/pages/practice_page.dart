@@ -5,6 +5,7 @@ import '../models/word.dart';
 import '../services/progress_service.dart';
 import '../theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/word_history_sheet.dart';
 
 class PracticePage extends StatelessWidget {
   final List<Word> words;
@@ -111,7 +112,6 @@ class _MistakeCard extends StatelessWidget {
                 children: [
                   Expanded(child: Text(word.displayEnglish, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.1))),
                   IconButton(tooltip: saved ? 'Аз захира хориҷ' : 'Барои баъд', onPressed: onSave, icon: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded, color: cyan700)),
-                  IconButton(tooltip: 'Ёдрас', onPressed: onRemind, icon: const Icon(Icons.alarm_rounded, color: cyan700)),
                 ],
               ),
               Text(word.tajik, style: const TextStyle(fontWeight: FontWeight.w800)),
@@ -122,28 +122,35 @@ class _MistakeCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 44,
-                      child: FilledButton.tonalIcon(
-                        onPressed: () => onSpeak(word.english),
-                        icon: const Icon(Icons.volume_up_rounded),
-                        label: const Text('🔊 Гӯш кардан'),
-                      ),
-                    ),
+                  IconButton(
+                    tooltip: 'Гӯш кардан',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: () => onSpeak(word.english),
+                    icon: const Icon(Icons.volume_up_rounded),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: SizedBox(
-                      height: 44,
-                      child: FilledButton.icon(
-                        onPressed: onRepeat,
-                        icon: const Icon(Icons.menu_book_rounded),
-                        label: const Text('📚 Такрор кардан'),
-                      ),
-                    ),
+                  IconButton(
+                    tooltip: 'Таърихи ин талаба',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: () => showWordHistory(context, word),
+                    icon: const Icon(Icons.history_rounded),
+                  ),
+                  IconButton(
+                    tooltip: 'Ёдрас',
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    onPressed: onRemind,
+                    icon: const Icon(Icons.alarm_rounded, color: cyan700),
                   ),
                 ],
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: FilledButton.icon(
+                  onPressed: onRepeat,
+                  icon: const Icon(Icons.menu_book_rounded),
+                  label: const Text('Такрор кардан'),
+                ),
               ),
             ],
           ),

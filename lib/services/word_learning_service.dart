@@ -59,20 +59,29 @@ class WordLearningService extends ChangeNotifier {
     }
     this.studentId = studentId;
     byId = loaded;
-    if (migrated) await _persist();
+    if (migrated) {
+      final saved = await _persist();
+      if (!saved) debugPrint('Word learning migration was kept in memory only');
+    }
     notifyListeners();
   }
 
-  Future<void> setFlag(
+  Future<bool> setFlag(
     String wordId, {
     bool? learned,
     bool? saved,
   }) async {
     final id = studentId;
-    if (id == null || wordId.isEmpty) return;
+    if (id == null || wordId.isEmpty) return false;
+    final previous = byId;
     byId = Lexicon.withFlag(byId, wordId, learned: learned, saved: saved);
-    await _persist();
+    final ok = await _persist();
+    if (!ok) {
+      byId = previous;
+      return false;
+    }
     notifyListeners();
+    return true;
   }
 
   Future<WordLearning> record(
@@ -83,8 +92,13 @@ class WordLearningService extends ChangeNotifier {
     final id = studentId;
     final when = (at ?? DateTime.now()).millisecondsSinceEpoch;
     if (id == null || wordId.isEmpty) return const WordLearning();
+    final previous = byId;
     byId = Lexicon.record(byId, wordId, mark, at: when);
-    await _persist();
+    final ok = await _persist();
+    if (!ok) {
+      byId = previous;
+      throw StateError('Натиҷа захира нашуд');
+    }
     await _mirrorProgress(wordId, mark);
     notifyListeners();
     return of(wordId);
@@ -100,15 +114,16 @@ class WordLearningService extends ChangeNotifier {
     }
   }
 
-  Future<void> _persist() async {
+  Future<bool> _persist() async {
     final id = studentId;
-    if (id == null) return;
-    await PreferencesService.instance.saveRaw(
+    if (id == null) return false;
+    final saved = await PreferencesService.instance.saveRaw(
       wordLearningKey(id),
       jsonEncode(Lexicon.encode(byId)),
     );
     await PreferencesService.instance.saveSet('learned_$id', learnedIds());
     await PreferencesService.instance.saveSet('saved_$id', savedIds());
+    return saved;
   }
 
   Future<void> _mirrorProgress(String wordId, OralMark mark) async {

@@ -34,21 +34,23 @@ class PinService {
     return h.toRadixString(16).padLeft(16, '0');
   }
 
-  Future<String> _salt() async {
-    var salt = await PreferencesService.instance.loadRaw(_saltKey);
-    if (salt == null || salt.isEmpty) {
-      salt = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
-      await PreferencesService.instance.saveRaw(_saltKey, salt);
-    }
+  Future<String?> _readSalt() async {
+    final salt = await PreferencesService.instance.loadRaw(_saltKey);
+    if (salt == null || salt.isEmpty) return null;
     return salt;
   }
 
   Future<bool> setPin(String pin) async {
     if (!validFormat(pin)) return false;
     try {
-      final salt = await _salt();
-      await PreferencesService.instance.saveRaw(_hashKey, digest(pin, salt));
-      return true;
+      final salt = await _readSalt() ?? DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+      final hash = digest(pin, salt);
+      final saltOk = await PreferencesService.instance.saveRaw(_saltKey, salt);
+      final hashOk = await PreferencesService.instance.saveRaw(_hashKey, hash);
+      if (!saltOk || !hashOk) return false;
+      final storedHash = await PreferencesService.instance.loadRaw(_hashKey);
+      final storedSalt = await PreferencesService.instance.loadRaw(_saltKey);
+      return storedHash == hash && storedSalt == salt;
     } catch (error, stack) {
       debugPrint('PIN save failed: $error\n$stack');
       return false;
@@ -58,8 +60,8 @@ class PinService {
   Future<bool> verify(String pin) async {
     try {
       final stored = await PreferencesService.instance.loadRaw(_hashKey);
-      if (stored == null || stored.isEmpty) return false;
-      final salt = await _salt();
+      final salt = await _readSalt();
+      if (stored == null || stored.isEmpty || salt == null) return false;
       return stored == digest(pin, salt);
     } catch (error, stack) {
       debugPrint('PIN verify failed: $error\n$stack');

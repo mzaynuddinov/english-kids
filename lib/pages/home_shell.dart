@@ -238,8 +238,12 @@ class _HomeShellState extends State<HomeShell> {
     if (!_needStudent()) return;
     final service = WordLearningService.instance;
     final wasSaved = service.of(word.id).saved;
-    await service.setFlag(word.id, saved: !wasSaved);
+    final savedNow = await service.setFlag(word.id, saved: !wasSaved);
     if (!mounted) return;
+    if (!savedNow) {
+      _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
+      return;
+    }
     _feedback(wasSaved
         ? '«${word.displayEnglish}» аз захираҳо хориҷ шуд'
         : '🔖 «${word.displayEnglish}» барои баъд захира шуд');
@@ -252,7 +256,11 @@ class _HomeShellState extends State<HomeShell> {
         ? word.isMarked(learned)
         : service.of(word.id).learned;
     if (service.studentId != null) {
-      await service.setFlag(word.id, learned: !wasLearned);
+      final savedNow = await service.setFlag(word.id, learned: !wasLearned);
+      if (!savedNow) {
+        if (mounted) _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
+        return;
+      }
     } else {
       final next = {...learned};
       if (wasLearned) {
@@ -314,7 +322,11 @@ class _HomeShellState extends State<HomeShell> {
       ),
     );
     await ProgressService.instance.save(ProgressService.instance.withActivity(next));
-    await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
+    final savedNow = await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
+    if (!savedNow) {
+      if (mounted) _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
+      return;
+    }
     if (mounted) setState(() {});
     _feedback(already
         ? 'Ҳарфи ${letter.letter} ба ҳолати қаблӣ баргардонида шуд.'
