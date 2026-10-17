@@ -66,11 +66,14 @@ class _EnglishKidsAppState extends State<EnglishKidsApp> {
         } catch (_) {
           data = MediaQueryData.fromView(View.of(builderContext));
         }
-        return MediaQuery(
-          data: data.copyWith(
-            textScaler: TextScaler.linear(settings.textScale.clamp(0.85, 1.25)),
+        return ColoredBox(
+          color: const Color(0xFFF8FAFC),
+          child: MediaQuery(
+            data: data.copyWith(
+              textScaler: TextScaler.linear(settings.textScale.clamp(0.85, 1.25)),
+            ),
+            child: child ?? const ErrorFallback(),
           ),
-          child: child ?? const ErrorFallback(),
         );
       },
       home: HomeShell(settings: settings, onSettingsChanged: _save),

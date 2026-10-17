@@ -32,6 +32,7 @@ class ReminderService {
   static const _channelDescription = 'Ёдраскуниҳои калимаҳои англисӣ';
 
   Future<void> initialize() async {
+    if (suppressTimersForTests) return;
     if (ready) return;
     try {
       tzdata.initializeTimeZones();

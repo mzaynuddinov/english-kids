@@ -13,7 +13,7 @@ class ErrorFallback extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Material(
-        color: slate950,
+        color: const Color(0xFFF8FAFC),
         child: SafeArea(
           child: Center(
             child: Padding(
@@ -27,7 +27,7 @@ class ErrorFallback extends StatelessWidget {
                     appName,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: slate900,
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
                     ),
@@ -37,7 +37,7 @@ class ErrorFallback extends StatelessWidget {
                     'Мушкилоти муваққатӣ ба вуҷуд омад.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF99F6E4),
+                      color: teal700,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),

@@ -19,6 +19,7 @@ import '../services/vocabulary_service.dart';
 import '../theme.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/error_fallback.dart';
 import '../widgets/search_sheet.dart';
 import '../widgets/word_card.dart';
 import 'about_page.dart';
@@ -651,10 +652,26 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    try {
+      return _buildScaffold(context);
+    } catch (error, stack) {
+      debugPrint('HomeShell build failed: $error\n$stack');
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: ErrorFallback(
+          onRetry: () {
+            if (mounted) setState(() {});
+          },
+        ),
+      );
+    }
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     final snap = ProgressService.instance.snapshot;
-    final pages = [
-      _home(),
-      SavedPage(
+    final Widget page;
+    if (tab == 1) {
+      page = SavedPage(
         words: words,
         saved: saved,
         learned: learned,
@@ -663,8 +680,9 @@ class _HomeShellState extends State<HomeShell> {
         onLearn: _learn,
         onRemind: _scheduleWord,
         voiceGender: widget.settings.voiceGender,
-      ),
-      ProgressPage(
+      );
+    } else if (tab == 2) {
+      page = ProgressPage(
         words: words,
         learned: learned,
         saved: saved,
@@ -672,8 +690,10 @@ class _HomeShellState extends State<HomeShell> {
         onPractice: _openPractice,
         onHistory: () => unawaited(_openHistory()),
         onCalendar: () => unawaited(_openCalendar()),
-      ),
-    ];
+      );
+    } else {
+      page = _home();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -707,10 +727,7 @@ class _HomeShellState extends State<HomeShell> {
       drawer: _drawer(),
       body: SafeArea(
         top: false,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
-          child: pages[tab],
-        ),
+        child: page,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: tab,

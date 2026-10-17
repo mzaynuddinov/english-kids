@@ -7,10 +7,9 @@ import 'app.dart';
 import 'widgets/error_fallback.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  _installErrorHandlers();
-
   runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    _installErrorHandlers();
     runApp(const EnglishKidsApp());
   }, (error, stack) {
     debugPrint('Uncaught zone error: $error\n$stack');
@@ -30,7 +29,7 @@ void _installErrorHandlers() {
   ErrorWidget.builder = (details) {
     debugPrint('Widget build error: ${details.exceptionAsString()}');
     return Material(
-      color: const Color(0xFFF1F5F9),
+      color: const Color(0xFFF8FAFC),
       child: ErrorFallback(
         onRetry: () => runApp(const EnglishKidsApp()),
       ),

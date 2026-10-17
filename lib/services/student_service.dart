@@ -27,6 +27,12 @@ class StudentService extends ChangeNotifier {
     notifyListeners();
   }
 
+  @visibleForTesting
+  void debugReset() {
+    students = [];
+    currentStudentId = null;
+  }
+
   Future<void> _loadStudents() async {
     final raw = await PreferencesService.instance.loadRaw(_studentsKey);
     if (raw == null || raw.isEmpty) {
