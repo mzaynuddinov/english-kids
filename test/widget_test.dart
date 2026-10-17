@@ -39,6 +39,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
+    ReminderService.suppressTimersForTests = true;
     SharedPreferences.setMockInitialValues({});
     PreferencesService.instance.debugReset();
     ProgressService.instance.debugReset();
@@ -51,6 +52,7 @@ void main() {
   tearDown(() {
     VocabularyService.debugReset();
     ReminderService.instance.cancelAllTimers();
+    ReminderService.suppressTimersForTests = false;
   });
 
   testWidgets('first frame shows the Tajik app name, not a black screen', (tester) async {

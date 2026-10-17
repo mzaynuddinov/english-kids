@@ -24,6 +24,9 @@ class ReminderService {
   String? lastError;
   ReminderCallback? onForegroundFire;
 
+  /// When true, foreground timers are not armed. Tests set this to avoid hangs.
+  static bool suppressTimersForTests = false;
+
   static const _channelId = 'word_review';
   static const _channelName = 'Такрори калимаҳо';
   static const _channelDescription = 'Ёдраскуниҳои калимаҳои англисӣ';
@@ -211,9 +214,7 @@ class ReminderService {
   }
 
   void _armForeground(WordReminder reminder, String gender, double rate) {
-    if (WidgetsBinding.instance is TestWidgetsFlutterBinding || WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
-      return;
-    }
+    if (suppressTimersForTests) return;
     _cancelTimers(reminder.id);
     final remaining = reminder.repeatTotal - reminder.completed;
     if (remaining <= 0) return;
@@ -227,9 +228,7 @@ class ReminderService {
   }
 
   void rearmActive(String gender, double rate) {
-    if (WidgetsBinding.instance is TestWidgetsFlutterBinding || WidgetsBinding.instance.runtimeType.toString().contains('Test')) {
-      return;
-    }
+    if (suppressTimersForTests) return;
     for (final reminder in ProgressService.instance.snapshot.reminders) {
       if (reminder.paused || reminder.finished) continue;
       _armForeground(reminder, gender, rate);
