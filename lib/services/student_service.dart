@@ -24,6 +24,7 @@ class StudentService extends ChangeNotifier {
     await _loadStudents();
     await _ensureDefaultAndMigrate();
     await _loadCurrent();
+    notifyListeners();
   }
 
   Future<void> _loadStudents() async {
@@ -38,7 +39,8 @@ class StudentService extends ChangeNotifier {
           .whereType<Map>()
           .map((e) => Student.fromJson(Map<String, dynamic>.from(e)))
           .toList();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to parse students: $e');
       students = [];
     }
   }
@@ -63,13 +65,11 @@ class StudentService extends ChangeNotifier {
   Future<void> _ensureDefaultAndMigrate() async {
     if (students.isNotEmpty) return;
 
-    // Create default student and migrate old global data
     const defaultId = 'default';
     final defaultStudent = Student(id: defaultId, name: 'Талабаи асосӣ');
     students = [defaultStudent];
     await _saveStudents();
 
-    // Migrate old keys if they exist
     final oldLearned = await PreferencesService.instance.loadSet('learned');
     if (oldLearned.isNotEmpty) {
       await PreferencesService.instance.saveSet(learnedKey(defaultId), oldLearned);
@@ -89,28 +89,34 @@ class StudentService extends ChangeNotifier {
 
   Future<Student?> getCurrentStudent() async {
     if (currentStudentId == null) await init();
-    return students.firstWhere(
-      (s) => s.id == currentStudentId,
-      orElse: () => students.isNotEmpty ? students.first : Student(id: 'default', name: 'Талаба'),
-    );
+    try {
+      return students.firstWhere((s) => s.id == currentStudentId);
+    } catch (_) {
+      return students.isNotEmpty ? students.first : null;
+    }
   }
 
   Future<void> setCurrentStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
     currentStudentId = id;
     await PreferencesService.instance.saveRaw(_currentKey, id);
-    // Reload progress for the new student
     await ProgressService.instance.load(key: progressKey(id));
     notifyListeners();
   }
 
   Future<Student> addStudent(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError('Ном холӣ аст');
+    }
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final student = Student(id: id, name: name.trim().isEmpty ? 'Талаба' : name.trim());
+    final student = Student(id: id, name: trimmed);
     students.add(student);
     await _saveStudents();
     if (currentStudentId == null) {
       await setCurrentStudent(id);
+    } else {
+      notifyListeners();
     }
     return student;
   }
@@ -118,14 +124,17 @@ class StudentService extends ChangeNotifier {
   Future<void> renameStudent(String id, String newName) async {
     final idx = students.indexWhere((s) => s.id == id);
     if (idx < 0) return;
-    students[idx] = students[idx].copyWith(name: newName.trim());
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty) return;
+    students[idx] = students[idx].copyWith(name: trimmed);
     await _saveStudents();
+    notifyListeners();
   }
 
   Future<void> deleteStudent(String id) async {
+    if (students.length <= 1) return;
     students.removeWhere((s) => s.id == id);
     await _saveStudents();
-    // Clean up data
     await PreferencesService.instance.saveSet(learnedKey(id), {});
     await PreferencesService.instance.saveSet(savedKey(id), {});
     await PreferencesService.instance.saveRaw(progressKey(id), '');
@@ -135,9 +144,15 @@ class StudentService extends ChangeNotifier {
         await PreferencesService.instance.saveRaw(_currentKey, currentStudentId!);
         await ProgressService.instance.load(key: progressKey());
       }
-      notifyListeners();
     }
+    notifyListeners();
   }
 
-  Student? studentById(String id) => students.firstWhere((s) => s.id == id, orElse: () => Student(id: id, name: 'Талаба'));
+  Student? studentById(String id) {
+    try {
+      return students.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
 }

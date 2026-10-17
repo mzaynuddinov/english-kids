@@ -23,13 +23,21 @@ class _StudentsPageState extends State<StudentsPage> {
   }
 
   Future<void> _load() async {
-    await StudentService.instance.init();
-    if (!mounted) return;
-    setState(() {
-      students = List.from(StudentService.instance.students);
-      currentId = StudentService.instance.currentStudentId;
-      loading = false;
-    });
+    try {
+      await StudentService.instance.init();
+      if (!mounted) return;
+      setState(() {
+        students = List.from(StudentService.instance.students);
+        currentId = StudentService.instance.currentStudentId;
+        loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Хатогӣ дар боркунӣ: $e')),
+      );
+    }
   }
 
   Future<void> _addStudent() async {
@@ -46,6 +54,7 @@ class _StudentsPageState extends State<StudentsPage> {
             hintText: 'Масалан: Аҳмад',
           ),
           textCapitalization: TextCapitalization.words,
+          onSubmitted: (value) => Navigator.pop(ctx, value.trim()),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Бекор')),
@@ -56,18 +65,49 @@ class _StudentsPageState extends State<StudentsPage> {
         ],
       ),
     );
-    if (name == null || name.isEmpty) return;
-    await StudentService.instance.addStudent(name);
-    await _load();
+
+    if (name == null || name.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ном холӣ буда наметавонад')),
+        );
+      }
+      return;
+    }
+
+    try {
+      await StudentService.instance.addStudent(name);
+      await _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('«$name» илова шуд')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Хатогӣ: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _switchTo(String id) async {
-    await StudentService.instance.setCurrentStudent(id);
-    await _load();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Талабаи ҷорӣ: ${StudentService.instance.studentById(id)?.name ?? ""}')),
-      );
+    try {
+      await StudentService.instance.setCurrentStudent(id);
+      await _load();
+      if (mounted) {
+        final name = StudentService.instance.studentById(id)?.name ?? '';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Талабаи ҷорӣ: $name')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Хатогӣ дар гузариш: $e')),
+        );
+      }
     }
   }
 
@@ -92,11 +132,27 @@ class _StudentsPageState extends State<StudentsPage> {
       ),
     );
     if (name == null || name.isEmpty) return;
-    await StudentService.instance.renameStudent(student.id, name);
-    await _load();
+    try {
+      await StudentService.instance.renameStudent(student.id, name);
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Хатогӣ: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _delete(Student student) async {
+    if (students.length <= 1) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Охирин талаба нест карда намешавад')),
+        );
+      }
+      return;
+    }
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -113,15 +169,23 @@ class _StudentsPageState extends State<StudentsPage> {
       ),
     );
     if (confirm != true) return;
-    await StudentService.instance.deleteStudent(student.id);
-    await _load();
+    try {
+      await StudentService.instance.deleteStudent(student.id);
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Хатогӣ: $e')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Талабагон'),
+        title: const Text('Талабагон / Фарзандон'),
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add_rounded),
