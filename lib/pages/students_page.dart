@@ -15,6 +15,7 @@ class _StudentsPageState extends State<StudentsPage> {
   List<Student> students = [];
   String? currentId;
   bool loading = true;
+  String? loadError;
 
   @override
   void initState() {
@@ -39,6 +40,12 @@ class _StudentsPageState extends State<StudentsPage> {
   }
 
   Future<void> _load() async {
+    if (mounted && !loading) {
+      setState(() {
+        loading = true;
+        loadError = null;
+      });
+    }
     try {
       await StudentService.instance.init();
       if (!mounted) return;
@@ -46,10 +53,16 @@ class _StudentsPageState extends State<StudentsPage> {
         students = List.from(StudentService.instance.students);
         currentId = StudentService.instance.currentStudentId;
         loading = false;
+        loadError = null;
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => loading = false);
+      setState(() {
+        students = List.from(StudentService.instance.students);
+        currentId = StudentService.instance.currentStudentId;
+        loading = false;
+        loadError = 'Рӯйхат бор нашуд. Боз кӯшиш кунед.';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Хатогӣ дар боркунӣ: $e')),
       );
@@ -210,10 +223,18 @@ class _StudentsPageState extends State<StudentsPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.people_outline, size: 64, color: Colors.grey),
+                      Icon(loadError == null ? Icons.people_outline : Icons.error_outline, size: 64, color: Colors.grey),
                       const SizedBox(height: 12),
-                      const Text('Ҳанӯз талаба нест'),
+                      Text(loadError ?? 'Ҳанӯз талаба нест'),
                       const SizedBox(height: 16),
+                      if (loadError != null) ...[
+                        FilledButton.icon(
+                          onPressed: _load,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Боз кӯшиш'),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       FilledButton.icon(
                         onPressed: _addStudent,
                         icon: const Icon(Icons.person_add),

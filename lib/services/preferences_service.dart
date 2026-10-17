@@ -22,6 +22,10 @@ class PreferencesService {
   bool _fileLoaded = false;
   final Map<String, Object> _memory = {};
   final Map<String, String> _fileCache = {};
+  @visibleForTesting
+  bool debugFailWrites = false;
+
+  static const _revKey = '__rev';
 
   Future<T> _sync<T>(Future<T> Function() action) {
     final result = _tail.then((_) => action());
@@ -49,7 +53,7 @@ class PreferencesService {
         _prefs = prefs;
         _ready = true;
         await _loadFile();
-        await _restoreMissing();
+        await _reconcile();
         return;
       } catch (error, stack) {
         lastError = error;
@@ -73,7 +77,7 @@ class PreferencesService {
       }
       _fileLoaded = false;
       await _loadFile();
-      await _restoreMissing();
+      await _reconcile();
     });
   }
 
@@ -138,7 +142,6 @@ class PreferencesService {
       if (prefs != null && prefs.containsKey(key)) {
         final list = prefs.getStringList(key) ?? <String>[];
         _memory[key] = list;
-        _fileCache['set:$key'] = jsonEncode(list);
         return {...list};
       }
       final stored = _fileCache['set:$key'];
@@ -163,13 +166,19 @@ class PreferencesService {
   }
 
   Future<bool> _saveSet(String key, Set<String> values) async {
+    if (debugFailWrites) return false;
     final list = values.toList();
+    _bumpRev();
     _memory[key] = list;
     _fileCache['set:$key'] = jsonEncode(list);
     final fileOk = await _writeFile();
     var prefsOk = false;
     try {
-      prefsOk = await _prefs?.setStringList(key, list) ?? false;
+      final prefs = _prefs;
+      if (prefs != null) {
+        prefsOk = await prefs.setStringList(key, list);
+        if (prefsOk) await _writePrefsRev(prefs);
+      }
     } catch (error, stack) {
       debugPrint('Failed to persist $key: $error\n$stack');
     }
@@ -183,7 +192,6 @@ class PreferencesService {
         final disk = prefs.getString(key);
         if (disk != null) {
           _memory[key] = disk;
-          _fileCache[key] = disk;
           return disk;
         }
       }
@@ -205,12 +213,18 @@ class PreferencesService {
   }
 
   Future<bool> _saveRaw(String key, String value) async {
+    if (debugFailWrites) return false;
+    _bumpRev();
     _memory[key] = value;
     _fileCache[key] = value;
     final fileOk = await _writeFile();
     var prefsOk = false;
     try {
-      prefsOk = await _prefs?.setString(key, value) ?? false;
+      final prefs = _prefs;
+      if (prefs != null) {
+        prefsOk = await prefs.setString(key, value);
+        if (prefsOk) await _writePrefsRev(prefs);
+      }
     } catch (error) {
       debugPrint('writeRaw $key failed: $error');
     }
@@ -293,6 +307,7 @@ class PreferencesService {
     if (prefs == null || _fileCache.isEmpty) return;
     try {
       for (final entry in _fileCache.entries.toList()) {
+        if (entry.key == _revKey) continue;
         if (entry.key.startsWith('set:')) {
           final key = entry.key.substring(4);
           if (prefs.containsKey(key)) continue;
@@ -307,6 +322,65 @@ class PreferencesService {
     } catch (error, stack) {
       debugPrint('Durable restore skipped: $error\n$stack');
     }
+  }
+
+  /// The JSON file is written with a flush. SharedPreferences can still be
+  /// holding an older copy when the process comes back. The higher revision
+  /// wins, so a slow or stale preference cache cannot hide saved students.
+  Future<void> _reconcile() async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      return;
+    }
+    final fileRev = _fileRev();
+    final prefsRev = _prefsRev();
+    if (fileRev > prefsRev) {
+      for (final entry in _fileCache.entries.toList()) {
+        if (entry.key == _revKey) continue;
+        try {
+          if (entry.key.startsWith('set:')) {
+            final key = entry.key.substring(4);
+            final decoded = jsonDecode(entry.value);
+            if (decoded is List) {
+              await prefs.setStringList(key, [for (final item in decoded) '$item']);
+            }
+          } else {
+            await prefs.setString(entry.key, entry.value);
+          }
+        } catch (error, stack) {
+          debugPrint('Durable reconcile skipped ${entry.key}: $error\n$stack');
+        }
+      }
+      try {
+        await prefs.setString(_revKey, '$fileRev');
+      } catch (error) {
+        debugPrint('Durable revision write skipped: $error');
+      }
+      return;
+    }
+    await _restoreMissing();
+  }
+
+  int _prefsRev() {
+    try {
+      return int.tryParse(_prefs?.getString(_revKey) ?? '') ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  int _fileRev() => int.tryParse(_fileCache[_revKey] ?? '') ?? 0;
+
+  void _bumpRev() {
+    final next = (_fileRev() > _prefsRev() ? _fileRev() : _prefsRev()) + 1;
+    _fileCache[_revKey] = '$next';
+    _memory[_revKey] = '$next';
+  }
+
+  Future<void> _writePrefsRev(SharedPreferences prefs) async {
+    final rev = _fileCache[_revKey];
+    if (rev == null) return;
+    await prefs.setString(_revKey, rev);
   }
 
   Future<bool> _writeFile() async {
@@ -326,6 +400,14 @@ class PreferencesService {
   }
 
   @visibleForTesting
+  void debugSeedFile(Map<String, String> values) {
+    _fileCache
+      ..clear()
+      ..addAll(values);
+    _fileLoaded = true;
+  }
+
+  @visibleForTesting
   void debugReset() {
     _prefs = null;
     _ready = false;
@@ -333,5 +415,6 @@ class PreferencesService {
     _tail = Future<void>.value();
     _memory.clear();
     _fileCache.clear();
+    debugFailWrites = false;
   }
 }

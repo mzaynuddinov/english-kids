@@ -116,7 +116,15 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
   Future<void> _toggleLearned() async {
     final item = widget.prompts[index];
     final next = !WordLearningService.instance.of(item.id).learned;
-    await WordLearningService.instance.setFlag(item.id, learned: next);
+    final ok = await WordLearningService.instance.setFlag(item.id, learned: next);
+    if (!ok) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ҳолат захира нашуд.')),
+        );
+      }
+      return;
+    }
     await _syncLetter(item.id, next);
     if (mounted) setState(() {});
   }
@@ -124,7 +132,15 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
   Future<void> _toggleSaved() async {
     final item = widget.prompts[index];
     final next = !WordLearningService.instance.of(item.id).saved;
-    await WordLearningService.instance.setFlag(item.id, saved: next);
+    final ok = await WordLearningService.instance.setFlag(item.id, saved: next);
+    if (!ok) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Рӯйхати барои баъд захира нашуд.')),
+        );
+      }
+      return;
+    }
     if (mounted) setState(() {});
   }
 

@@ -73,7 +73,6 @@ class StudentService extends ChangeNotifier {
       return;
     }
     final loaded = disk;
-    if (loaded == null) return;
     if (loaded.isEmpty && students.isNotEmpty) {
       await _saveStudents();
       return;

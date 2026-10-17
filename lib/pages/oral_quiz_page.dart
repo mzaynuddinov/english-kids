@@ -98,10 +98,13 @@ class _OralQuizPageState extends State<OralQuizPage> {
     if (saving || index >= queue.length) return;
     final word = queue[index];
     final next = !WordLearningService.instance.of(word.id).learned;
+    var ok = false;
     try {
-      await WordLearningService.instance.setFlag(word.id, learned: next);
+      ok = await WordLearningService.instance.setFlag(word.id, learned: next);
     } catch (error, stack) {
       debugPrint('Oral learned flag failed: $error\n$stack');
+    }
+    if (!ok) {
       _failed('Ҳолат захира нашуд.');
       return;
     }
@@ -112,10 +115,13 @@ class _OralQuizPageState extends State<OralQuizPage> {
     if (saving || index >= queue.length) return;
     final word = queue[index];
     final next = !WordLearningService.instance.of(word.id).saved;
+    var ok = false;
     try {
-      await WordLearningService.instance.setFlag(word.id, saved: next);
+      ok = await WordLearningService.instance.setFlag(word.id, saved: next);
     } catch (error, stack) {
       debugPrint('Oral saved flag failed: $error\n$stack');
+    }
+    if (!ok) {
       _failed('Рӯйхати барои баъд захира нашуд.');
       return;
     }

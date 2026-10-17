@@ -135,12 +135,8 @@ class _HomeShellState extends State<HomeShell> {
     }
 
     try {
-      final learnedSet = await PreferencesService.instance
-          .loadSet(StudentService.instance.learnedKey())
-          .timeout(const Duration(seconds: 4), onTimeout: () => <String>{});
-      final savedSet = await PreferencesService.instance
-          .loadSet(StudentService.instance.savedKey())
-          .timeout(const Duration(seconds: 4), onTimeout: () => <String>{});
+      final learnedSet = await PreferencesService.instance.loadSet(StudentService.instance.learnedKey());
+      final savedSet = await PreferencesService.instance.loadSet(StudentService.instance.savedKey());
       final studentId = StudentService.instance.currentStudentId;
       if (studentId != null && words.isNotEmpty) {
         await WordLearningService.instance.openStudent(
@@ -314,6 +310,11 @@ class _HomeShellState extends State<HomeShell> {
     } else {
       letters.add(letter.letter);
     }
+    final savedNow = await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
+    if (!savedNow) {
+      if (mounted) _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
+      return;
+    }
     final next = snap.copyWith(
       letters: letters,
       achievements: ProgressService.instance.computeAchievements(
@@ -321,11 +322,10 @@ class _HomeShellState extends State<HomeShell> {
         learned: words.where((word) => word.isMarked(learned)).length,
       ),
     );
-    await ProgressService.instance.save(ProgressService.instance.withActivity(next));
-    final savedNow = await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
-    if (!savedNow) {
-      if (mounted) _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
-      return;
+    try {
+      await ProgressService.instance.save(ProgressService.instance.withActivity(next));
+    } catch (error, stack) {
+      debugPrint('Letter snapshot was not saved: $error\n$stack');
     }
     if (mounted) setState(() {});
     _feedback(already
