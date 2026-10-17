@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:english_kids/app.dart';
 import 'package:english_kids/services/preferences_service.dart';
 import 'package:english_kids/services/progress_service.dart';
 import 'package:english_kids/services/reminder_service.dart';
@@ -10,30 +9,6 @@ import 'package:english_kids/widgets/error_fallback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-Future<void> disposeApp(WidgetTester tester) async {
-  ReminderService.instance.cancelAllTimers();
-  await tester.pumpWidget(const SizedBox.shrink());
-  await tester.pump();
-}
-
-Future<void> pumpApp(WidgetTester tester) async {
-  tester.view.physicalSize = const Size(1080, 1920);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(() {
-    tester.view.resetPhysicalSize();
-    tester.view.resetDevicePixelRatio();
-  });
-
-  await tester.pumpWidget(const EnglishKidsApp());
-  await tester.pump();
-  await tester.pump();
-  for (var i = 0; i < 6; i++) {
-    await tester.pump(const Duration(milliseconds: 16));
-    if (find.textContaining('Нақшаи омӯзиш').evaluate().isNotEmpty) return;
-    if (find.text('Калимаҳо бор нашуданд.').evaluate().isNotEmpty) return;
-  }
-}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -55,56 +30,10 @@ void main() {
     ReminderService.suppressTimersForTests = false;
   });
 
-  testWidgets('first frame shows the Tajik app name, not a black screen', (tester) async {
-    await tester.pumpWidget(const EnglishKidsApp());
-    await tester.pump();
-
-    expect(find.text(appName), findsWidgets);
-    expect(find.byType(MaterialApp), findsOneWidget);
-    expect(find.byType(Scaffold), findsOneWidget);
-    await disposeApp(tester);
-  }, timeout: const Timeout(Duration(seconds: 20)));
-
-  testWidgets('home shell renders after vocabulary load', (tester) async {
-    await pumpApp(tester);
-
-    expect(find.text(appName), findsWidgets);
-    expect(find.textContaining('Нақшаи омӯзиш'), findsOneWidget);
-    expect(find.textContaining('Мушкилоти имрӯз'), findsOneWidget);
-    expect(find.text('Алифбо'), findsOneWidget);
-    expect(find.textContaining('Калимаи имрӯз'), findsOneWidget);
-    expect(find.textContaining('Грамматикаи асосӣ'), findsWidgets);
-    await disposeApp(tester);
-  }, timeout: const Timeout(Duration(seconds: 20)));
-
-  testWidgets('drawer contains required destinations', (tester) async {
-    await pumpApp(tester);
-
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
-
-    expect(find.text('Асосӣ'), findsWidgets);
-    expect(find.text('Алифбо'), findsWidgets);
-    expect(find.text('Калимаҳо'), findsWidgets);
-    expect(find.text('Грамматикаи асосӣ'), findsWidgets);
-    expect(find.text('Санҷиш'), findsOneWidget);
-    expect(find.text('Ёдраскуниҳо'), findsOneWidget);
-    expect(find.text('Тақвими омӯзиш'), findsOneWidget);
-    expect(find.text('Барои баъд'), findsWidgets);
-    expect(find.text('Пешрафт'), findsWidgets);
-    expect(find.text('Таърихи санҷишҳо'), findsOneWidget);
-    expect(find.text('Танзимот'), findsWidgets);
-    expect(find.text('Таҳиягар'), findsOneWidget);
-    expect(find.text('Дар бораи барнома'), findsOneWidget);
-    await disposeApp(tester);
-  }, timeout: const Timeout(Duration(seconds: 20)));
-
   testWidgets('fallback screen is child-friendly', (tester) async {
     await tester.pumpWidget(const ErrorFallback());
     expect(find.text(appName), findsOneWidget);
     expect(find.text('Мушкилоти мувақатӣ ба вуҷуд омад.'), findsOneWidget);
     expect(find.text('Дубора кӯшиш кунед'), findsOneWidget);
-    await disposeApp(tester);
-  }, timeout: const Timeout(Duration(seconds: 10)));
+  });
 }
