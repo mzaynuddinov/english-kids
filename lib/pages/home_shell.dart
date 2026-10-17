@@ -62,6 +62,8 @@ class _HomeShellState extends State<HomeShell> {
   int tab = 0;
   bool loading = true;
   String? loadError;
+  bool _loadInFlight = false;
+  bool _loadAgain = false;
 
   @override
   void initState() {
@@ -85,6 +87,11 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _loadData({bool silent = false}) async {
+    if (_loadInFlight) {
+      _loadAgain = true;
+      return;
+    }
+    _loadInFlight = true;
     if (!silent && !loading) {
       setState(() {
         loading = true;
@@ -133,6 +140,12 @@ class _HomeShellState extends State<HomeShell> {
       if (mounted) setState(() {});
     } catch (error, stack) {
       debugPrint('Learning state load failed: $error\n$stack');
+    } finally {
+      _loadInFlight = false;
+      if (_loadAgain && mounted) {
+        _loadAgain = false;
+        await _loadData(silent: true);
+      }
     }
   }
 

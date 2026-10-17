@@ -15,22 +15,31 @@ class StudentService extends ChangeNotifier {
 
   List<Student> students = [];
   String? currentStudentId;
+  bool _initialized = false;
 
   String learnedKey([String? id]) => 'learned_${id ?? currentStudentId ?? "default"}';
   String savedKey([String? id]) => 'saved_${id ?? currentStudentId ?? "default"}';
   String progressKey([String? id]) => 'learning_state_v2_${id ?? currentStudentId ?? "default"}';
 
   Future<void> init() async {
-    await _loadStudents();
-    await _ensureDefaultAndMigrate();
-    await _loadCurrent();
-    notifyListeners();
+    if (_initialized) return;
+    _initialized = true;
+    try {
+      await _loadStudents();
+      await _ensureDefaultAndMigrate();
+      await _loadCurrent();
+      notifyListeners();
+    } catch (error) {
+      _initialized = false;
+      rethrow;
+    }
   }
 
   @visibleForTesting
   void debugReset() {
     students = [];
     currentStudentId = null;
+    _initialized = false;
   }
 
   Future<void> _loadStudents() async {
