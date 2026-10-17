@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../models/achievements.dart';
+import '../models/student.dart';
 import '../models/word.dart';
 import '../services/progress_service.dart';
+import '../services/student_service.dart';
 import '../theme.dart';
+import 'certificate_page.dart';
 
 class ProgressPage extends StatelessWidget {
   final List<Word> words;
@@ -73,6 +76,30 @@ class ProgressPage extends StatelessWidget {
                   '${learned.length} аз ${words.length} калима омӯхта шуд',
                   style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
+                if (learned.length >= words.length && words.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFFD4AF37),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () async {
+                      final student = await StudentService.instance.getCurrentStudent();
+                      if (!context.mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CertificatePage(
+                            student: student ?? Student(id: 'default', name: 'Талаба'),
+                            wordCount: words.length,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.workspace_premium_rounded),
+                    label: const Text('Гирифтани сертификат'),
+                  ),
+                ],
                 if (snapshot.streak > 0) ...[
                   const SizedBox(height: 8),
                   Text('🔥 ${snapshot.streak} рӯз пай дар пай', style: const TextStyle(fontWeight: FontWeight.w800)),
