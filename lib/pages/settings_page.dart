@@ -5,6 +5,7 @@ import '../models/word.dart';
 import '../services/preferences_service.dart';
 import '../services/progress_service.dart';
 import '../services/reminder_service.dart';
+import '../services/student_service.dart';
 import '../theme.dart';
 import 'about_page.dart';
 import 'calendar_page.dart';
@@ -280,8 +281,8 @@ class SettingsPage extends StatelessWidget {
       ),
     );
     try {
-      await PreferencesService.instance.saveSet('learned', {});
-      await PreferencesService.instance.saveSet('saved', {});
+      await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), {});
+      await PreferencesService.instance.saveSet(StudentService.instance.savedKey(), {});
       await ProgressService.instance.resetLearning();
       await ReminderService.instance.initialize();
       await onResetProgress();
