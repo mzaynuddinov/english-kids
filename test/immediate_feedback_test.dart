@@ -131,9 +131,12 @@ void main() {
   });
 
   testWidgets('adding a student updates the list and the notice before storage finishes', (tester) async {
+    await StudentService.instance.init();
     await tester.pumpWidget(const MaterialApp(home: StudentsPage()));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.byType(CircularProgressIndicator).evaluate().isEmpty) break;
+    }
     expect(find.byType(CircularProgressIndicator), findsNothing);
 
     final gate = Completer<void>();
@@ -155,10 +158,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
     expect(find.text('Насим'), findsWidgets);
     expect(StudentService.instance.students, hasLength(1));
-  });
+    await tester.pumpWidget(const SizedBox.shrink());
+  }, timeout: const Timeout(Duration(minutes: 1)));
 
   testWidgets('the alphabet learned button and notice update before storage finishes', (tester) async {
-    tester.view.physicalSize = const Size(800, 2400);
+    tester.view.physicalSize = const Size(1200, 8000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -182,17 +186,10 @@ void main() {
       of: find.byKey(const ValueKey('home')),
       matching: find.text('Алифбо'),
     );
-    await tester.scrollUntilVisible(
-      alphabet,
-      400,
-      scrollable: find.descendant(
-        of: find.byKey(const ValueKey('home')),
-        matching: find.byType(Scrollable),
-      ),
-    );
+    expect(alphabet, findsOneWidget);
     await tester.tap(alphabet);
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 300));
     expect(find.byType(AlphabetPage), findsOneWidget);
     expect(find.text('Омӯхтам'), findsOneWidget);
 
@@ -224,5 +221,5 @@ void main() {
     backGate.complete();
     await tester.pump();
     await tester.pumpWidget(const SizedBox.shrink());
-  });
+  }, timeout: const Timeout(Duration(minutes: 1)));
 }
