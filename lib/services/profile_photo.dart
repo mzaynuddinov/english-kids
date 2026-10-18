@@ -14,7 +14,12 @@ Uint8List? cropSquareJpeg(
   int edge = 512,
   int quality = 80,
 }) {
-  final decoded = img.decodeImage(source);
+  img.Image? decoded;
+  try {
+    decoded = img.decodeImage(source);
+  } catch (_) {
+    return null;
+  }
   if (decoded == null || decoded.width < 1 || decoded.height < 1) return null;
   final minSide = decoded.width < decoded.height ? decoded.width : decoded.height;
   final safeZoom = zoom < 1 ? 1.0 : zoom;
