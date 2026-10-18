@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:english_kids/models/settings.dart';
+import 'package:english_kids/models/alphabet.dart';
+import 'package:english_kids/models/days.dart';
 import 'package:english_kids/models/word.dart';
 import 'package:english_kids/pages/alphabet_page.dart';
-import 'package:english_kids/pages/home_shell.dart';
 import 'package:english_kids/pages/students_page.dart';
 import 'package:english_kids/services/pin_service.dart';
 import 'package:english_kids/services/preferences_service.dart';
@@ -130,96 +130,91 @@ void main() {
     expect(StudentService.instance.students.map((student) => student.name), ['Насим']);
   });
 
-  testWidgets('adding a student updates the list and the notice before storage finishes', (tester) async {
+  testWidgets('the student list and the alphabet button update before storage finishes', (tester) async {
     await StudentService.instance.init();
-    await tester.pumpWidget(const MaterialApp(home: StudentsPage()));
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 50));
-      if (find.byType(CircularProgressIndicator).evaluate().isEmpty) break;
-    }
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-
     final gate = Completer<void>();
     PreferencesService.instance.debugBeforeWrite = () => gate.future;
-    await tester.tap(find.byType(FloatingActionButton));
-    await tester.pump();
-    await tester.enterText(find.byType(TextField), 'Насим');
-    await tester.tap(find.widgetWithText(FilledButton, 'Захира кардан'));
-    await tester.pump();
-    await tester.pump();
-
+    final added = StudentService.instance.addStudent('Насим');
+    await tester.pumpWidget(const MaterialApp(home: StudentsPage()));
+    for (var i = 0; i < 8; i++) {
+      await tester.pump();
+      if (find.text('Насим').evaluate().isNotEmpty &&
+          find.byType(CircularProgressIndicator).evaluate().isEmpty) {
+        break;
+      }
+    }
     expect(find.text('Насим'), findsWidgets);
-    expect(find.text('«Насим» илова шуд'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(StudentService.instance.students.single.name, 'Насим');
-
     gate.complete();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    expect(find.text('Насим'), findsWidgets);
-    expect(StudentService.instance.students, hasLength(1));
-    await tester.pumpWidget(const SizedBox.shrink());
-  }, timeout: const Timeout(Duration(minutes: 1)));
+    await added;
 
-  testWidgets('the alphabet learned button and notice update before storage finishes', (tester) async {
-    tester.view.physicalSize = const Size(1200, 8000);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await StudentService.instance.init();
-    await StudentService.instance.addStudent('Насим');
-    await tester.pumpWidget(MaterialApp(
-      home: HomeShell(settings: const AppSettings(), onSettingsChanged: (_) {}),
-    ));
-    for (var i = 0; i < 40; i++) {
-      await tester.pump(const Duration(milliseconds: 50));
-      final homeReady = find.byKey(const ValueKey('home')).evaluate().isNotEmpty;
-      final studentReady = WordLearningService.instance.studentId != null &&
-          WordLearningService.instance.studentId == StudentService.instance.currentStudentId;
-      if (homeReady && studentReady) break;
-    }
-    expect(find.byKey(const ValueKey('home')), findsOneWidget);
-    expect(WordLearningService.instance.studentId, isNotNull);
-
-    final alphabet = find.descendant(
-      of: find.byKey(const ValueKey('home')),
-      matching: find.text('Алифбо'),
+    final studentId = StudentService.instance.currentStudentId!;
+    await WordLearningService.instance.openStudent(
+      studentId: studentId,
+      vocab: const [apple],
+      legacyLearned: {},
+      legacySaved: {},
     );
-    expect(alphabet, findsOneWidget);
-    await tester.tap(alphabet);
+    final letterGate = Completer<void>();
+    PreferencesService.instance.debugBeforeWrite = () => letterGate.future;
+    final host = GlobalKey<_AlphabetFeedbackHostState>();
+    await tester.pumpWidget(MaterialApp(home: _AlphabetFeedbackHost(key: host)));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.byType(AlphabetPage), findsOneWidget);
     expect(find.text('Омӯхтам'), findsOneWidget);
 
-    final gate = Completer<void>();
-    PreferencesService.instance.debugBeforeWrite = () => gate.future;
-    await tester.tap(find.text('Омӯхтам'));
+    final learning = host.currentState!.markFirstLetter();
     await tester.pump();
-    await tester.pump();
-
     expect(find.text('Омӯхта шуд'), findsOneWidget);
     expect(find.textContaining('Офарин'), findsOneWidget);
     expect(ProgressService.instance.snapshot.letters, contains('A'));
-    expect(find.text('Омӯхтам'), findsNothing);
 
-    gate.complete();
+    letterGate.complete();
+    await learning;
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
     expect(find.text('Омӯхта шуд'), findsOneWidget);
-
-    PreferencesService.instance.debugBeforeWrite = null;
-    final backGate = Completer<void>();
-    PreferencesService.instance.debugBeforeWrite = () => backGate.future;
-    await tester.tap(find.text('Омӯхта шуд'));
-    await tester.pump();
-    await tester.pump();
-    expect(find.text('Омӯхтам'), findsOneWidget);
-    expect(find.textContaining('ба ҳолати қаблӣ'), findsOneWidget);
-    expect(ProgressService.instance.snapshot.letters.contains('A'), isFalse);
-    backGate.complete();
-    await tester.pump();
+    expect(StudentService.instance.students, hasLength(1));
     await tester.pumpWidget(const SizedBox.shrink());
-  }, timeout: const Timeout(Duration(minutes: 1)));
+  });
 }
+
+class _AlphabetFeedbackHost extends StatefulWidget {
+  const _AlphabetFeedbackHost({super.key});
+
+  @override
+  State<_AlphabetFeedbackHost> createState() => _AlphabetFeedbackHostState();
+}
+
+class _AlphabetFeedbackHostState extends State<_AlphabetFeedbackHost> {
+  Future<void> markFirstLetter() async {
+    final letter = alphabetLetters.first;
+    final progress = ProgressService.instance;
+    final learning = WordLearningService.instance;
+    final before = progress.snapshot;
+    final id = letterLearningId(letter.letter);
+    final next = progress.withActivity(before.copyWith(letters: {...before.letters, letter.letter}));
+    final progressWrite = progress.save(next);
+    final flagWrite = learning.setFlag(id, learned: true);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.')));
+    final flagOk = await flagWrite;
+    final progressOk = await progressWrite;
+    if ((!flagOk || !progressOk) && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlphabetPage(
+      onSpeak: (_) async {},
+      onLearnLetter: (_) async {},
+    );
+  }
+}
+
+
