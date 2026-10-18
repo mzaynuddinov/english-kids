@@ -19,7 +19,6 @@ class WordLearningService extends ChangeNotifier {
 
   String? studentId;
   Map<String, WordLearning> byId = {};
-  Map<String, WordLearning> _durable = {};
   final Map<String, Map<String, WordLearning>> _byStudent = {};
   final Map<String, Map<String, WordLearning>> _durableByStudent = {};
   final Map<String, int> _latestGen = {};
@@ -160,9 +159,8 @@ class WordLearningService extends ChangeNotifier {
   void _show(String id) {
     final map = _byStudent[id];
     if (map == null) return;
-    this.studentId = id;
+    studentId = id;
     byId = map;
-    _durable = _durableByStudent[id] ?? map;
     notifyListeners();
   }
 
@@ -224,14 +222,12 @@ class WordLearningService extends ChangeNotifier {
           _byStudent[id] = durable;
           if (studentId == id) {
             byId = durable;
-            _durable = durable;
             notifyListeners();
           }
           if (!done.isCompleted) done.complete(false);
           return;
         }
         _durableByStudent[id] = snapshot;
-        if (studentId == id) _durable = snapshot;
         _syncCertificate(id, snapshot);
         if (!done.isCompleted) done.complete(true);
       } catch (error, stack) {
@@ -241,7 +237,6 @@ class WordLearningService extends ChangeNotifier {
           _byStudent[id] = durable;
           if (studentId == id) {
             byId = durable;
-            _durable = durable;
             notifyListeners();
           }
         }
@@ -272,7 +267,6 @@ class WordLearningService extends ChangeNotifier {
     await PreferencesService.instance.saveSet('saved_$studentId', {});
     if (this.studentId == studentId) {
       byId = empty;
-      _durable = empty;
       notifyListeners();
     }
   }
@@ -326,7 +320,6 @@ class WordLearningService extends ChangeNotifier {
     _gen++;
     studentId = null;
     byId = {};
-    _durable = {};
     notifyListeners();
   }
 
@@ -337,7 +330,6 @@ class WordLearningService extends ChangeNotifier {
     _lock = Future<void>.value();
     studentId = null;
     byId = {};
-    _durable = {};
     _byStudent.clear();
     _durableByStudent.clear();
     _latestGen.clear();

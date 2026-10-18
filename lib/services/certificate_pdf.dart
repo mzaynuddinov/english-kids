@@ -1,5 +1,4 @@
 import 'dart:isolate';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
@@ -54,17 +53,19 @@ Future<Uint8List> buildCertificatePdf({
 }) async {
   final data = await rootBundle.load(certificateFontAsset);
   final fontBytes = data.buffer.asUint8List();
-  return Isolate.run(() => renderCertificatePdf(
-        fontBytes: fontBytes,
-        studentName: studentName,
-        wordCount: wordCount,
-        completedAt: completedAt,
-        certificateId: certificateId,
-        photoJpeg: photoJpeg,
-      ));
+  return Isolate.run<Uint8List>(() async {
+    return renderCertificatePdf(
+      fontBytes: fontBytes,
+      studentName: studentName,
+      wordCount: wordCount,
+      completedAt: completedAt,
+      certificateId: certificateId,
+      photoJpeg: photoJpeg,
+    );
+  });
 }
 
-Uint8List renderCertificatePdf({
+Future<Uint8List> renderCertificatePdf({
   required Uint8List fontBytes,
   required String studentName,
   required int wordCount,

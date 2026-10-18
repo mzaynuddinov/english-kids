@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:english_kids/models/student.dart';
 import 'package:english_kids/models/word.dart';
@@ -299,7 +298,7 @@ void main() {
       edge: 16,
     );
     final font = (await rootBundle.load(certificateFontAsset)).buffer.asUint8List();
-    final bytes = renderCertificatePdf(
+    final bytes = await renderCertificatePdf(
       fontBytes: font,
       studentName: 'Насим',
       wordCount: 500,

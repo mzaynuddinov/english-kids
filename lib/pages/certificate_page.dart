@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
@@ -157,7 +158,6 @@ class _CertificateSheet extends StatelessWidget {
   final Uint8List? photo;
 
   const _CertificateSheet({
-    super.key,
     required this.student,
     required this.wordCount,
     required this.date,

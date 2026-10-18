@@ -110,7 +110,7 @@ class _HomeShellState extends State<HomeShell> {
         saved = learning.savedIds();
         _statsReady = !ProgressService.instance.displayOnly;
       });
-      if (ProgressService.instance.displayOnly && id != null) {
+      if (ProgressService.instance.displayOnly) {
         unawaited(ProgressService.instance.load(key: StudentService.instance.progressKey(id)));
       }
       return;

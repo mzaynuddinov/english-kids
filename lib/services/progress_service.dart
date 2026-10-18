@@ -175,7 +175,6 @@ class ProgressService extends ChangeNotifier {
   String _key = _defaultKey;
 
   ProgressSnapshot snapshot = const ProgressSnapshot();
-  ProgressSnapshot _durable = const ProgressSnapshot();
   final Map<String, ProgressSnapshot> _memory = {};
   final Map<String, ProgressSnapshot> _durableMemory = {};
   final Map<String, int> _latestGen = {};
@@ -193,7 +192,6 @@ class ProgressService extends ChangeNotifier {
     final cached = _memory[key];
     if (cached != null) {
       snapshot = cached;
-      _durable = _durableMemory[key] ?? cached;
       displayOnly = false;
       notifyListeners();
       return true;
@@ -215,7 +213,6 @@ class ProgressService extends ChangeNotifier {
     _latestGen.remove(key);
     if (_key != key) return;
     snapshot = const ProgressSnapshot();
-    _durable = snapshot;
     displayOnly = false;
     notifyListeners();
   }
@@ -226,7 +223,6 @@ class ProgressService extends ChangeNotifier {
     final cached = _memory[target];
     if (cached != null) {
       snapshot = cached;
-      _durable = _durableMemory[target] ?? cached;
       displayOnly = false;
       notifyListeners();
       return snapshot;
@@ -264,7 +260,6 @@ class ProgressService extends ChangeNotifier {
       _durableMemory[target] = parsed;
       if (publish && _key == target) {
         snapshot = parsed;
-        _durable = parsed;
         displayOnly = false;
         notifyListeners();
       }
@@ -317,14 +312,12 @@ class ProgressService extends ChangeNotifier {
           _memory[saveKey] = durable;
           if (_key == saveKey) {
             snapshot = durable;
-            _durable = durable;
             notifyListeners();
           }
           if (!done.isCompleted) done.complete(false);
           return;
         }
         _durableMemory[saveKey] = captured;
-        if (_key == saveKey) _durable = captured;
         if (!done.isCompleted) done.complete(true);
       } catch (error, stack) {
         debugPrint('Progress save failed: $error\n$stack');
@@ -333,7 +326,6 @@ class ProgressService extends ChangeNotifier {
           _memory[saveKey] = durable;
           if (_key == saveKey) {
             snapshot = durable;
-            _durable = durable;
             notifyListeners();
           }
         }
@@ -351,7 +343,6 @@ class ProgressService extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     snapshot = const ProgressSnapshot();
-    _durable = const ProgressSnapshot();
     _memory.clear();
     _durableMemory.clear();
     _latestGen.clear();
