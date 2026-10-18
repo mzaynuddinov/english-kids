@@ -221,7 +221,7 @@ class StudentService extends ChangeNotifier {
     final previousCurrent = currentStudentId;
     final previous = students;
     students = [...students, student];
-    if (currentStudentId == null) currentStudentId = id;
+    currentStudentId ??= id;
     notifyListeners();
     final saved = await _saveStudents();
     if (!saved) {
