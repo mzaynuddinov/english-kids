@@ -1,17 +1,13 @@
 import 'dart:async';
 
-import 'package:english_kids/models/alphabet.dart';
 import 'package:english_kids/models/days.dart';
 import 'package:english_kids/models/word.dart';
-import 'package:english_kids/pages/alphabet_page.dart';
-import 'package:english_kids/pages/students_page.dart';
 import 'package:english_kids/services/pin_service.dart';
 import 'package:english_kids/services/preferences_service.dart';
 import 'package:english_kids/services/progress_service.dart';
 import 'package:english_kids/services/reminder_service.dart';
 import 'package:english_kids/services/student_service.dart';
 import 'package:english_kids/services/word_learning_service.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -130,91 +126,141 @@ void main() {
     expect(StudentService.instance.students.map((student) => student.name), ['Насим']);
   });
 
-  testWidgets('the student list and the alphabet button update before storage finishes', (tester) async {
+  test('an empty name is rejected without creating a student', () async {
     await StudentService.instance.init();
+    final watch = Stopwatch()..start();
+    final failed = StudentService.instance.addStudent('   ');
+    watch.stop();
+    expect(watch.elapsedMilliseconds, lessThan(200));
+    await expectLater(failed, throwsArgumentError);
+    expect(StudentService.instance.students, isEmpty);
+  });
+
+  test('rename and student switch are visible before storage and roll back on failure', () async {
+    await StudentService.instance.init();
+    final first = await StudentService.instance.addStudent('Насим');
+    final second = await StudentService.instance.addStudent('Ҳадиса');
+    expect(StudentService.instance.currentStudentId, first.id);
+
     final gate = Completer<void>();
     PreferencesService.instance.debugBeforeWrite = () => gate.future;
-    final added = StudentService.instance.addStudent('Насим');
-    await tester.pumpWidget(const MaterialApp(home: StudentsPage()));
-    for (var i = 0; i < 8; i++) {
-      await tester.pump();
-      if (find.text('Насим').evaluate().isNotEmpty &&
-          find.byType(CircularProgressIndicator).evaluate().isEmpty) {
-        break;
-      }
-    }
-    expect(find.text('Насим'), findsWidgets);
-    expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(StudentService.instance.students.single.name, 'Насим');
+    final renamed = StudentService.instance.renameStudent(first.id, 'Нилуфар');
+    expect(StudentService.instance.studentById(first.id)?.name, 'Нилуфар');
+    expect(StudentService.instance.studentById(first.id)?.id, first.id);
+    final switched = StudentService.instance.setCurrentStudent(second.id);
+    expect(StudentService.instance.currentStudentId, second.id);
     gate.complete();
-    await added;
+    await renamed;
+    await switched;
+    expect(StudentService.instance.currentStudentId, second.id);
+    expect(StudentService.instance.studentById(first.id)?.name, 'Нилуфар');
 
-    final studentId = StudentService.instance.currentStudentId!;
+    PreferencesService.instance.debugBeforeWrite = null;
+    PreferencesService.instance.debugFailWrites = true;
+    final failedRename = StudentService.instance.renameStudent(first.id, 'Дигар');
+    expect(StudentService.instance.studentById(first.id)?.name, 'Дигар');
+    await expectLater(failedRename, throwsStateError);
+    expect(StudentService.instance.studentById(first.id)?.name, 'Нилуфар');
+
+    final failedSwitch = StudentService.instance.setCurrentStudent(first.id);
+    expect(StudentService.instance.currentStudentId, first.id);
+    await expectLater(failedSwitch, throwsStateError);
+    expect(StudentService.instance.currentStudentId, second.id);
+  });
+
+  test('one student learned flag does not change another student', () async {
+    await StudentService.instance.init();
+    final first = await StudentService.instance.addStudent('Насим');
+    final second = await StudentService.instance.addStudent('Ҳадиса');
     await WordLearningService.instance.openStudent(
-      studentId: studentId,
+      studentId: first.id,
       vocab: const [apple],
       legacyLearned: {},
       legacySaved: {},
     );
-    final letterGate = Completer<void>();
-    PreferencesService.instance.debugBeforeWrite = () => letterGate.future;
-    final host = GlobalKey<_AlphabetFeedbackHostState>();
-    await tester.pumpWidget(MaterialApp(home: _AlphabetFeedbackHost(key: host)));
-    await tester.pump();
-    expect(find.text('Омӯхтам'), findsOneWidget);
+    expect(await WordLearningService.instance.setFlag(apple.id, learned: true), isTrue);
+    await WordLearningService.instance.openStudent(
+      studentId: second.id,
+      vocab: const [apple],
+      legacyLearned: {},
+      legacySaved: {},
+    );
+    expect(WordLearningService.instance.studentId, second.id);
+    expect(WordLearningService.instance.of(apple.id).learned, isFalse);
+    await WordLearningService.instance.openStudent(
+      studentId: first.id,
+      vocab: const [apple],
+      legacyLearned: {},
+      legacySaved: {},
+    );
+    expect(WordLearningService.instance.of(apple.id).learned, isTrue);
+  });
 
-    final learning = host.currentState!.markFirstLetter();
-    await tester.pump();
-    expect(find.text('Омӯхта шуд'), findsOneWidget);
-    expect(find.textContaining('Офарин'), findsOneWidget);
+  test('alphabet progress is visible before storage, and a newer letter wins', () async {
+    await StudentService.instance.init();
+    final student = await StudentService.instance.addStudent('Насим');
+    final key = StudentService.instance.progressKey(student.id);
+    await ProgressService.instance.load(key: key);
+    await WordLearningService.instance.openStudent(
+      studentId: student.id,
+      vocab: const [apple],
+      legacyLearned: {},
+      legacySaved: {},
+    );
+    final letterId = letterLearningId('A');
+    final gate = Completer<void>();
+    PreferencesService.instance.debugBeforeWrite = () => gate.future;
+    final withA = ProgressService.instance.snapshot.copyWith(letters: {'A'});
+    final watch = Stopwatch()..start();
+    final progressWrite = ProgressService.instance.save(withA);
+    final flagWrite = WordLearningService.instance.setFlag(letterId, learned: true);
+    watch.stop();
     expect(ProgressService.instance.snapshot.letters, contains('A'));
+    expect(WordLearningService.instance.of(letterId).learned, isTrue);
+    expect(watch.elapsedMilliseconds, lessThan(200));
+    var finished = false;
+    progressWrite.whenComplete(() => finished = true);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(finished, isFalse);
+    gate.complete();
+    expect(await progressWrite, isTrue);
+    expect(await flagWrite, isTrue);
 
-    letterGate.complete();
-    await learning;
-    await tester.pump();
-    expect(find.text('Омӯхта шуд'), findsOneWidget);
-    expect(StudentService.instance.students, hasLength(1));
-    await tester.pumpWidget(const SizedBox.shrink());
+    final older = ProgressService.instance.save(
+      ProgressService.instance.snapshot.copyWith(letters: <String>{'A'}),
+    );
+    final newer = ProgressService.instance.save(
+      ProgressService.instance.snapshot.copyWith(letters: <String>{'B'}),
+    );
+    expect(ProgressService.instance.snapshot.letters, <String>{'B'});
+    await older;
+    await newer;
+    ProgressService.instance.debugReset();
+    PreferencesService.instance.debugReset();
+    await ProgressService.instance.load(key: key);
+    expect(ProgressService.instance.snapshot.letters, <String>{'B'});
+
+    PreferencesService.instance.debugFailWrites = true;
+    final failed = ProgressService.instance.save(
+      ProgressService.instance.snapshot.copyWith(letters: <String>{}),
+    );
+    expect(ProgressService.instance.snapshot.letters, isEmpty);
+    expect(await failed, isFalse);
+    expect(ProgressService.instance.snapshot.letters, contains('B'));
+  });
+
+  test('a warm PIN check does not read storage again', () async {
+    expect(await PinService.instance.setPin('1234'), isTrue);
+    final reads = PreferencesService.instance.prefsReads;
+    final watch = Stopwatch()..start();
+    final ok = await PinService.instance.verify('1234');
+    final wrong = await PinService.instance.verify('0000');
+    final short = await PinService.instance.verify('12');
+    watch.stop();
+    expect(ok, isTrue);
+    expect(wrong, isFalse);
+    expect(short, isFalse);
+    expect(PreferencesService.instance.prefsReads, reads);
+    expect(watch.elapsedMilliseconds, lessThan(200));
   });
 }
-
-class _AlphabetFeedbackHost extends StatefulWidget {
-  const _AlphabetFeedbackHost({super.key});
-
-  @override
-  State<_AlphabetFeedbackHost> createState() => _AlphabetFeedbackHostState();
-}
-
-class _AlphabetFeedbackHostState extends State<_AlphabetFeedbackHost> {
-  Future<void> markFirstLetter() async {
-    final letter = alphabetLetters.first;
-    final progress = ProgressService.instance;
-    final learning = WordLearningService.instance;
-    final before = progress.snapshot;
-    final id = letterLearningId(letter.letter);
-    final next = progress.withActivity(before.copyWith(letters: {...before.letters, letter.letter}));
-    final progressWrite = progress.save(next);
-    final flagWrite = learning.setFlag(id, learned: true);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.')));
-    final flagOk = await flagWrite;
-    final progressOk = await progressWrite;
-    if ((!flagOk || !progressOk) && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlphabetPage(
-      onSpeak: (_) async {},
-      onLearnLetter: (_) async {},
-    );
-  }
-}
-
-

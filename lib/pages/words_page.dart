@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/progress_rules.dart';
 import '../models/word.dart';
+import '../services/progress_service.dart';
+import '../services/word_learning_service.dart';
 import '../theme.dart';
 import 'week_page.dart';
 
@@ -31,50 +33,61 @@ class WordsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Калимаҳо')),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-          children: [
-            const Text(
-              'Аввал алифбо. Ҳар ҳафтаи навбатӣ танҳо пас аз анҷоми ҳафтаи пеш кушода мешавад.',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 10),
-            for (var week = 1; week <= weekCount; week++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _WeekTile(
-                  week: week,
-                  words: words.where((w) => w.week == week).toList(),
-                  learned: learned,
-                  locked: !weekOpen(week),
-                  onOpen: () {
-                    if (!weekOpen(week)) return;
-                    Navigator.push<void>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => WeekPage(
-                          week: week,
-                          title: weekTitles[week] ?? 'Ҳафтаи $week',
-                          words: words.where((w) => w.week == week).toList(),
-                          learned: learned,
-                          saved: saved,
-                          onSpeak: onSpeak,
-                          onSave: onSave,
-                          onLearn: onLearn,
-                          onRemind: onRemind,
-                          voiceGender: voiceGender,
-                        ),
-                      ),
-                    );
-                  },
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        WordLearningService.instance,
+        ProgressService.instance,
+      ]),
+      builder: (context, _) {
+        final learning = WordLearningService.instance;
+        final liveLearned = learning.studentId == null ? learned : learning.learnedIds();
+        final liveSaved = learning.studentId == null ? saved : learning.savedIds();
+        return Scaffold(
+          appBar: AppBar(title: const Text('Калимаҳо')),
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+              children: [
+                const Text(
+                  'Аввал алифбо. Ҳар ҳафтаи навбатӣ танҳо пас аз анҷоми ҳафтаи пеш кушода мешавад.',
+                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
-              ),
-          ],
-        ),
-      ),
+                const SizedBox(height: 10),
+                for (var week = 1; week <= weekCount; week++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _WeekTile(
+                      week: week,
+                      words: words.where((w) => w.week == week).toList(),
+                      learned: liveLearned,
+                      locked: !weekOpen(week),
+                      onOpen: () {
+                        if (!weekOpen(week)) return;
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => WeekPage(
+                              week: week,
+                              title: weekTitles[week] ?? 'Ҳафтаи $week',
+                              words: words.where((w) => w.week == week).toList(),
+                              learned: liveLearned,
+                              saved: liveSaved,
+                              onSpeak: onSpeak,
+                              onSave: onSave,
+                              onLearn: onLearn,
+                              onRemind: onRemind,
+                              voiceGender: voiceGender,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
