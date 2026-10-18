@@ -27,13 +27,13 @@ class _OralQuizPageState extends State<OralQuizPage> {
   OralScope scope = OralScope.all;
   List<Word> queue = const [];
   int index = 0;
+  int _action = 0;
   bool running = false;
   bool reveal = false;
   bool finished = false;
   int sessionCorrect = 0;
   int sessionIncorrect = 0;
   int sessionUnknown = 0;
-  bool saving = false;
 
   String get _studentName {
     final id = StudentService.instance.currentStudentId;
@@ -60,28 +60,15 @@ class _OralQuizPageState extends State<OralQuizPage> {
   }
 
   Future<void> _mark(OralMark mark) async {
-    if (saving || index >= queue.length) return;
+    if (index >= queue.length) return;
     if (WordLearningService.instance.studentId == null) {
       _failed('Аввал талабаро интихоб кунед.');
       return;
     }
     final word = queue[index];
-    setState(() => saving = true);
-    var ok = false;
-    try {
-      await WordLearningService.instance.record(word.id, mark);
-      ok = true;
-    } catch (error, stack) {
-      debugPrint('Oral quiz save failed: $error\n$stack');
-    }
-    if (!mounted) return;
-    if (!ok) {
-      setState(() => saving = false);
-      _failed('Натиҷа захира нашуд. Боз кӯшиш кунед.');
-      return;
-    }
+    final action = ++_action;
+    final at = index;
     setState(() {
-      saving = false;
       reveal = false;
       if (mark == OralMark.correct) sessionCorrect += 1;
       if (mark == OralMark.incorrect) sessionIncorrect += 1;
@@ -92,40 +79,53 @@ class _OralQuizPageState extends State<OralQuizPage> {
         finished = true;
       }
     });
+    try {
+      await WordLearningService.instance.record(word.id, mark);
+    } catch (error, stack) {
+      debugPrint('Oral quiz save failed: $error\n$stack');
+      if (!mounted || action != _action) return;
+      setState(() {
+        index = at;
+        running = queue.isNotEmpty;
+        finished = false;
+        if (mark == OralMark.correct && sessionCorrect > 0) sessionCorrect -= 1;
+        if (mark == OralMark.incorrect && sessionIncorrect > 0) sessionIncorrect -= 1;
+        if (mark == OralMark.unknown && sessionUnknown > 0) sessionUnknown -= 1;
+      });
+      _failed('Натиҷа захира нашуд. Боз кӯшиш кунед.');
+    }
   }
 
   Future<void> _toggleLearned() async {
-    if (saving || index >= queue.length) return;
+    if (index >= queue.length) return;
     final word = queue[index];
     final next = !WordLearningService.instance.of(word.id).learned;
-    var ok = false;
-    try {
-      ok = await WordLearningService.instance.setFlag(word.id, learned: next);
-    } catch (error, stack) {
-      debugPrint('Oral learned flag failed: $error\n$stack');
-    }
+    final pending = WordLearningService.instance.setFlag(word.id, learned: next);
+    if (mounted) setState(() {});
+    final ok = await pending;
+    if (!mounted) return;
     if (!ok) {
+      setState(() {});
       _failed('Ҳолат захира нашуд.');
       return;
     }
-    if (mounted) setState(() {});
+    setState(() {});
   }
 
   Future<void> _toggleSaved() async {
-    if (saving || index >= queue.length) return;
+    if (index >= queue.length) return;
     final word = queue[index];
     final next = !WordLearningService.instance.of(word.id).saved;
-    var ok = false;
-    try {
-      ok = await WordLearningService.instance.setFlag(word.id, saved: next);
-    } catch (error, stack) {
-      debugPrint('Oral saved flag failed: $error\n$stack');
-    }
+    final pending = WordLearningService.instance.setFlag(word.id, saved: next);
+    if (mounted) setState(() {});
+    final ok = await pending;
+    if (!mounted) return;
     if (!ok) {
+      setState(() {});
       _failed('Рӯйхати барои баъд захира нашуд.');
       return;
     }
-    if (mounted) setState(() {});
+    setState(() {});
   }
 
   void _failed(String message) {
@@ -269,35 +269,33 @@ class _OralQuizPageState extends State<OralQuizPage> {
         ),
         const SizedBox(height: 8),
         FilledButton(
-          onPressed: saving ? null : () => _mark(OralMark.correct),
+          onPressed: () => _mark(OralMark.correct),
           style: FilledButton.styleFrom(backgroundColor: emerald600, minimumSize: const Size.fromHeight(46)),
           child: const Text('Дуруст ҷавоб дод'),
         ),
         const SizedBox(height: 8),
         FilledButton(
-          onPressed: saving ? null : () => _mark(OralMark.incorrect),
+          onPressed: () => _mark(OralMark.incorrect),
           style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade800, minimumSize: const Size.fromHeight(46)),
           child: const Text('Нодуруст ҷавоб дод'),
         ),
         const SizedBox(height: 8),
         FilledButton(
-          onPressed: saving ? null : () => _mark(OralMark.unknown),
+          onPressed: () => _mark(OralMark.unknown),
           style: FilledButton.styleFrom(backgroundColor: slate700, minimumSize: const Size.fromHeight(46)),
           child: const Text('Надонист'),
         ),
         const SizedBox(height: 8),
         OutlinedButton(
-          onPressed: saving ? null : _toggleSaved,
+          onPressed: _toggleSaved,
           child: Text(record.saved ? 'Аз «барои баъд» гирифтан' : 'Барои баъд'),
         ),
         OutlinedButton(
-          onPressed: saving ? null : _toggleLearned,
+          onPressed: _toggleLearned,
           child: Text(record.learned ? 'Омӯхта шуд — бозгашт' : 'Омӯхта шуд'),
         ),
         TextButton(
-          onPressed: saving
-              ? null
-              : () => setState(() {
+          onPressed: () => setState(() {
                     running = false;
                     finished = true;
                   }),

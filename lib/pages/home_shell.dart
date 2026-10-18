@@ -69,6 +69,7 @@ class _HomeShellState extends State<HomeShell> {
   String? loadError;
   bool _loadInFlight = false;
   bool _loadAgain = false;
+  String? _appliedStudentId;
 
   @override
   void initState() {
@@ -90,7 +91,18 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   void _onStudentChanged() {
-    if (mounted) unawaited(_loadData(silent: true));
+    if (!mounted) return;
+    final id = StudentService.instance.currentStudentId;
+    if (id == _appliedStudentId) {
+      setState(() {});
+      return;
+    }
+    _appliedStudentId = id;
+    setState(() {
+      learned = {};
+      saved = {};
+    });
+    unawaited(_loadData(silent: true));
   }
 
   void _onLexiconChanged() {
@@ -156,6 +168,7 @@ class _HomeShellState extends State<HomeShell> {
           learned = learnedSet;
           saved = savedSet;
         }
+        _appliedStudentId = StudentService.instance.currentStudentId;
       });
     } catch (error, stack) {
       debugPrint('Progress load failed: $error\n$stack');
@@ -234,15 +247,18 @@ class _HomeShellState extends State<HomeShell> {
     if (!_needStudent()) return;
     final service = WordLearningService.instance;
     final wasSaved = service.of(word.id).saved;
-    final savedNow = await service.setFlag(word.id, saved: !wasSaved);
+    final nowSaved = !wasSaved;
+    final pending = service.setFlag(word.id, saved: nowSaved);
+    _feedback(wasSaved
+        ? '«${word.displayEnglish}» аз захираҳо хориҷ шуд'
+        : '🔖 «${word.displayEnglish}» барои баъд захира шуд');
+    final savedNow = await pending;
     if (!mounted) return;
     if (!savedNow) {
       _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
       return;
     }
-    _feedback(wasSaved
-        ? '«${word.displayEnglish}» аз захираҳо хориҷ шуд'
-        : '🔖 «${word.displayEnglish}» барои баъд захира шуд');
+    if (service.of(word.id).saved != nowSaved) return;
   }
 
   Future<void> _learn(Word word) async {
@@ -255,13 +271,22 @@ class _HomeShellState extends State<HomeShell> {
       _feedback(lockReason(word.week));
       return;
     }
+    final nowLearned = !wasLearned;
+    final message = wasLearned
+        ? '«${word.displayEnglish}» ба ҳолати қаблӣ баргардонида шуд.'
+        : '🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.';
     if (service.studentId != null) {
-      final savedNow = await service.setFlag(word.id, learned: !wasLearned);
+      final pending = service.setFlag(word.id, learned: nowLearned);
+      _feedback(message);
+      final savedNow = await pending;
+      if (!mounted) return;
       if (!savedNow) {
-        if (mounted) _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
+        _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
         return;
       }
+      if (service.of(word.id).learned != nowLearned) return;
     } else {
+      final previous = learned;
       final next = {...learned};
       if (wasLearned) {
         next.remove(word.id);
@@ -269,25 +294,37 @@ class _HomeShellState extends State<HomeShell> {
       } else {
         next.add(word.id);
       }
-      await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), next);
-      if (mounted) setState(() => learned = next);
+      setState(() => learned = next);
+      _feedback(message);
+      final ok = await PreferencesService.instance.saveSet(StudentService.instance.learnedKey(), next);
+      if (!ok) {
+        if (mounted) {
+          setState(() => learned = previous);
+          _feedback('«${word.displayEnglish}» захира нашуд. Боз кӯшиш кунед.');
+        }
+        return;
+      }
     }
     if (!mounted) return;
-    final learnedCount = words.where((item) => service.of(item.id).learned).length;
+    await _noteWordActivity(word, learnedNow: nowLearned);
+  }
+
+  Future<void> _noteWordActivity(Word word, {required bool learnedNow}) async {
+    final service = WordLearningService.instance;
+    final learnedCount = service.studentId == null
+        ? learned.length
+        : words.where((item) => service.of(item.id).learned).length;
     try {
-      var snap = ProgressService.instance
-          .withActivity(ProgressService.instance.snapshot);
-      snap = ProgressService.instance.bumpDay(snap, learned: wasLearned ? 0 : 1, opened: 1);
+      var snap = ProgressService.instance.withActivity(ProgressService.instance.snapshot);
+      snap = ProgressService.instance.bumpDay(snap, learned: learnedNow ? 1 : 0, opened: 1);
       snap = ProgressService.instance.bumpWord(snap, word.id, opened: 1);
       snap = snap.copyWith(
-          achievements: ProgressService.instance
-              .computeAchievements(snap, learned: learnedCount));
+        achievements: ProgressService.instance.computeAchievements(snap, learned: learnedCount),
+      );
       await ProgressService.instance.save(snap);
-    } catch (_) {}
-    if (mounted) setState(() {});
-    _feedback(wasLearned
-        ? '«${word.displayEnglish}» ба ҳолати қаблӣ баргардонида шуд.'
-        : '🎉 Офарин! «${word.displayEnglish}» омӯхта шуд.');
+    } catch (error, stack) {
+      debugPrint('Word activity was not saved: $error\n$stack');
+    }
   }
 
   Set<String> _stageLetters() {
@@ -315,36 +352,42 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _learnLetter(AlphabetLetter letter) async {
     if (!_needStudent()) return;
-    final snap = ProgressService.instance.snapshot;
-    final already = snap.letters.contains(letter.letter) ||
-        WordLearningService.instance.of(letterLearningId(letter.letter)).learned;
-    final letters = {...snap.letters};
+    final progress = ProgressService.instance;
+    final learning = WordLearningService.instance;
+    final before = progress.snapshot;
+    final id = letterLearningId(letter.letter);
+    final already = before.letters.contains(letter.letter) || learning.of(id).learned;
+    final letters = {...before.letters};
     if (already) {
       letters.remove(letter.letter);
     } else {
       letters.add(letter.letter);
     }
-    final savedNow = await WordLearningService.instance.setFlag(letterLearningId(letter.letter), learned: !already);
-    if (!savedNow) {
-      if (mounted) _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
-      return;
-    }
-    final next = snap.copyWith(
+    final next = progress.withActivity(before.copyWith(
       letters: letters,
-      achievements: ProgressService.instance.computeAchievements(
-        snap.copyWith(letters: letters),
+      achievements: progress.computeAchievements(
+        before.copyWith(letters: letters),
         learned: words.where((word) => word.isMarked(learned)).length,
       ),
-    );
-    try {
-      await ProgressService.instance.save(ProgressService.instance.withActivity(next));
-    } catch (error, stack) {
-      debugPrint('Letter snapshot was not saved: $error\n$stack');
-    }
+    ));
+    final progressWrite = progress.save(next);
+    final flagWrite = learning.setFlag(id, learned: !already);
     if (mounted) setState(() {});
     _feedback(already
         ? 'Ҳарфи ${letter.letter} ба ҳолати қаблӣ баргардонида шуд.'
         : '🎉 Офарин! Ҳарфи ${letter.letter} омӯхта шуд.');
+    final flagOk = await flagWrite;
+    if (!flagOk) {
+      await progress.save(before);
+      if (mounted) _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
+      return;
+    }
+    if (learning.of(id).learned != !already) return;
+    final progressOk = await progressWrite;
+    if (!progressOk && mounted) {
+      await learning.setFlag(id, learned: already);
+      _feedback('Ҳарфи ${letter.letter} захира нашуд. Боз кӯшиш кунед.');
+    }
   }
 
   Future<void> _saveAlphabetIndex(int index) async {
@@ -1008,7 +1051,7 @@ class _HomeShellState extends State<HomeShell> {
       context,
       MaterialPageRoute(builder: (_) => const StudentsPage()),
     );
-    if (mounted) await _loadData(silent: true);
+    if (mounted) setState(() {});
   }
 
   Future<void> _openStudy() async {

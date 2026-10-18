@@ -26,6 +26,9 @@ class PreferencesService {
   bool debugFailWrites = false;
   @visibleForTesting
   int prefsReads = 0;
+  /// Test hook that runs before a write reaches disk. Production leaves it null.
+  @visibleForTesting
+  Future<void> Function()? debugBeforeWrite;
   bool _fileDirty = false;
   Future<void>? _fileJob;
 
@@ -173,6 +176,8 @@ class PreferencesService {
 
   Future<bool> _saveSet(String key, Set<String> values) async {
     if (debugFailWrites) return false;
+    final hook = debugBeforeWrite;
+    if (hook != null) await hook();
     final list = values.toList();
     final previous = _memory[key];
     _bumpRev();
@@ -228,6 +233,8 @@ class PreferencesService {
 
   Future<bool> _saveRaw(String key, String value) async {
     if (debugFailWrites) return false;
+    final hook = debugBeforeWrite;
+    if (hook != null) await hook();
     final previous = _memory[key];
     _bumpRev();
     _memory[key] = value;
@@ -468,6 +475,7 @@ class PreferencesService {
     _memory.clear();
     _fileCache.clear();
     debugFailWrites = false;
+    debugBeforeWrite = null;
     prefsReads = 0;
     _fileDirty = false;
     _fileJob = null;

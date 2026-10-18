@@ -15,6 +15,7 @@ class _StudentsPageState extends State<StudentsPage> {
   List<Student> students = [];
   String? currentId;
   bool loading = true;
+  bool _adding = false;
   String? loadError;
 
   @override
@@ -69,8 +70,17 @@ class _StudentsPageState extends State<StudentsPage> {
     }
   }
 
+  void _toast(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _addStudent() async {
+    if (_adding) return;
     final controller = TextEditingController();
+    var closed = false;
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -83,66 +93,66 @@ class _StudentsPageState extends State<StudentsPage> {
             hintText: 'Масалан: Аҳмад',
           ),
           textCapitalization: TextCapitalization.words,
-          onSubmitted: (value) => Navigator.pop(ctx, value.trim()),
+          onSubmitted: (value) {
+            if (closed) return;
+            closed = true;
+            Navigator.pop(ctx, value.trim());
+          },
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Бекор')),
+          TextButton(
+            onPressed: () {
+              if (closed) return;
+              closed = true;
+              Navigator.pop(ctx);
+            },
+            child: const Text('Бекор'),
+          ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            onPressed: () {
+              if (closed) return;
+              closed = true;
+              Navigator.pop(ctx, controller.text.trim());
+            },
             child: const Text('Захира кардан'),
           ),
         ],
       ),
     );
 
-    if (name == null) return;
+    controller.dispose();
+    if (name == null || !mounted) return;
     if (name.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ном холӣ буда наметавонад')),
-        );
-      }
+      _toast('Ном холӣ буда наметавонад');
       return;
     }
 
+    _adding = true;
     try {
-      await StudentService.instance.addStudent(name);
-      await _load();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('«$name» илова шуд')),
-        );
-      }
+      final future = StudentService.instance.addStudent(name);
+      _toast('«$name» илова шуд');
+      await future;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Хатогӣ: $e')),
-        );
-      }
+      _toast('Хатогӣ: $e');
+    } finally {
+      _adding = false;
     }
   }
 
   Future<void> _switchTo(String id) async {
+    final name = StudentService.instance.studentById(id)?.name ?? '';
     try {
-      await StudentService.instance.setCurrentStudent(id);
-      await _load();
-      if (mounted) {
-        final name = StudentService.instance.studentById(id)?.name ?? '';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Талабаи ҷорӣ: $name')),
-        );
-      }
+      final future = StudentService.instance.setCurrentStudent(id);
+      _toast('Талабаи ҷорӣ: $name');
+      await future;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Хатогӣ дар гузариш: $e')),
-        );
-      }
+      _toast('Хатогӣ дар гузариш: $e');
     }
   }
 
   Future<void> _rename(Student student) async {
     final controller = TextEditingController(text: student.name);
+    var closed = false;
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -153,24 +163,33 @@ class _StudentsPageState extends State<StudentsPage> {
           decoration: const InputDecoration(labelText: 'Номи нав'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Бекор')),
+          TextButton(
+            onPressed: () {
+              if (closed) return;
+              closed = true;
+              Navigator.pop(ctx);
+            },
+            child: const Text('Бекор'),
+          ),
           FilledButton(
-            onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+            onPressed: () {
+              if (closed) return;
+              closed = true;
+              Navigator.pop(ctx, controller.text.trim());
+            },
             child: const Text('Захира кардан'),
           ),
         ],
       ),
     );
-    if (name == null || name.isEmpty) return;
+    controller.dispose();
+    if (name == null || name.isEmpty || !mounted) return;
     try {
-      await StudentService.instance.renameStudent(student.id, name);
-      await _load();
+      final future = StudentService.instance.renameStudent(student.id, name);
+      _toast('Ном иваз шуд');
+      await future;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Хатогӣ: $e')),
-        );
-      }
+      _toast('Хатогӣ: $e');
     }
   }
 
@@ -190,16 +209,13 @@ class _StudentsPageState extends State<StudentsPage> {
         ],
       ),
     );
-    if (confirm != true) return;
+    if (confirm != true || !mounted) return;
     try {
-      await StudentService.instance.deleteStudent(student.id);
-      await _load();
+      final future = StudentService.instance.deleteStudent(student.id);
+      _toast('«${student.name}» аз рӯйхат гирифта шуд');
+      await future;
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Хатогӣ: $e')),
-        );
-      }
+      _toast('Хатогӣ: $e');
     }
   }
 

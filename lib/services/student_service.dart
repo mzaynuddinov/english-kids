@@ -20,6 +20,7 @@ class StudentService extends ChangeNotifier {
   bool _initialized = false;
   Future<void>? _initFuture;
   bool _allowEmptyWrite = false;
+  final Map<String, Future<Student>> _addsInFlight = {};
 
   String learnedKey([String? id]) => 'learned_${id ?? currentStudentId ?? "default"}';
   String savedKey([String? id]) => 'saved_${id ?? currentStudentId ?? "default"}';
@@ -100,6 +101,7 @@ class StudentService extends ChangeNotifier {
     _initialized = false;
     _initFuture = null;
     _allowEmptyWrite = false;
+    _addsInFlight.clear();
   }
 
   Future<void> _loadStudents() async {
@@ -190,30 +192,47 @@ class StudentService extends ChangeNotifier {
 
   Future<void> setCurrentStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
+    if (currentStudentId == id) return;
+    final previous = currentStudentId;
     currentStudentId = id;
-    await PreferencesService.instance.saveRaw(_currentKey, id);
-    await ProgressService.instance.load(key: progressKey(id));
     notifyListeners();
+    final saved = await PreferencesService.instance.saveRaw(_currentKey, id);
+    if (!saved) {
+      currentStudentId = previous;
+      notifyListeners();
+      throw StateError('Талабаи ҷорӣ захира нашуд');
+    }
+    await ProgressService.instance.load(key: progressKey(id));
   }
 
-  Future<Student> addStudent(String name) async {
+  Future<Student> addStudent(String name) {
     final trimmed = name.trim();
-    if (trimmed.isEmpty) {
-      throw ArgumentError('Ном холӣ аст');
-    }
+    if (trimmed.isEmpty) return Future<Student>.error(ArgumentError('Ном холӣ аст'));
+    final pending = _addsInFlight[trimmed];
+    if (pending != null) return pending;
+    final created = _addStudentNow(trimmed);
+    _addsInFlight[trimmed] = created;
+    return created.whenComplete(() => _addsInFlight.remove(trimmed));
+  }
+
+  Future<Student> _addStudentNow(String trimmed) async {
     final id = '${DateTime.now().microsecondsSinceEpoch}_${students.length}';
     final student = Student(id: id, name: trimmed);
-    students.add(student);
+    final previousCurrent = currentStudentId;
+    final previous = students;
+    students = [...students, student];
+    if (currentStudentId == null) currentStudentId = id;
+    notifyListeners();
     final saved = await _saveStudents();
     if (!saved) {
-      students.removeWhere((item) => item.id == id);
+      students = previous;
+      currentStudentId = previousCurrent;
       notifyListeners();
       throw StateError('Талаба захира нашуд. Боз кӯшиш кунед.');
     }
-    if (currentStudentId == null) {
-      await setCurrentStudent(id);
-    } else {
-      notifyListeners();
+    if (previousCurrent == null) {
+      await PreferencesService.instance.saveRaw(_currentKey, id);
+      await ProgressService.instance.load(key: progressKey(id));
     }
     return student;
   }
@@ -223,41 +242,51 @@ class StudentService extends ChangeNotifier {
     if (idx < 0) return;
     final trimmed = newName.trim();
     if (trimmed.isEmpty) return;
-    students[idx] = students[idx].copyWith(name: trimmed);
+    final previous = students[idx];
+    students = [...students]..[idx] = previous.copyWith(name: trimmed);
+    notifyListeners();
     final saved = await _saveStudents();
     if (!saved) {
-      await _loadStudents();
-      return;
+      final restore = students.indexWhere((s) => s.id == id);
+      if (restore >= 0) {
+        students = [...students]..[restore] = previous;
+      }
+      notifyListeners();
+      throw StateError('Ном захира нашуд. Боз кӯшиш кунед.');
     }
-    notifyListeners();
   }
 
   Future<void> deleteStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
-    students.removeWhere((s) => s.id == id);
+    final previousStudents = students;
+    final previousCurrent = currentStudentId;
+    students = students.where((s) => s.id != id).toList();
     if (students.isEmpty) _allowEmptyWrite = true;
+    if (currentStudentId == id) {
+      currentStudentId = students.isNotEmpty ? students.first.id : null;
+    }
+    notifyListeners();
     final saved = await _saveStudents();
     if (!saved) {
-      await _loadStudents();
+      students = previousStudents;
+      currentStudentId = previousCurrent;
       notifyListeners();
-      return;
+      throw StateError('Талаба нест нашуд. Боз кӯшиш кунед.');
     }
     await PreferencesService.instance.saveSet(learnedKey(id), {});
     await PreferencesService.instance.saveSet(savedKey(id), {});
     await PreferencesService.instance.saveRaw(progressKey(id), '');
     await PreferencesService.instance.saveRaw(wordLearningKey(id), '{"words":{}}');
     WordLearningService.instance.release(id);
-    if (currentStudentId == id) {
-      currentStudentId = students.isNotEmpty ? students.first.id : null;
-      if (currentStudentId != null) {
-        await PreferencesService.instance.saveRaw(_currentKey, currentStudentId!);
+    if (currentStudentId != null) {
+      await PreferencesService.instance.saveRaw(_currentKey, currentStudentId!);
+      if (currentStudentId != previousCurrent) {
         await ProgressService.instance.load(key: progressKey());
-      } else {
-        await PreferencesService.instance.saveRaw(_currentKey, '');
-        await ProgressService.instance.load(key: progressKey('none'));
       }
+    } else {
+      await PreferencesService.instance.saveRaw(_currentKey, '');
+      await ProgressService.instance.load(key: progressKey('none'));
     }
-    notifyListeners();
   }
 
   Student? studentById(String id) {

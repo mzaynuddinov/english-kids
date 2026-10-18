@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -167,6 +168,9 @@ class ProgressService extends ChangeNotifier {
   String _key = _defaultKey;
 
   ProgressSnapshot snapshot = const ProgressSnapshot();
+  ProgressSnapshot _durable = const ProgressSnapshot();
+  int _saveGen = 0;
+  Future<void> _saveLock = Future<void>.value();
 
   Future<ProgressSnapshot> load({String? key}) async {
     if (key != null) _key = key;
@@ -174,6 +178,7 @@ class ProgressService extends ChangeNotifier {
       final raw = await PreferencesService.instance.loadRaw(_key);
       if (raw == null || raw.isEmpty) {
         snapshot = const ProgressSnapshot();
+        _durable = snapshot;
         notifyListeners();
         return snapshot;
       }
@@ -185,18 +190,50 @@ class ProgressService extends ChangeNotifier {
       debugPrint('Progress load failed: $error\n$stack');
       snapshot = const ProgressSnapshot();
     }
+    _durable = snapshot;
     notifyListeners();
     return snapshot;
   }
 
-  Future<void> save(ProgressSnapshot next) async {
+  Future<bool> save(ProgressSnapshot next) async {
+    final gen = ++_saveGen;
     snapshot = next;
     notifyListeners();
-    try {
-      await PreferencesService.instance.saveRaw(_key, jsonEncode(next.toJson()));
-    } catch (error, stack) {
-      debugPrint('Progress save failed: $error\n$stack');
-    }
+    return _enqueueSave(gen);
+  }
+
+  Future<bool> _enqueueSave(int gen) {
+    final done = Completer<bool>();
+    _saveLock = _saveLock.then((_) async {
+      try {
+        if (gen != _saveGen) {
+          if (!done.isCompleted) done.complete(true);
+          return;
+        }
+        final current = snapshot;
+        final ok = await PreferencesService.instance.saveRaw(_key, jsonEncode(current.toJson()));
+        if (gen != _saveGen) {
+          if (!done.isCompleted) done.complete(true);
+          return;
+        }
+        if (!ok) {
+          snapshot = _durable;
+          notifyListeners();
+          if (!done.isCompleted) done.complete(false);
+          return;
+        }
+        _durable = current;
+        if (!done.isCompleted) done.complete(true);
+      } catch (error, stack) {
+        debugPrint('Progress save failed: $error\n$stack');
+        if (gen == _saveGen) {
+          snapshot = _durable;
+          notifyListeners();
+        }
+        if (!done.isCompleted) done.complete(false);
+      }
+    });
+    return done.future;
   }
 
   Future<void> resetLearning() async {
@@ -206,6 +243,9 @@ class ProgressService extends ChangeNotifier {
   @visibleForTesting
   void debugReset() {
     snapshot = const ProgressSnapshot();
+    _durable = const ProgressSnapshot();
+    _saveGen++;
+    _saveLock = Future<void>.value();
   }
 
   static String todayKey([DateTime? now]) {

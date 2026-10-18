@@ -40,9 +40,9 @@ class CatalogQuizPage extends StatefulWidget {
 
 class _CatalogQuizPageState extends State<CatalogQuizPage> {
   int index = 0;
+  int _action = 0;
   bool reveal = false;
   bool finished = false;
-  bool saving = false;
   int correct = 0;
   int incorrect = 0;
   int unknown = 0;
@@ -74,7 +74,7 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
   }
 
   Future<void> _mark(OralMark mark) async {
-    if (saving || index >= widget.prompts.length) return;
+    if (index >= widget.prompts.length) return;
     if (WordLearningService.instance.studentId == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,26 +84,9 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
       return;
     }
     final item = widget.prompts[index];
-    setState(() => saving = true);
-    var savedOk = true;
-    try {
-      await WordLearningService.instance.record(item.id, mark);
-    } catch (error, stack) {
-      savedOk = false;
-      debugPrint('Catalog quiz save failed: $error\n$stack');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Натиҷа захира нашуд. Боз кӯшиш кунед.')),
-        );
-      }
-    }
-    if (!mounted) return;
-    if (!savedOk) {
-      setState(() => saving = false);
-      return;
-    }
+    final action = ++_action;
+    final at = index;
     setState(() {
-      saving = false;
       reveal = false;
       if (mark == OralMark.correct) correct += 1;
       if (mark == OralMark.incorrect) incorrect += 1;
@@ -111,37 +94,58 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
       index += 1;
       if (index >= widget.prompts.length) finished = true;
     });
+    try {
+      await WordLearningService.instance.record(item.id, mark);
+    } catch (error, stack) {
+      debugPrint('Catalog quiz save failed: $error\n$stack');
+      if (!mounted || action != _action) return;
+      setState(() {
+        index = at;
+        finished = false;
+        if (mark == OralMark.correct && correct > 0) correct -= 1;
+        if (mark == OralMark.incorrect && incorrect > 0) incorrect -= 1;
+        if (mark == OralMark.unknown && unknown > 0) unknown -= 1;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Натиҷа захира нашуд. Боз кӯшиш кунед.')),
+      );
+    }
   }
 
   Future<void> _toggleLearned() async {
+    if (index >= widget.prompts.length) return;
     final item = widget.prompts[index];
     final next = !WordLearningService.instance.of(item.id).learned;
-    final ok = await WordLearningService.instance.setFlag(item.id, learned: next);
+    final pending = WordLearningService.instance.setFlag(item.id, learned: next);
+    if (mounted) setState(() {});
+    final ok = await pending;
+    if (!mounted) return;
     if (!ok) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ҳолат захира нашуд.')),
-        );
-      }
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ҳолат захира нашуд.')),
+      );
       return;
     }
-    await _syncLetter(item.id, next);
-    if (mounted) setState(() {});
+    final letterWrite = _syncLetter(item.id, next);
+    setState(() {});
+    await letterWrite;
   }
 
   Future<void> _toggleSaved() async {
+    if (index >= widget.prompts.length) return;
     final item = widget.prompts[index];
     final next = !WordLearningService.instance.of(item.id).saved;
-    final ok = await WordLearningService.instance.setFlag(item.id, saved: next);
-    if (!ok) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Рӯйхати барои баъд захира нашуд.')),
-        );
-      }
-      return;
-    }
+    final pending = WordLearningService.instance.setFlag(item.id, saved: next);
     if (mounted) setState(() {});
+    final ok = await pending;
+    if (!mounted) return;
+    setState(() {});
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Рӯйхати барои баъд захира нашуд.')),
+      );
+    }
   }
 
   @override
@@ -204,25 +208,25 @@ class _CatalogQuizPageState extends State<CatalogQuizPage> {
             ),
             const Spacer(),
             FilledButton(
-              onPressed: saving ? null : () => _mark(OralMark.correct),
+              onPressed: () => _mark(OralMark.correct),
               style: FilledButton.styleFrom(backgroundColor: emerald600, minimumSize: const Size.fromHeight(46)),
               child: const Text('Дуруст ҷавоб дод'),
             ),
             const SizedBox(height: 8),
             FilledButton(
-              onPressed: saving ? null : () => _mark(OralMark.incorrect),
+              onPressed: () => _mark(OralMark.incorrect),
               style: FilledButton.styleFrom(backgroundColor: Colors.orange.shade800, minimumSize: const Size.fromHeight(46)),
               child: const Text('Нодуруст ҷавоб дод'),
             ),
             const SizedBox(height: 8),
             FilledButton(
-              onPressed: saving ? null : () => _mark(OralMark.unknown),
+              onPressed: () => _mark(OralMark.unknown),
               style: FilledButton.styleFrom(backgroundColor: slate700, minimumSize: const Size.fromHeight(46)),
               child: const Text('Надонист'),
             ),
             const SizedBox(height: 8),
-            OutlinedButton(onPressed: saving ? null : _toggleSaved, child: Text(record.saved ? 'Аз «барои баъд» гирифтан' : 'Барои баъд')),
-            OutlinedButton(onPressed: saving ? null : _toggleLearned, child: Text(record.learned ? 'Омӯхта шуд — бозгашт' : 'Омӯхта шуд')),
+            OutlinedButton(onPressed: _toggleSaved, child: Text(record.saved ? 'Аз «барои баъд» гирифтан' : 'Барои баъд')),
+            OutlinedButton(onPressed: _toggleLearned, child: Text(record.learned ? 'Омӯхта шуд — бозгашт' : 'Омӯхта шуд')),
           ],
         ),
       ),

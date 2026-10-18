@@ -4,7 +4,9 @@ import '../models/alphabet.dart';
 import '../models/days.dart';
 import '../models/progress_rules.dart';
 import '../models/word.dart';
+import '../services/progress_service.dart';
 import '../services/student_service.dart';
+import '../services/word_learning_service.dart';
 import 'alphabet_page.dart';
 import 'catalog_quiz_page.dart';
 import 'oral_quiz_page.dart';
@@ -44,12 +46,35 @@ class StudyStartPage extends StatelessWidget {
 
   List<Word> _topic(String topic) => words.where((word) => word.topic == topic).toList();
 
-  bool _open(int week) => weekUnlocked(week, letters, words, learned);
+  Set<String> get _activeLetters {
+    final learning = WordLearningService.instance;
+    final fromProgress = ProgressService.instance.snapshot.letters;
+    if (learning.studentId == null) return {...fromProgress, ...letters};
+    return {
+      ...fromProgress,
+      for (final id in learning.learnedIds())
+        if (id.startsWith('letter:') && id.length > 7) id.substring(7),
+    };
+  }
+
+  Set<String> get _activeLearned {
+    final learning = WordLearningService.instance;
+    if (learning.studentId == null) return learned;
+    return learning.learnedIds();
+  }
+
+  Set<String> get _activeSaved {
+    final learning = WordLearningService.instance;
+    if (learning.studentId == null) return saved;
+    return learning.savedIds();
+  }
+
+  bool _open(int week) => weekUnlocked(week, _activeLetters, words, _activeLearned);
 
   List<Word> _openTopic(String topic) => _topic(topic).where((word) => _open(word.week)).toList();
 
   String _topicLock(String topic) {
-    if (!alphabetComplete(letters)) return lockReason(1);
+    if (!alphabetComplete(_activeLetters)) return lockReason(1);
     final list = _topic(topic);
     if (list.isEmpty) return lockReason(1);
     for (final word in list) {
@@ -64,6 +89,17 @@ class StudyStartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        ProgressService.instance,
+        WordLearningService.instance,
+        StudentService.instance,
+      ]),
+      builder: (context, _) => _scaffold(context),
+    );
+  }
+
+  Widget _scaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Оғози омӯзиш')),
       body: ListView(
@@ -113,7 +149,7 @@ class StudyStartPage extends StatelessWidget {
             'Рӯзҳои ҳафта',
             'Days of the Week · 7',
             () {
-              if (!alphabetComplete(letters)) {
+              if (!alphabetComplete(_activeLetters)) {
                 _blocked(context, lockReason(1));
                 return;
               }
@@ -124,7 +160,7 @@ class StudyStartPage extends StatelessWidget {
                 ),
               );
             },
-            locked: !alphabetComplete(letters),
+            locked: !alphabetComplete(_activeLetters),
             lockText: lockReason(1),
           ),
           _tile(
@@ -202,8 +238,8 @@ class StudyStartPage extends StatelessWidget {
           week: list.first.week,
           title: title,
           words: list,
-          learned: learned,
-          saved: saved,
+          learned: _activeLearned,
+          saved: _activeSaved,
           onSpeak: onSpeak,
           onSave: onSave,
           onLearn: onLearn,
@@ -225,8 +261,8 @@ class StudyStartPage extends StatelessWidget {
           week: week,
           title: weekTitles[week] ?? 'Ҳафтаи $week',
           words: words.where((word) => word.week == week).toList(),
-          learned: learned,
-          saved: saved,
+          learned: _activeLearned,
+          saved: _activeSaved,
           onSpeak: onSpeak,
           onSave: onSave,
           onLearn: onLearn,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,9 @@ class WordLearningService extends ChangeNotifier {
 
   String? studentId;
   Map<String, WordLearning> byId = {};
+  Map<String, WordLearning> _durable = {};
+  int _gen = 0;
+  Future<void> _lock = Future<void>.value();
 
   WordLearning of(String wordId) => Lexicon.of(byId, wordId);
 
@@ -35,6 +39,7 @@ class WordLearningService extends ChangeNotifier {
     required Set<String> legacySaved,
   }) async {
     final raw = await PreferencesService.instance.loadRaw(wordLearningKey(studentId));
+    _gen++;
     Map<String, WordLearning> loaded;
     var migrated = false;
     if (raw == null || raw.isEmpty) {
@@ -59,9 +64,11 @@ class WordLearningService extends ChangeNotifier {
     }
     this.studentId = studentId;
     byId = loaded;
+    _durable = loaded;
     if (migrated) {
-      final saved = await _persist();
+      final saved = await _writeStudent(studentId, loaded);
       if (!saved) debugPrint('Word learning migration was kept in memory only');
+      if (saved) _durable = loaded;
     }
     notifyListeners();
   }
@@ -70,18 +77,10 @@ class WordLearningService extends ChangeNotifier {
     String wordId, {
     bool? learned,
     bool? saved,
-  }) async {
+  }) {
     final id = studentId;
-    if (id == null || wordId.isEmpty) return false;
-    final previous = byId;
-    byId = Lexicon.withFlag(byId, wordId, learned: learned, saved: saved);
-    final ok = await _persist();
-    if (!ok) {
-      byId = previous;
-      return false;
-    }
-    notifyListeners();
-    return true;
+    if (id == null || wordId.isEmpty) return Future<bool>.value(false);
+    return _commit(id, Lexicon.withFlag(byId, wordId, learned: learned, saved: saved));
   }
 
   Future<WordLearning> record(
@@ -92,37 +91,86 @@ class WordLearningService extends ChangeNotifier {
     final id = studentId;
     final when = (at ?? DateTime.now()).millisecondsSinceEpoch;
     if (id == null || wordId.isEmpty) return const WordLearning();
-    final previous = byId;
-    byId = Lexicon.record(byId, wordId, mark, at: when);
-    final ok = await _persist();
-    if (!ok) {
-      byId = previous;
-      throw StateError('Натиҷа захира нашуд');
+    final next = Lexicon.record(byId, wordId, mark, at: when);
+    final ok = await _commit(id, next);
+    if (!ok) throw StateError('Натиҷа захира нашуд');
+    if (of(wordId).history.any((attempt) => attempt.at == when && attempt.mark == mark)) {
+      await _mirrorProgress(wordId, mark);
     }
-    await _mirrorProgress(wordId, mark);
-    notifyListeners();
     return of(wordId);
   }
 
+  /// Applies the new map immediately, then writes the newest map for this student.
+  /// A slower older write cannot replace a newer tap. Failure of the latest
+  /// write restores the last map that actually reached storage.
+  Future<bool> _commit(String id, Map<String, WordLearning> next) async {
+    if (studentId != id) return false;
+    final gen = ++_gen;
+    byId = next;
+    notifyListeners();
+    return _enqueue(gen, id);
+  }
+
+  Future<bool> _enqueue(int gen, String id) {
+    final done = Completer<bool>();
+    _lock = _lock.then((_) async {
+      try {
+        if (gen != _gen || studentId != id) {
+          if (!done.isCompleted) done.complete(true);
+          return;
+        }
+        final snapshot = byId;
+        final saved = await _writeStudent(id, snapshot);
+        if (gen != _gen || studentId != id) {
+          if (!done.isCompleted) done.complete(true);
+          return;
+        }
+        if (!saved) {
+          byId = _durable;
+          notifyListeners();
+          if (!done.isCompleted) done.complete(false);
+          return;
+        }
+        _durable = snapshot;
+        if (!done.isCompleted) done.complete(true);
+      } catch (error, stack) {
+        debugPrint('Word learning save failed: $error\n$stack');
+        if (gen == _gen && studentId == id) {
+          byId = _durable;
+          notifyListeners();
+        }
+        if (!done.isCompleted) done.complete(false);
+      }
+    });
+    return done.future;
+  }
+
   Future<void> clear(String studentId) async {
-    await PreferencesService.instance.saveRaw(wordLearningKey(studentId), jsonEncode(Lexicon.encode({})));
+    _gen++;
+    final empty = Lexicon.encode({});
+    await PreferencesService.instance.saveRaw(wordLearningKey(studentId), jsonEncode(empty));
     await PreferencesService.instance.saveSet('learned_$studentId', {});
     await PreferencesService.instance.saveSet('saved_$studentId', {});
     if (this.studentId == studentId) {
       byId = {};
+      _durable = {};
       notifyListeners();
     }
   }
 
-  Future<bool> _persist() async {
-    final id = studentId;
-    if (id == null) return false;
+  Future<bool> _writeStudent(String id, Map<String, WordLearning> snapshot) async {
     final saved = await PreferencesService.instance.saveRaw(
       wordLearningKey(id),
-      jsonEncode(Lexicon.encode(byId)),
+      jsonEncode(Lexicon.encode(snapshot)),
     );
-    await PreferencesService.instance.saveSet('learned_$id', learnedIds());
-    await PreferencesService.instance.saveSet('saved_$id', savedIds());
+    await PreferencesService.instance.saveSet('learned_$id', {
+      for (final entry in snapshot.entries)
+        if (entry.value.learned) entry.key,
+    });
+    await PreferencesService.instance.saveSet('saved_$id', {
+      for (final entry in snapshot.entries)
+        if (entry.value.saved) entry.key,
+    });
     return saved;
   }
 
@@ -152,14 +200,19 @@ class WordLearningService extends ChangeNotifier {
   /// Drops the in-memory map when that student is removed. Stored data is cleared by the caller.
   void release(String id) {
     if (studentId != id) return;
+    _gen++;
     studentId = null;
     byId = {};
+    _durable = {};
     notifyListeners();
   }
 
   @visibleForTesting
   void debugReset() {
+    _gen++;
+    _lock = Future<void>.value();
     studentId = null;
     byId = {};
+    _durable = {};
   }
 }
