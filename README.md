@@ -96,7 +96,7 @@
 | Огоҳӣ | `flutter_local_notifications` ^19.5.0, `timezone` ^0.10.1 |
 | Роҳи файл | `path_provider` ^2.1.5 |
 | Пайванд | `url_launcher` ^6.3.1 |
-| Акс | `image_picker` ^1.1.2 ва буриши чоркунҷа бо `image` ^4.5.4 |
+| Акс | `image_picker` ^1.1.2 ва буриши чоркунҷа бо `image` 4.5.4 |
 | PDF | `pdf` ^3.11.3, шрифти `assets/fonts/NotoSans-Regular.ttf`, мубодила `share_plus` 10.1.4 |
 | Ҳолат | `ChangeNotifier` дар хидматҳои дохилӣ. Бастаи алоҳидаи state management нест |
 | Санҷиш | `flutter_test`, `flutter_lints` ^5.0.0 |

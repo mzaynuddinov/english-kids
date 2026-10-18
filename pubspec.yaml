@@ -16,7 +16,9 @@ dependencies:
   flutter_local_notifications: ^19.5.0
   timezone: ^0.10.1
   url_launcher: ^6.3.1
-  image: ^4.5.4
+  # image 4.11 calls ZLibDecoder.decodeLazy, which is missing from archive 4.0.x
+  # pulled in by pdf when the SDK cannot use pdf 3.13.1. 4.5.4 still crops JPEGs.
+  image: 4.5.4
   image_picker: ^1.1.2
   pdf: ^3.11.3
   share_plus: 10.1.4
