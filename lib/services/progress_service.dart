@@ -27,6 +27,7 @@ class ProgressSnapshot {
   final Map<String, DailyActivity> days;
   final Map<String, WordActivity> wordStats;
   final int reminderDone;
+  final int? certificateAt;
 
   const ProgressSnapshot({
     this.letters = const {},
@@ -46,6 +47,7 @@ class ProgressSnapshot {
     this.days = const {},
     this.wordStats = const {},
     this.reminderDone = 0,
+    this.certificateAt,
   });
 
   ProgressSnapshot copyWith({
@@ -67,6 +69,8 @@ class ProgressSnapshot {
     Map<String, DailyActivity>? days,
     Map<String, WordActivity>? wordStats,
     int? reminderDone,
+    int? certificateAt,
+    bool clearCertificate = false,
   }) {
     return ProgressSnapshot(
       letters: letters ?? this.letters,
@@ -86,6 +90,7 @@ class ProgressSnapshot {
       days: days ?? this.days,
       wordStats: wordStats ?? this.wordStats,
       reminderDone: reminderDone ?? this.reminderDone,
+      certificateAt: clearCertificate ? null : (certificateAt ?? this.certificateAt),
     );
   }
 
@@ -107,6 +112,7 @@ class ProgressSnapshot {
         'days': {for (final e in days.entries) e.key: e.value.toJson()},
         'wordStats': {for (final e in wordStats.entries) e.key: e.value.toJson()},
         'reminderDone': reminderDone,
+        if (certificateAt != null) 'certificateAt': certificateAt,
       };
 
   static ProgressSnapshot fromJson(Map<String, dynamic> json) {
@@ -157,6 +163,7 @@ class ProgressSnapshot {
           if (e.value is Map) '${e.key}': WordActivity.fromJson(Map<String, dynamic>.from(e.value as Map)),
       },
       reminderDone: json['reminderDone'] is num ? (json['reminderDone'] as num).toInt() : 0,
+      certificateAt: json['certificateAt'] is num ? (json['certificateAt'] as num).toInt() : null,
     );
   }
 }
@@ -169,66 +176,166 @@ class ProgressService extends ChangeNotifier {
 
   ProgressSnapshot snapshot = const ProgressSnapshot();
   ProgressSnapshot _durable = const ProgressSnapshot();
+  final Map<String, ProgressSnapshot> _memory = {};
+  final Map<String, ProgressSnapshot> _durableMemory = {};
+  final Map<String, int> _latestGen = {};
+  final Map<String, Future<void>> _loads = {};
   int _saveGen = 0;
   Future<void> _saveLock = Future<void>.value();
+  bool displayOnly = false;
+
+  String get key => _key;
+
+  /// Shows cached progress immediately. If nothing is cached, shows a blank
+  /// snapshot so the previous student is not left on screen, without writing it.
+  bool showPending(String key) {
+    _key = key;
+    final cached = _memory[key];
+    if (cached != null) {
+      snapshot = cached;
+      _durable = _durableMemory[key] ?? cached;
+      displayOnly = false;
+      notifyListeners();
+      return true;
+    }
+    displayOnly = true;
+    snapshot = const ProgressSnapshot();
+    notifyListeners();
+    return false;
+  }
+
+  Future<void> preload(String key) {
+    if (_memory.containsKey(key)) return Future<void>.value();
+    return _flight(key, publish: false);
+  }
+
+  void drop(String key) {
+    _memory.remove(key);
+    _durableMemory.remove(key);
+    _latestGen.remove(key);
+    if (_key != key) return;
+    snapshot = const ProgressSnapshot();
+    _durable = snapshot;
+    displayOnly = false;
+    notifyListeners();
+  }
 
   Future<ProgressSnapshot> load({String? key}) async {
     if (key != null) _key = key;
-    try {
-      final raw = await PreferencesService.instance.loadRaw(_key);
-      if (raw == null || raw.isEmpty) {
-        snapshot = const ProgressSnapshot();
-        _durable = snapshot;
-        notifyListeners();
-        return snapshot;
-      }
-      final decoded = jsonDecode(raw);
-      if (decoded is Map) {
-        snapshot = ProgressSnapshot.fromJson(Map<String, dynamic>.from(decoded));
-      }
-    } catch (error, stack) {
-      debugPrint('Progress load failed: $error\n$stack');
-      snapshot = const ProgressSnapshot();
+    final target = _key;
+    final cached = _memory[target];
+    if (cached != null) {
+      snapshot = cached;
+      _durable = _durableMemory[target] ?? cached;
+      displayOnly = false;
+      notifyListeners();
+      return snapshot;
     }
-    _durable = snapshot;
-    notifyListeners();
+    await _flight(target, publish: true);
     return snapshot;
   }
 
-  Future<bool> save(ProgressSnapshot next) async {
-    final gen = ++_saveGen;
-    snapshot = next;
-    notifyListeners();
-    return _enqueueSave(gen);
+  Future<void> _flight(String target, {required bool publish}) {
+    final pending = _loads[target];
+    if (pending != null) return pending;
+    final created = _read(target, publish: publish);
+    _loads[target] = created;
+    return created.whenComplete(() {
+      if (identical(_loads[target], created)) _loads.remove(target);
+    });
   }
 
-  Future<bool> _enqueueSave(int gen) {
+  Future<void> _read(String target, {required bool publish}) async {
+    try {
+      final raw = await PreferencesService.instance.loadRaw(target);
+      if (_latestGen.containsKey(target)) {
+        if (publish && _key == target) displayOnly = false;
+        return;
+      }
+      var parsed = const ProgressSnapshot();
+      if (raw != null && raw.isNotEmpty) {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          parsed = ProgressSnapshot.fromJson(Map<String, dynamic>.from(decoded));
+        }
+      }
+      if (_latestGen.containsKey(target)) return;
+      _memory[target] = parsed;
+      _durableMemory[target] = parsed;
+      if (publish && _key == target) {
+        snapshot = parsed;
+        _durable = parsed;
+        displayOnly = false;
+        notifyListeners();
+      }
+    } catch (error, stack) {
+      debugPrint('Progress load failed: $error\n$stack');
+      if (publish && _key == target && !_memory.containsKey(target)) {
+        displayOnly = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> syncCertificate({required bool earned, int? nowMillis}) async {
+    if (displayOnly) return;
+    if (earned) {
+      if (snapshot.certificateAt != null) return;
+      await save(snapshot.copyWith(certificateAt: nowMillis ?? DateTime.now().millisecondsSinceEpoch));
+      return;
+    }
+    if (snapshot.certificateAt == null) return;
+    await save(snapshot.copyWith(clearCertificate: true));
+  }
+
+  Future<bool> save(ProgressSnapshot next) async {
+    if (displayOnly) return false;
+    final gen = ++_saveGen;
+    final saveKey = _key;
+    _latestGen[saveKey] = gen;
+    snapshot = next;
+    _memory[saveKey] = next;
+    notifyListeners();
+    return _enqueueSave(gen, saveKey, next);
+  }
+
+  Future<bool> _enqueueSave(int gen, String saveKey, ProgressSnapshot captured) {
     final done = Completer<bool>();
     _saveLock = _saveLock.then((_) async {
       try {
-        if (gen != _saveGen) {
+        if (_latestGen[saveKey] != gen) {
           if (!done.isCompleted) done.complete(true);
           return;
         }
-        final current = snapshot;
-        final ok = await PreferencesService.instance.saveRaw(_key, jsonEncode(current.toJson()));
-        if (gen != _saveGen) {
+        final ok = await PreferencesService.instance.saveRaw(saveKey, jsonEncode(captured.toJson()));
+        if (_latestGen[saveKey] != gen) {
           if (!done.isCompleted) done.complete(true);
           return;
         }
         if (!ok) {
-          snapshot = _durable;
-          notifyListeners();
+          final durable = _durableMemory[saveKey] ?? const ProgressSnapshot();
+          _memory[saveKey] = durable;
+          if (_key == saveKey) {
+            snapshot = durable;
+            _durable = durable;
+            notifyListeners();
+          }
           if (!done.isCompleted) done.complete(false);
           return;
         }
-        _durable = current;
+        _durableMemory[saveKey] = captured;
+        if (_key == saveKey) _durable = captured;
         if (!done.isCompleted) done.complete(true);
       } catch (error, stack) {
         debugPrint('Progress save failed: $error\n$stack');
-        if (gen == _saveGen) {
-          snapshot = _durable;
-          notifyListeners();
+        if (_latestGen[saveKey] == gen) {
+          final durable = _durableMemory[saveKey] ?? const ProgressSnapshot();
+          _memory[saveKey] = durable;
+          if (_key == saveKey) {
+            snapshot = durable;
+            _durable = durable;
+            notifyListeners();
+          }
         }
         if (!done.isCompleted) done.complete(false);
       }
@@ -237,6 +344,7 @@ class ProgressService extends ChangeNotifier {
   }
 
   Future<void> resetLearning() async {
+    displayOnly = false;
     await save(const ProgressSnapshot());
   }
 
@@ -244,6 +352,12 @@ class ProgressService extends ChangeNotifier {
   void debugReset() {
     snapshot = const ProgressSnapshot();
     _durable = const ProgressSnapshot();
+    _memory.clear();
+    _durableMemory.clear();
+    _latestGen.clear();
+    _loads.clear();
+    _key = _defaultKey;
+    displayOnly = false;
     _saveGen++;
     _saveLock = Future<void>.value();
   }

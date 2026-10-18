@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/student.dart';
+import '../services/profile_photo.dart';
 import '../services/student_service.dart';
 import '../theme.dart';
+import '../widgets/student_avatar.dart';
+import 'photo_crop_page.dart';
 
 class StudentsPage extends StatefulWidget {
   const StudentsPage({super.key});
@@ -81,42 +86,72 @@ class _StudentsPageState extends State<StudentsPage> {
     if (_adding) return;
     final controller = TextEditingController();
     var closed = false;
+    var picked = false;
+    Uint8List? photo;
     final name = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Талабаи нав'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Номи талаба / фарзанд',
-            hintText: 'Масалан: Аҳмад',
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: const Text('Талабаи нав'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Номи талаба / фарзанд',
+                  hintText: 'Масалан: Аҳмад',
+                ),
+                textCapitalization: TextCapitalization.words,
+                onSubmitted: (value) {
+                  if (closed) return;
+                  closed = true;
+                  Navigator.pop(ctx, value.trim());
+                },
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () async {
+                    try {
+                      final bytes = await pickCroppedProfilePhoto(ctx);
+                      if (bytes == null) return;
+                      setLocal(() {
+                        photo = bytes;
+                        picked = true;
+                      });
+                    } catch (_) {
+                      if (!ctx.mounted) return;
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(content: Text('Галерея кушода нашуд. Иҷозатро санҷед.')),
+                      );
+                    }
+                  },
+                  child: Text(picked ? 'Акс интихоб шуд' : 'Иловаи акс'),
+                ),
+              ),
+            ],
           ),
-          textCapitalization: TextCapitalization.words,
-          onSubmitted: (value) {
-            if (closed) return;
-            closed = true;
-            Navigator.pop(ctx, value.trim());
-          },
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (closed) return;
+                closed = true;
+                Navigator.pop(ctx);
+              },
+              child: const Text('Бекор'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (closed) return;
+                closed = true;
+                Navigator.pop(ctx, controller.text.trim());
+              },
+              child: const Text('Захира кардан'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (closed) return;
-              closed = true;
-              Navigator.pop(ctx);
-            },
-            child: const Text('Бекор'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (closed) return;
-              closed = true;
-              Navigator.pop(ctx, controller.text.trim());
-            },
-            child: const Text('Захира кардан'),
-          ),
-        ],
       ),
     );
 
@@ -131,7 +166,22 @@ class _StudentsPageState extends State<StudentsPage> {
     try {
       final future = StudentService.instance.addStudent(name);
       _toast('«$name» илова шуд');
-      await future;
+      final created = await future;
+      final bytes = photo;
+      if (bytes != null) {
+        final folder = await ProfilePhotoStore.appFolder();
+        final path = await ProfilePhotoStore.saveBytes(
+          folder,
+          '${created.id}_${DateTime.now().microsecondsSinceEpoch}',
+          bytes,
+        );
+        try {
+          await StudentService.instance.setPhoto(created.id, path);
+        } catch (_) {
+          await ProfilePhotoStore.deleteIfOwned(path);
+          rethrow;
+        }
+      }
     } catch (e) {
       _toast('Хатогӣ: $e');
     } finally {
@@ -147,6 +197,28 @@ class _StudentsPageState extends State<StudentsPage> {
       await future;
     } catch (e) {
       _toast('Хатогӣ дар гузариш: $e');
+    }
+  }
+
+  Future<void> _changePhoto(Student student) async {
+    try {
+      final bytes = await pickCroppedProfilePhoto(context);
+      if (bytes == null || !mounted) return;
+      final folder = await ProfilePhotoStore.appFolder();
+      final path = await ProfilePhotoStore.saveBytes(
+        folder,
+        '${student.id}_${DateTime.now().microsecondsSinceEpoch}',
+        bytes,
+      );
+      try {
+        await StudentService.instance.setPhoto(student.id, path);
+      } catch (_) {
+        await ProfilePhotoStore.deleteIfOwned(path);
+        rethrow;
+      }
+      if (mounted) _toast('Акс захира шуд');
+    } catch (error) {
+      _toast('Акс захира нашуд. Иҷозати галереяро санҷед.');
     }
   }
 
@@ -269,13 +341,7 @@ class _StudentsPageState extends State<StudentsPage> {
                       color: isCurrent ? const Color(0xFFECFDF5) : null,
                       margin: const EdgeInsets.only(bottom: 10),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isCurrent ? emerald600 : teal600,
-                          child: Text(
-                            s.name.isNotEmpty ? s.name[0].toUpperCase() : '?',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                        leading: StudentAvatar(student: s, radius: 22),
                         title: Text(
                           s.name,
                           style: TextStyle(
@@ -286,11 +352,13 @@ class _StudentsPageState extends State<StudentsPage> {
                         subtitle: Text(isCurrent ? 'Талабаи ҷорӣ' : 'Барои интихоб пахш кунед'),
                         trailing: PopupMenuButton<String>(
                           onSelected: (value) {
+                            if (value == 'photo') unawaited(_changePhoto(s));
                             if (value == 'switch') _switchTo(s.id);
                             if (value == 'rename') _rename(s);
                             if (value == 'delete') _delete(s);
                           },
                           itemBuilder: (_) => [
+                            const PopupMenuItem(value: 'photo', child: Text('Акс')),
                             if (!isCurrent)
                               const PopupMenuItem(value: 'switch', child: Text('Интихоб кардан')),
                             const PopupMenuItem(value: 'rename', child: Text('Тағйири ном')),

@@ -21,7 +21,17 @@ class VocabularyService {
 
   static VocabularyLoadResult? _cached;
 
+  static List<Word>? get cachedWords {
+    final cached = _cached;
+    if (cached == null || !cached.ok) return null;
+    return cached.words;
+  }
+
+  @visibleForTesting
+  static int loadCalls = 0;
+
   static Future<VocabularyLoadResult> load() {
+    loadCalls++;
     final override = debugLoader;
     if (override != null) return override();
     final cached = _cached;
@@ -85,5 +95,6 @@ class VocabularyService {
   static void debugReset() {
     debugLoader = null;
     _cached = null;
+    loadCalls = 0;
   }
 }

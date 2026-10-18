@@ -10,6 +10,7 @@ import '../services/progress_service.dart';
 import '../services/student_service.dart';
 import '../services/word_learning_service.dart';
 import '../theme.dart';
+import '../widgets/student_avatar.dart';
 import '../widgets/word_history_sheet.dart';
 import 'certificate_page.dart';
 
@@ -50,9 +51,13 @@ class ProgressPage extends StatelessWidget {
     final savedWords = words.where((word) => word.isMarked(saved) || (sameStudent && service.of(word.id).saved)).length;
     final earned = sameStudent && Lexicon.certificateEarned(words, service.byId);
     String? studentName;
+    Student? currentStudent;
     final currentId = StudentService.instance.currentStudentId;
     for (final student in StudentService.instance.students) {
-      if (student.id == currentId) studentName = student.name;
+      if (student.id == currentId) {
+        studentName = student.name;
+        currentStudent = student;
+      }
     }
     final pct = words.isEmpty ? 0.0 : learnedCount / words.length;
     final practice = snapshot.misses.values.where((v) => v > 0).length;
@@ -105,6 +110,8 @@ class ProgressPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
+                StudentAvatar(student: currentStudent, radius: 28),
+                const SizedBox(height: 8),
                 Text(
                   studentName == null
                       ? 'Талаба интихоб нашудааст'
@@ -128,21 +135,29 @@ class ProgressPage extends StatelessWidget {
                       backgroundColor: const Color(0xFFD4AF37),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () async {
-                      final student = await StudentService.instance.getCurrentStudent();
-                      if (!context.mounted) return;
+                    onPressed: () {
+                      final student = currentStudent;
+                      if (student == null) return;
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => CertificatePage(
-                            student: student ?? Student(id: 'default', name: 'Талаба'),
+                            student: student,
                             wordCount: words.length,
+                            completedAtMillis: snapshot.certificateAt,
                           ),
                         ),
                       );
                     },
                     icon: const Icon(Icons.workspace_premium_rounded),
                     label: const Text('Гирифтани сертификат'),
+                  ),
+                ] else ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Сертификати 500 калима ҳанӯз дода намешавад: $learnedCount аз ${words.length}.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ],
                 if (snapshot.streak > 0) ...[

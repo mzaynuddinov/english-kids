@@ -23,6 +23,7 @@ import '../widgets/app_logo.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/error_fallback.dart';
 import '../widgets/search_sheet.dart';
+import '../widgets/student_avatar.dart';
 import '../widgets/word_card.dart';
 import 'about_page.dart';
 import 'alphabet_page.dart';
@@ -69,6 +70,7 @@ class _HomeShellState extends State<HomeShell> {
   String? loadError;
   bool _loadInFlight = false;
   bool _loadAgain = false;
+  bool _statsReady = false;
   String? _appliedStudentId;
 
   @override
@@ -77,6 +79,7 @@ class _HomeShellState extends State<HomeShell> {
     ReminderService.instance.onForegroundFire = _showInAppReminder;
     StudentService.instance.addListener(_onStudentChanged);
     WordLearningService.instance.addListener(_onLexiconChanged);
+    ProgressService.instance.addListener(_onProgress);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_loadData());
     });
@@ -87,6 +90,7 @@ class _HomeShellState extends State<HomeShell> {
     ReminderService.instance.onForegroundFire = null;
     StudentService.instance.removeListener(_onStudentChanged);
     WordLearningService.instance.removeListener(_onLexiconChanged);
+    ProgressService.instance.removeListener(_onProgress);
     super.dispose();
   }
 
@@ -97,12 +101,31 @@ class _HomeShellState extends State<HomeShell> {
       setState(() {});
       return;
     }
+    final learning = WordLearningService.instance;
+    final ready = id != null && learning.studentId == id;
     _appliedStudentId = id;
+    if (ready) {
+      setState(() {
+        learned = learning.learnedIds();
+        saved = learning.savedIds();
+        _statsReady = !ProgressService.instance.displayOnly;
+      });
+      if (ProgressService.instance.displayOnly && id != null) {
+        unawaited(ProgressService.instance.load(key: StudentService.instance.progressKey(id)));
+      }
+      return;
+    }
     setState(() {
       learned = {};
       saved = {};
+      _statsReady = false;
     });
     unawaited(_loadData(silent: true));
+  }
+
+  void _onProgress() {
+    if (!mounted || ProgressService.instance.displayOnly) return;
+    setState(() => _statsReady = true);
   }
 
   void _onLexiconChanged() {
@@ -147,38 +170,62 @@ class _HomeShellState extends State<HomeShell> {
     }
 
     try {
-      final learnedSet = await PreferencesService.instance.loadSet(StudentService.instance.learnedKey());
-      final savedSet = await PreferencesService.instance.loadSet(StudentService.instance.savedKey());
       final studentId = StudentService.instance.currentStudentId;
-      if (studentId != null && words.isNotEmpty) {
-        await WordLearningService.instance.openStudent(
-          studentId: studentId,
-          vocab: words,
-          legacyLearned: learnedSet,
-          legacySaved: savedSet,
-        );
-      }
-      if (!mounted) return;
-      final service = WordLearningService.instance;
-      setState(() {
-        if (service.studentId == studentId && studentId != null && words.isNotEmpty) {
-          learned = service.learnedIds();
-          saved = service.savedIds();
-        } else {
-          learned = learnedSet;
-          saved = savedSet;
+      if (studentId != null &&
+          words.isNotEmpty &&
+          WordLearningService.instance.studentId == studentId) {
+        if (mounted) {
+          setState(() {
+            learned = WordLearningService.instance.learnedIds();
+            saved = WordLearningService.instance.savedIds();
+            _appliedStudentId = studentId;
+            _statsReady = !ProgressService.instance.displayOnly;
+          });
         }
-        _appliedStudentId = StudentService.instance.currentStudentId;
-      });
+      } else {
+        final learnedSet = await PreferencesService.instance.loadSet(StudentService.instance.learnedKey());
+        final savedSet = await PreferencesService.instance.loadSet(StudentService.instance.savedKey());
+        if (!mounted || StudentService.instance.currentStudentId != studentId) {
+          _loadAgain = true;
+        } else if (studentId != null && words.isNotEmpty) {
+          await WordLearningService.instance.openStudent(
+            studentId: studentId,
+            vocab: words,
+            legacyLearned: learnedSet,
+            legacySaved: savedSet,
+          );
+          if (!mounted || StudentService.instance.currentStudentId != studentId) {
+            _loadAgain = true;
+          } else {
+            final service = WordLearningService.instance;
+            setState(() {
+              if (service.studentId == studentId) {
+                learned = service.learnedIds();
+                saved = service.savedIds();
+              } else {
+                learned = learnedSet;
+                saved = savedSet;
+              }
+              _appliedStudentId = studentId;
+              _statsReady = !ProgressService.instance.displayOnly;
+            });
+          }
+        }
+      }
     } catch (error, stack) {
       debugPrint('Progress load failed: $error\n$stack');
     }
 
     try {
-      await ProgressService.instance.load(key: StudentService.instance.progressKey());
+      final studentId = StudentService.instance.currentStudentId;
+      if (studentId != null && !_loadAgain) {
+        await ProgressService.instance.load(key: StudentService.instance.progressKey(studentId));
+      }
       ReminderService.instance
           .rearmActive(widget.settings.voiceGender, widget.settings.speechRate);
-      if (mounted) setState(() {});
+      if (mounted && !_loadAgain) {
+        setState(() => _statsReady = !ProgressService.instance.displayOnly);
+      }
     } catch (error, stack) {
       debugPrint('Learning state load failed: $error\n$stack');
     } finally {
@@ -189,6 +236,29 @@ class _HomeShellState extends State<HomeShell> {
       if (_loadAgain && mounted) {
         _loadAgain = false;
         await _loadData(silent: true);
+      } else if (mounted && words.isNotEmpty) {
+        unawaited(_warmOtherStudents());
+      }
+    }
+  }
+
+  Future<void> _warmOtherStudents() async {
+    final vocab = words;
+    if (vocab.isEmpty) return;
+    final snapshot = List.of(StudentService.instance.students);
+    for (final student in snapshot) {
+      if (!mounted) return;
+      if (student.id == StudentService.instance.currentStudentId) continue;
+      try {
+        await WordLearningService.instance.preload(
+          studentId: student.id,
+          vocab: vocab,
+          legacyLearned: await PreferencesService.instance.loadSet(StudentService.instance.learnedKey(student.id)),
+          legacySaved: await PreferencesService.instance.loadSet(StudentService.instance.savedKey(student.id)),
+        );
+        await ProgressService.instance.preload(StudentService.instance.progressKey(student.id));
+      } catch (error, stack) {
+        debugPrint('Student warm failed: $error\n$stack');
       }
     }
   }
@@ -962,6 +1032,10 @@ class _HomeShellState extends State<HomeShell> {
                 _hero(progress, snap.streak, vocabLearned),
                 const SizedBox(height: 12),
                 _studentBar(),
+                if (!_statsReady) ...[
+                  const SizedBox(height: 8),
+                  const LinearProgressIndicator(value: 0, minHeight: 3, color: cyan600),
+                ],
                 const SizedBox(height: 12),
                 _studyCard(),
                 const SizedBox(height: 12),
@@ -1128,6 +1202,7 @@ class _HomeShellState extends State<HomeShell> {
           children: [
             for (final student in students)
               ChoiceChip(
+                avatar: StudentAvatar(student: student, radius: 12),
                 label: Text(student.name),
                 selected: student.id == current,
                 onSelected: (_) => unawaited(StudentService.instance.setCurrentStudent(student.id)),

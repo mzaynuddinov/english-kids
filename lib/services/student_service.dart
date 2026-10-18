@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/student.dart';
 import '../models/word_learning.dart';
 import 'preferences_service.dart';
+import 'profile_photo.dart';
 import 'progress_service.dart';
 import 'word_learning_service.dart';
 
@@ -21,6 +22,7 @@ class StudentService extends ChangeNotifier {
   Future<void>? _initFuture;
   bool _allowEmptyWrite = false;
   final Map<String, Future<Student>> _addsInFlight = {};
+  int _switchSerial = 0;
 
   String learnedKey([String? id]) => 'learned_${id ?? currentStudentId ?? "default"}';
   String savedKey([String? id]) => 'saved_${id ?? currentStudentId ?? "default"}';
@@ -36,6 +38,7 @@ class StudentService extends ChangeNotifier {
       await _loadStudents();
       await _ensureDefaultAndMigrate();
       await _loadCurrent();
+      await _ensureSchema();
       _initialized = true;
       notifyListeners();
     } catch (error) {
@@ -82,7 +85,9 @@ class StudentService extends ChangeNotifier {
     var memoryChangedDisk = loaded.length != students.length;
     for (final student in students) {
       final previous = byId[student.id];
-      if (previous == null || previous.name != student.name) memoryChangedDisk = true;
+      if (previous == null || previous.name != student.name || previous.photoPath != student.photoPath) {
+        memoryChangedDisk = true;
+      }
       byId[student.id] = student;
     }
     final merged = byId.values.toList();
@@ -102,6 +107,7 @@ class StudentService extends ChangeNotifier {
     _initFuture = null;
     _allowEmptyWrite = false;
     _addsInFlight.clear();
+    _switchSerial = 0;
   }
 
   Future<void> _loadStudents() async {
@@ -190,19 +196,38 @@ class StudentService extends ChangeNotifier {
     }
   }
 
+  Future<void> _ensureSchema() async {
+    const key = 'data_schema';
+    const current = '2';
+    final raw = await PreferencesService.instance.loadRaw(key);
+    if (raw == current) return;
+    final saved = await PreferencesService.instance.saveRaw(key, current);
+    if (!saved) debugPrint('Data schema marker was not written');
+  }
+
   Future<void> setCurrentStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
     if (currentStudentId == id) return;
+    final serial = ++_switchSerial;
     final previous = currentStudentId;
     currentStudentId = id;
+    final progressReady = ProgressService.instance.showPending(progressKey(id));
+    WordLearningService.instance.activate(id);
     notifyListeners();
     final saved = await PreferencesService.instance.saveRaw(_currentKey, id);
+    if (serial != _switchSerial) return;
     if (!saved) {
       currentStudentId = previous;
+      if (previous != null) {
+        ProgressService.instance.showPending(progressKey(previous));
+        WordLearningService.instance.activate(previous);
+      }
       notifyListeners();
       throw StateError('Талабаи ҷорӣ захира нашуд');
     }
-    await ProgressService.instance.load(key: progressKey(id));
+    if (!progressReady) {
+      await ProgressService.instance.load(key: progressKey(id));
+    }
   }
 
   Future<Student> addStudent(String name) {
@@ -237,6 +262,29 @@ class StudentService extends ChangeNotifier {
     return student;
   }
 
+  Future<void> setPhoto(String id, String path) async {
+    final idx = students.indexWhere((s) => s.id == id);
+    if (idx < 0) return;
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return;
+    final previous = students[idx];
+    final oldPath = previous.photoPath;
+    students = [...students]..[idx] = previous.copyWith(photoPath: trimmed);
+    notifyListeners();
+    final saved = await _saveStudents();
+    if (!saved) {
+      final restore = students.indexWhere((s) => s.id == id);
+      if (restore >= 0) {
+        students = [...students]..[restore] = previous;
+      }
+      notifyListeners();
+      throw StateError('Акс захира нашуд. Боз кӯшиш кунед.');
+    }
+    if (oldPath != null && oldPath != trimmed) {
+      await ProfilePhotoStore.deleteIfOwned(oldPath);
+    }
+  }
+
   Future<void> renameStudent(String id, String newName) async {
     final idx = students.indexWhere((s) => s.id == id);
     if (idx < 0) return;
@@ -258,6 +306,7 @@ class StudentService extends ChangeNotifier {
 
   Future<void> deleteStudent(String id) async {
     if (!students.any((s) => s.id == id)) return;
+    final removed = students.firstWhere((s) => s.id == id);
     final previousStudents = students;
     final previousCurrent = currentStudentId;
     students = students.where((s) => s.id != id).toList();
@@ -278,6 +327,8 @@ class StudentService extends ChangeNotifier {
     await PreferencesService.instance.saveRaw(progressKey(id), '');
     await PreferencesService.instance.saveRaw(wordLearningKey(id), '{"words":{}}');
     WordLearningService.instance.release(id);
+    ProgressService.instance.drop(progressKey(id));
+    await ProfilePhotoStore.deleteIfOwned(removed.photoPath);
     if (currentStudentId != null) {
       await PreferencesService.instance.saveRaw(_currentKey, currentStudentId!);
       if (currentStudentId != previousCurrent) {
